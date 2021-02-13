@@ -49,10 +49,13 @@ namespace T1.ParserKit.SqlDom
 				Variable,
 				Symbol("="),
 				fieldExpr)
-				.Map1(x => new VariableAssignFieldExpression()
+				.MapAssign<VariableAssignFieldExpression>((x, expr) =>
 				{
-					VariableName = x[0].GetText(),
-					Field = (FieldExpression)x[1]
+					var f = (FieldExpression)x[2];
+					expr.VariableName = x[0].GetText();
+					expr.Name = f.Name;
+					expr.From = f.From;
+					expr.AliasName = f.AliasName;
 				});
 			return Parse.Any(assignField, fieldExpr);
 		}

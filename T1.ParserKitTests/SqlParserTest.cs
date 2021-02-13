@@ -57,6 +57,49 @@ namespace T1.ParserKitTests
 		}
 
 		[Fact]
+		public void Select_variable_assign_field()
+		{
+			GiveText("select @name=name from customer");
+			WhenParse();
+			ThenResultShouldBe(new SelectExpression()
+			{
+				File = "",
+				Length = _code.Length,
+				Position = 0,
+				Content = _code,
+				Fields = new FieldsExpression()
+				{
+					File = "",
+					Length = 10,
+					Position = 7,
+					Content = _code,
+					Items = new List<SqlExpression>()
+					{
+						new VariableAssignFieldExpression()
+						{
+							VariableName = "@name",
+							Name = "name",
+							File = "",
+							Length = 10,
+							Position = 7,
+							Content = _code
+						},
+					}
+				},
+				From = new TableExpression()
+				{
+					File = "",
+					Length = 8,
+					Position = 23,
+					Content = _code,
+					Name = "customer"
+				}
+			});
+		}
+
+
+
+		[Fact]
 		public void Select_field_from_table_nolock()
 		{
 			GiveText("select name from customer with(nolock)");
