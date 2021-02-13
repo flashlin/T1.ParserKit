@@ -1,0 +1,289 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using T1.ParserKit.Core;
+using T1.ParserKit.Helpers;
+using T1.ParserKit.SqlDom.Expressions;
+using T1.Standard.Common;
+using T1.Standard.Extensions;
+
+namespace T1.ParserKit.SqlDom
+{
+	public class SqlParser
+	{
+		public IParser LParent => Symbol("(");
+		public IParser RParent => Symbol(")");
+
+		public IParser WithOptionExpr
+		{
+			get
+			{
+				return Parse.Chain(
+					Match("with"),
+					LParent,
+					Match("nolock"),
+					RParent
+				).Map1(x => new WithOptionExpression()
+				{
+					Nolock = true
+				});
+			}
+		}
+
+		public IParser Variable
+		{
+			get
+			{
+				return Parse.Chain(
+					Symbol("@"),
+					Identifier()
+				).Merge();
+			}
+		}
+
+		public IParser VariableAssignFieldExpr(IParser fieldExpr)
+		{
+			var assignField = Parse.Chain(
+				Variable,
+				Symbol("="),
+				fieldExpr)
+				.Map1(x => new VariableAssignFieldExpression()
+				{
+					VariableName = x[0].GetText(),
+					Field = (FieldExpression)x[1]
+				});
+			return Parse.Any(assignField, fieldExpr);
+		}
+
+		public IParser FieldExpr
+		{
+			get
+			{
+				var tableField =
+					Parse.Chain(Identifier(), Match("."), Identifier())
+						.MapAssign<FieldExpression>((x, expr) =>
+						{
+							expr.Name = x[2].GetText();
+							expr.From = x[0].GetText();
+						});
+
+				var field = Identifier()
+					.MapAssign<FieldExpression>((x, expr) =>
+					{
+						expr.Name = x[0].GetText();
+					});
+
+				var field1 = Parse.Any(tableField, field)
+					.Map1(x =>
+					{
+						return x[0];
+					})
+					.Named("FieldExpr1");
+
+				var field2 = new[]
+				{
+					field1,
+					Identifier()
+				}.Chain().Map1(x =>
+				{
+					var expr = (FieldExpression)x[0];
+					expr.AliasName = x[1].GetText();
+					return expr;
+				}).Named("FieldExpr2");
+
+				var field3 = new[]
+				{
+					field1,
+					Match("as"),
+					Identifier()
+				}.Chain().Map1(x =>
+				{
+					var expr = (FieldExpression)x[0];
+					expr.AliasName = x[2].GetText();
+					return expr;
+				}).Named("FieldExpr3");
+
+				return Parse.Any(field3, field2, field1).Named("FieldExpr");
+			}
+		}
+
+		public IParser RecFieldExpr(IParser factor)
+		{
+			return VariableAssignFieldExpr(FieldExpr);
+		}
+
+		public IParser Comma =>
+			Match(",");
+
+		public IParser FieldsExpr
+		{
+			get
+			{
+				var fieldExpr = RecFieldExpr(FieldExpr);
+
+				var fields = fieldExpr.ManyDelimitedBy(Comma)
+					.Map1(x => new FieldsExpression()
+					{
+						Items = x.TakeEvery(1).Cast<SqlExpression>().ToList()
+					});
+
+				var fields1 = fieldExpr
+					.Map1(x => new FieldsExpression()
+					{
+						Items = new List<SqlExpression>()
+						{
+							x[0] as FieldExpression
+						}
+					});
+
+				return fields.Or(fields1).Named("FieldsExpr");
+			}
+		}
+
+		public IParser SelectExpr =>
+			new[] {
+				Match("SELECT"),
+				FieldsExpr,
+				Match("FROM"),
+				TableExpr
+			}.Chain()
+			.Map1(x => new SelectExpression()
+			{
+				Fields = x[1] as FieldsExpression,
+				From = x[3] as TableExpression
+			}).Named("SelectExpr");
+
+		public IParser Group(IParser p)
+		{
+			return Parse.Chain(
+				Symbol("("),
+				p,
+				Symbol(")"));
+		}
+
+		public IParser RecSelectExpr(IParser factor)
+		{
+			var subTableExpr =
+				Parse.Chain(
+					Group(factor),
+					Identifier())
+					.Map1(x => new SourceExpression()
+					{
+						Item = x[1] as SqlExpression,
+						AliasName = x[3].GetText()
+					}).Named("SubTableExpr");
+
+			var tableExpr = Parse.Any(subTableExpr, TableExpr).Named("TableExpr");
+
+			var expr = Parse.Chain(
+				Match("SELECT"),
+				FieldsExpr,
+				Match("FROM"),
+				tableExpr
+			)
+			.Map1(x => new SelectExpression()
+			{
+				Fields = x[1] as FieldsExpression,
+				From = x[3] as SqlExpression
+			});
+
+			return expr.Or(factor);
+		}
+
+		public IParser TableExpr
+		{
+			get
+			{
+				var withOption = WithOptionExpr.Many(0, 1);
+
+				var table1 =
+					Parse.Chain(Identifier(),
+							withOption)
+					.Map1(x => new TableExpression()
+					{
+						Name = x[0].GetText(),
+						WithOption = x.FirstCast<WithOptionExpression>()
+					});
+
+				var table2 =
+					new[] {
+						Identifier(),
+						Identifier()
+					}.Chain().Map1(x => new TableExpression()
+					{
+						Name = x[0].GetText(),
+						AliasName = x[1].GetText()
+					});
+
+				var table3 =
+					new[] {
+						Identifier(),
+						Match("as"),
+						Identifier(),
+
+					}.Chain().Map1(x => new TableExpression()
+					{
+						Name = x[0].GetText(),
+						AliasName = x[2].GetText()
+					});
+
+				return Parse.Any(table3, table2, table1);
+			}
+		}
+
+		public SqlExpression[] ParseText(string code)
+		{
+			var startExpr = SelectExpr;
+
+			startExpr = RecSelectExpr(SelectExpr);
+
+			return startExpr.ParseText(code).Cast<SqlExpression>().ToArray();
+		}
+
+		public IParser Identifier()
+		{
+			return SkipBlanks(SqlToken.Identifier.ThenLeft(NotKeyword()))
+				.Named("SqlIdentifier");
+		}
+
+		protected IParser NotKeyword()
+		{
+			return SqlTokenizer.KeywordsParser.Not().Named("!SqlKeyword");
+		}
+
+		protected bool IsKeyword(string text)
+		{
+			var parsed = SqlTokenizer.KeywordsParser.TryParseAllText(text);
+			return parsed.IsSuccess();
+		}
+
+		protected IParser Match(string text)
+		{
+			if (IsKeyword(text))
+			{
+				return SkipBlanks(Parse.Equal(text, true)).Named($"{text}");
+			}
+
+			return SkipBlanks(
+				NotKeyword().ThenRight(Parse.Equal(text, true))
+				).Named($"{text}");
+		}
+
+		protected IParser Symbol(string text)
+		{
+			return SkipBlanks(
+				Parse.Equal(text)
+			);
+		}
+
+		protected IParser SkipBlanks(IParser p)
+		{
+			return new[] {
+				Parse.Blanks().Many().Skip(),
+				p
+			}.Chain().Named($">>{p.Name}");
+		}
+	}
+}
