@@ -145,6 +145,39 @@ namespace T1.ParserKit.SqlDom
 			}
 		}
 
+		public IParser Atom
+		{
+			get
+			{
+				return Parse.Any(FieldExpr);
+			}
+		}
+
+		public IParser FilterExpr(IParser atom)
+		{
+			var oper = ContainsSymbol(">=", "<=", "!=", ">", "<", "=");
+			return Parse.Chain(
+				atom,
+				oper,
+				atom
+				).Map1(x => new FilterExpression(){
+					Left = (SqlExpression)x[0], 
+					Oper = x[1].GetText(),
+					Right = (SqlExpression)x[2], 
+				});
+		}
+
+		public IParser WhereExpr
+		{
+			get
+			{
+				return Parse.Chain(
+					Match("WHERE"),
+					FilterExpr(Atom)
+					).Map1(x => x[1]);
+			}
+		}
+
 		public IParser SelectExpr =>
 			new[] {
 				Match("SELECT"),
@@ -278,6 +311,13 @@ namespace T1.ParserKit.SqlDom
 		{
 			return SkipBlanks(
 				Parse.Equal(text)
+			);
+		}
+
+		protected IParser ContainsSymbol(params string[] symbols)
+		{
+			return SkipBlanks(
+				Parse.Contains(symbols)
 			);
 		}
 
