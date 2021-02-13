@@ -183,12 +183,14 @@ namespace T1.ParserKit.SqlDom
 				Match("SELECT"),
 				FieldsExpr,
 				Match("FROM"),
-				TableExpr
+				TableExpr,
+				WhereExpr.Optional()
 			}.Chain()
 			.Map1(x => new SelectExpression()
 			{
 				Fields = x[1] as FieldsExpression,
-				From = x[3] as TableExpression
+				From = x[3] as TableExpression,
+				Where = x.FirstCast<FilterExpression>()
 			}).Named("SelectExpr");
 
 		public IParser Group(IParser p)

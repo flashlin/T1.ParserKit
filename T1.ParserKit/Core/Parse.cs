@@ -106,6 +106,11 @@ namespace T1.ParserKit.Core
 			return Choice(parsers);
 		}
 
+		public static IParser Optional(this IParser p)
+		{
+			return p.Many(0,1);
+		}
+
 		public static IParser Many(this IParser p, int min = 0, int max = int.MaxValue)
 		{
 			var name = $"{p.Name}({min},{max})";

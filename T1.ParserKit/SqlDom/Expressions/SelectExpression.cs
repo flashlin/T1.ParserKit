@@ -6,5 +6,6 @@ namespace T1.ParserKit.SqlDom.Expressions
 	{
 		public FieldsExpression Fields { get; set; }
 		public SqlExpression From { get; set; }
+		public FilterExpression Where { get; set; }
 	}
 }
