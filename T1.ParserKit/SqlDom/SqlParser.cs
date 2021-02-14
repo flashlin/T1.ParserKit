@@ -65,7 +65,7 @@ namespace T1.ParserKit.SqlDom
 			get
 			{
 				var tableField =
-					Parse.Chain(Identifier(), Match("."), Identifier())
+					Parse.Chain(Identifier(), Symbol("."), Identifier())
 						.MapAssign<FieldExpression>((x, expr) =>
 						{
 							expr.Name = x[2].GetText();
@@ -118,7 +118,7 @@ namespace T1.ParserKit.SqlDom
 		}
 
 		public IParser Comma =>
-			Match(",");
+			Symbol(",");
 
 		public IParser FieldsExpr
 		{
@@ -149,7 +149,7 @@ namespace T1.ParserKit.SqlDom
 		{
 			get
 			{
-				return Parse.Any(FieldExpr);
+				return Parse.Any(FieldExpr, NumberExpr);
 			}
 		}
 
@@ -160,12 +160,21 @@ namespace T1.ParserKit.SqlDom
 				atom,
 				oper,
 				atom
-				).Map1(x => new FilterExpression(){
-					Left = (SqlExpression)x[0], 
+				).Map1(x => new FilterExpression()
+				{
+					Left = (SqlExpression)x[0],
 					Oper = x[1].GetText(),
-					Right = (SqlExpression)x[2], 
+					Right = (SqlExpression)x[2],
 				});
 		}
+
+		public IParser NumberExpr =>
+			SkipBlanks(Parse.Digits().Assertion(true)).Named("NumberExpr")
+				.Map1(x => new NumberExpression()
+				{
+					ValueTypeFullname = typeof(int).FullName,
+					Value = int.Parse(x[0].GetText())
+				});
 
 		public IParser WhereExpr
 		{
@@ -174,23 +183,26 @@ namespace T1.ParserKit.SqlDom
 				return Parse.Chain(
 					Match("WHERE"),
 					FilterExpr(Atom)
-					).Map1(x => x[1]);
+					).Named("WhereExpr")
+					.Map1(x => new WhereExpression()
+					{
+						Filter = (FilterExpression)x[1]
+					});
 			}
 		}
 
 		public IParser SelectExpr =>
-			new[] {
+			Parse.Chain(
 				Match("SELECT"),
 				FieldsExpr,
 				Match("FROM"),
 				TableExpr,
 				WhereExpr.Optional()
-			}.Chain()
-			.Map1(x => new SelectExpression()
+			).Map1(x => new SelectExpression()
 			{
 				Fields = x[1] as FieldsExpression,
 				From = x[3] as TableExpression,
-				Where = x.FirstCast<FilterExpression>()
+				Where = x.FirstCast<WhereExpression>()
 			}).Named("SelectExpr");
 
 		public IParser Group(IParser p)
@@ -213,13 +225,11 @@ namespace T1.ParserKit.SqlDom
 						AliasName = x[3].GetText()
 					}).Named("SubTableExpr");
 
-			var tableExpr = Parse.Any(subTableExpr, TableExpr).Named("TableExpr");
-
-			var expr = Parse.Chain(
+			var recSelectExpr = Parse.Chain(
 				Match("SELECT"),
 				FieldsExpr,
 				Match("FROM"),
-				tableExpr
+				subTableExpr
 			)
 			.Map1(x => new SelectExpression()
 			{
@@ -227,7 +237,7 @@ namespace T1.ParserKit.SqlDom
 				From = x[3] as SqlExpression
 			});
 
-			return expr.Or(factor);
+			return recSelectExpr.Or(factor);
 		}
 
 		public IParser TableExpr

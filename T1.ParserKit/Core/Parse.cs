@@ -212,7 +212,6 @@ namespace T1.ParserKit.Core
 			{
 				var curr = inp;
 				var acc = new List<ITextSpan>();
-				//var accParsers = new List<string>();
 				IParseResult parsed = null;
 				foreach (var parser in parsersArr)
 				{
@@ -220,14 +219,11 @@ namespace T1.ParserKit.Core
 					if (!parsed.IsSuccess())
 					{
 						var ch = curr.Substr(20);
-						//var accSuccess = accParsers.Zip(acc, (p, t) => $"{p}:'{t.GetText()}'");
-						//var successMessage = string.Join("\r\n", accSuccess);
 						return Parse.Error($"Expect {name}, but got '{ch}' at {curr}.", 
 							parsed.Error, parsed.Rest);
 					}
 
 					acc.AddRange(parsed.Result);
-					//accParsers.Add(parser.Name);
 					curr = parsed.Rest;
 				}
 
