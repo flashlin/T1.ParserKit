@@ -114,7 +114,7 @@ namespace T1.ParserKit.SqlDom
 
 		public IParser RecFieldExpr(IParser factor)
 		{
-			return VariableAssignFieldExpr(FieldExpr);
+			return VariableAssignFieldExpr(factor);
 		}
 
 		public IParser Comma =>
@@ -124,7 +124,7 @@ namespace T1.ParserKit.SqlDom
 		{
 			get
 			{
-				var fieldExpr = RecFieldExpr(FieldExpr);
+				var fieldExpr = RecFieldExpr(ArithmeticOperatorExpr());
 
 				var fields = fieldExpr.ManyDelimitedBy(Comma)
 					.MapResult(x => new FieldsExpression()
@@ -137,7 +137,7 @@ namespace T1.ParserKit.SqlDom
 					{
 						Items = new List<SqlExpression>()
 						{
-							x[0] as FieldExpression
+							x[0] as SqlExpression
 						}
 					});
 
@@ -153,9 +153,9 @@ namespace T1.ParserKit.SqlDom
 			}
 		}
 
-		public IParser ArithmeticOperatorExpr()
+		public IParser ArithmeticOperatorExpr(IParser atom)
 		{
-			return Parse.RecGroupOperatorExpr(LParen, Atom, RParen, new[]
+			return Parse.RecGroupOperatorExpr(LParen, atom, RParen, new[]
 			{
 				Symbol("*"),
 				Symbol("/"),
@@ -167,6 +167,11 @@ namespace T1.ParserKit.SqlDom
 				Oper = x[1].GetText(),
 				Right = (SqlExpression)x[2]
 			});
+		}
+
+		public IParser ArithmeticOperatorExpr()
+		{
+			return ArithmeticOperatorExpr(Atom);
 		}
 
 		public IParser FilterExpr(IParser atom)

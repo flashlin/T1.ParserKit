@@ -17,7 +17,7 @@ namespace T1.ParserKitTests
 		private SqlParser _parser;
 
 		[Fact]
-		public void Select_field()
+		public void Select_field_from_table()
 		{
 			GiveText("select name from customer");
 			WhenParse();
@@ -55,6 +55,65 @@ namespace T1.ParserKitTests
 				}
 			});
 		}
+
+		[Fact]
+		public void Select_field_add_1_from_table()
+		{
+			GiveText("select id+1 from customer");
+			WhenParse();
+			ThenResultShouldBe(new SelectExpression()
+			{
+				File = "",
+				Length = 25,
+				Position = 0,
+				Content = _code,
+				Fields = new FieldsExpression()
+				{
+					File = "",
+					Length = 4,
+					Position = 7,
+					Content = _code,
+					Items = new List<SqlExpression>()
+					{
+						new ArithmeticOperatorExpression
+						{
+							Left = new FieldExpression
+							{
+								Name = "id",
+								File = "",
+								Length = 2,
+								Position = 7,
+								Content = _code
+							},
+							Oper = "+",
+							Right = new NumberExpression
+							{
+								Value = 1,
+								ValueTypeFullname = typeof(int).FullName,
+								File = "",
+								Length = 1,
+								Position = 10,
+								Content = _code
+							},
+							File = "",
+							Length = 4,
+							Position = 7,
+							Content = _code
+						}
+					}
+				},
+				From = new TableExpression()
+				{
+					File = "",
+					Length = 8,
+					Position = 17,
+					Content = _code,
+					Name = "customer"
+				}
+			});
+		}
+
+
 
 		[Fact]
 		public void Select_field_from_table_where_filter1()

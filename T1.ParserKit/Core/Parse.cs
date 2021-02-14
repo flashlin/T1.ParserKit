@@ -120,6 +120,11 @@ namespace T1.ParserKit.Core
 				name = $"{p.Name}({min})";
 			}
 
+			if (min == 0 && max == 1)
+			{
+				name = $"{p.Name}?";
+			}
+
 			if (min == 0 && max == int.MaxValue)
 			{
 				name = $"{p.Name}*";
