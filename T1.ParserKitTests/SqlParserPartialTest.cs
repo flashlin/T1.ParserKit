@@ -218,6 +218,57 @@ namespace T1.ParserKitTests
 			});
 		}
 
+		[Fact]
+		public void Arithmetic_1_mul_2_add_3()
+		{
+			GiveText("1 * 2 + 3");
+			WhenTryParse(_parser.ArithmeticOperatorExpr());
+			ThenResultShouldBe(new ArithmeticOperatorExpression()
+			{
+				File = "",
+				Content = _text,
+				Length = _text.Length,
+				Position = 0,
+				Left = new ArithmeticOperatorExpression
+				{
+					File = "",
+					Length = 5,
+					Position = 0,
+					Content = _text,
+					Left = new NumberExpression
+					{
+						Value = 1,
+						ValueTypeFullname = typeof(int).FullName,
+						File = "",
+						Length = 1,
+						Position = 0,
+						Content = _text
+					},
+					Oper = "*",
+					Right = new NumberExpression
+					{
+						Value = 2,
+						ValueTypeFullname = typeof(int).FullName,
+						File = "",
+						Length = 1,
+						Position = 4,
+						Content = _text
+					},
+				},
+				Oper = "+",
+				Right = new NumberExpression()
+				{
+					Value = 3,
+					ValueTypeFullname = typeof(int).FullName,
+					File = "",
+					Length = 1,
+					Position = 8,
+					Content = _text
+				},
+			});
+		}
+
+
 
 		private void ThenResultShouldBe(SqlExpression expression)
 		{
