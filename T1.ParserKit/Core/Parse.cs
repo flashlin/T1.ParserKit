@@ -428,7 +428,7 @@ namespace T1.ParserKit.Core
 			return Parse.Success(acc, parsed.Rest);
 		}
 
-		public static IParser Map1(this IParser p, Func<ITextSpan[], ITextSpan> f)
+		public static IParser MapResult(this IParser p, Func<ITextSpan[], ITextSpan> f)
 		{
 			return new Parser(p.Name, inp =>
 			{

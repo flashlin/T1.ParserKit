@@ -134,29 +134,36 @@ namespace T1.ParserKitTests
 		{
 			GiveText("where name = 1");
 			WhenTryParse(_parser.WhereExpr);
-			ThenResultShouldBe(new FilterExpression()
+			ThenResultShouldBe(new WhereExpression()
 			{
 				File = "",
 				Content = _text,
-				Length = 8,
+				Length = _text.Length,
 				Position = 0,
-				Left = new FieldExpression()
+				Filter = new FilterExpression()
 				{
 					File = "",
 					Content = _text,
-					Length = 4,
+					Length = 8,
 					Position = 6,
-					Name = "name"
-				},
-				Oper = "=",
-				Right = new NumberExpression()
-				{
-					File = "",
-					Content = _text,
-					Length = 1,
-					Position = 13,
-					ValueTypeFullname = typeof(int).FullName,
-					Value = 1
+					Left = new FieldExpression()
+					{
+						File = "",
+						Content = _text,
+						Length = 4,
+						Position = 6,
+						Name = "name"
+					},
+					Oper = "=",
+					Right = new NumberExpression()
+					{
+						File = "",
+						Content = _text,
+						Length = 1,
+						Position = 13,
+						ValueTypeFullname = typeof(int).FullName,
+						Value = 1
+					}
 				}
 			});
 		}
@@ -169,7 +176,7 @@ namespace T1.ParserKitTests
 			expression.ToExpectedObject()
 				.ShouldMatch(_parsed.Result[0]);
 		}
-		
+
 		private void ThenResultShouldSuccess()
 		{
 			Assert.True(_parsed.IsSuccess());
