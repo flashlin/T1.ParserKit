@@ -613,5 +613,36 @@ namespace T1.ParserKit.Core
 
 			return identifierCharacters1.Or(identifierCharacters2).Merge().Named("CStyleIdentifier");
 		}
+
+		public static IParser GroupExpr(IParser lparen, IParser atom, IParser rparen)
+		{
+			var groupExpr = Parse.Chain(lparen, atom, rparen)
+				.MapResult(x => x[1]);
+			return groupExpr.Or(atom);
+		}
+
+		public static IParser RecOperatorExpr(IParser item, IParser[] operators, Func<ITextSpan[], ITextSpan> mapResult)
+		{
+			var expr = item;
+			foreach (var oper in operators)
+			{
+				IParser RecExpr(IParser atom)
+				{
+					var operandExpr = Parse.Chain(atom, oper, atom)
+						.MapResult(mapResult);
+					return operandExpr.Or(atom);
+				}
+				expr = RecExpr(expr);
+			}
+			return expr.Or(item);
+		}
+
+		public static IParser RecGroupOperatorExpr(IParser lparen, IParser atom, IParser rparen,
+			IParser[] operators, Func<ITextSpan[], ITextSpan> mapResult)
+		{
+			var expr = RecOperatorExpr(atom, operators, mapResult);
+			var groupExpr = GroupExpr(lparen, expr, rparen);
+			return RecOperatorExpr(groupExpr, operators, mapResult);
+		}
 	}
 }

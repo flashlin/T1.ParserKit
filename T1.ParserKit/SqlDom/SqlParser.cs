@@ -153,40 +153,9 @@ namespace T1.ParserKit.SqlDom
 			}
 		}
 
-
-		public IParser GroupExpr(IParser atom)
-		{
-			var groupExpr = Parse.Chain(LParen, atom, RParen)
-				.MapResult(x => x[1]);
-			return groupExpr.Or(atom);
-		}
-
-		public IParser RecOperatorExpr(IParser item, IParser[] operators, Func<ITextSpan[], ITextSpan> mapResult)
-		{
-			var expr = item;
-			foreach (var oper in operators)
-			{
-				IParser RecExpr(IParser atom)
-				{
-					var operandExpr = Parse.Chain(atom, oper, atom)
-						.MapResult(mapResult);
-					return operandExpr.Or(atom);
-				}
-				expr = RecExpr(expr);
-			}
-			return expr.Or(item);
-		}
-
-		public IParser RecOperator(IParser atom, IParser[] operators, Func<ITextSpan[], ITextSpan> mapResult)
-		{
-			var expr = RecOperatorExpr(atom, operators, mapResult);
-			var groupExpr = GroupExpr(expr);
-			return RecOperatorExpr(groupExpr, operators, mapResult);
-		}
-
 		public IParser ArithmeticOperatorExpr()
 		{
-			return RecOperator(Atom, new[]
+			return Parse.RecGroupOperatorExpr(LParen, Atom, RParen, new[]
 			{
 				Symbol("*"),
 				Symbol("/"),
