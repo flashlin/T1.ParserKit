@@ -153,6 +153,49 @@ namespace T1.ParserKit.SqlDom
 			}
 		}
 
+		public IParser ArithmeticOperatorExpr1(IParser atom)
+		{
+			var oper = ContainsSymbol("*", "/");
+			var expr = Parse.Chain(
+				atom,
+				oper,
+				atom
+			).MapResult(x => new ArithmeticOperatorExpression()
+			{
+				Left = (SqlExpression) x[0],
+				Oper = x[1].GetText(),
+				Right = (SqlExpression) x[2]
+			});
+			return Parse.Any(expr, atom);
+		}
+
+		public IParser ArithmeticOperatorExpr2(IParser atom)
+		{
+			var oper = ContainsSymbol("+", "-");
+			var expr = Parse.Chain(
+				atom,
+				oper,
+				atom
+			).MapResult(x => new ArithmeticOperatorExpression()
+			{
+				Left = (SqlExpression)x[0],
+				Oper = x[1].GetText(),
+				Right = (SqlExpression)x[2]
+			});
+			return Parse.Any(expr, atom);
+		}
+
+		public IParser RecArithmeticOperatorExpr(IParser atom)
+		{
+			var expr1 = ArithmeticOperatorExpr1(atom);
+			return ArithmeticOperatorExpr2(expr1);
+		}
+
+		public IParser ArithmeticOperatorExpr()
+		{
+			return RecArithmeticOperatorExpr(Atom);
+		}
+
 		public IParser FilterExpr(IParser atom)
 		{
 			var oper = ContainsSymbol(">=", "<=", "!=", ">", "<", "=");
