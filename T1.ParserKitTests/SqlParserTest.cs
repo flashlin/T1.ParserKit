@@ -190,7 +190,7 @@ namespace T1.ParserKitTests
 
 
 		[Fact]
-		public void Select_variable_assign_field()
+		public void Select_variable_assign_field_from_table()
 		{
 			GiveText("select @name=name from customer");
 			WhenParse();
@@ -323,7 +323,7 @@ namespace T1.ParserKitTests
 		}
 
 		[Fact]
-		public void Select_tb_field_alias()
+		public void Select_tb_field_alias_from_table_alias()
 		{
 			GiveText("select c.name username from customer c");
 			WhenParse();
@@ -366,7 +366,7 @@ namespace T1.ParserKitTests
 		}
 
 		[Fact]
-		public void Select_Field_alias()
+		public void Select_Field_alias_from_table()
 		{
 			GiveText("select name n1 from customer");
 			WhenParse();
@@ -407,7 +407,7 @@ namespace T1.ParserKitTests
 		}
 
 		[Fact]
-		public void Select_Field_as_alias()
+		public void Select_Field_as_alias_from_table()
 		{
 			GiveText("select name as n1 from customer");
 			WhenParse();
@@ -490,7 +490,7 @@ namespace T1.ParserKitTests
 		}
 
 		[Fact]
-		public void Select_Field_as_alias_from_select_name()
+		public void Select_Field_as_alias_from_lparen_select_name_from_table_rparen_alias()
 		{
 			GiveText("select name as n1 from (select name1 from customer) c");
 			WhenParse();

@@ -16,6 +16,30 @@ namespace T1.ParserKit.SqlDom
 		public IParser LParen => Symbol("(");
 		public IParser RParen => Symbol(")");
 
+		public IParser SqlDataType
+		{
+			get
+			{
+				return ContainsText("DATETIME", "BIGINT");
+			}
+		}
+
+		public IParser DeclareVariableExpr
+		{
+			get
+			{
+				return Parse.Chain(
+					Match("DECLARE"),
+					Variable,
+					SqlDataType)
+					.MapResult(x => new DeclareExpression()
+				{
+					Name = x[1].GetText(),
+					DataType = x[2].GetText()
+				});
+			}
+		}
+
 		public IParser WithOptionExpr
 		{
 			get
@@ -344,6 +368,13 @@ namespace T1.ParserKit.SqlDom
 		{
 			return SkipBlanks(
 				Parse.Equal(text)
+			);
+		}
+
+		protected IParser ContainsText(params string[] texts)
+		{
+			return SkipBlanks(
+				Parse.Contains(texts, true).Assertion(true)
 			);
 		}
 

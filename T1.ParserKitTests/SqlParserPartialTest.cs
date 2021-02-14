@@ -319,8 +319,31 @@ namespace T1.ParserKitTests
 			});
 		}
 
+		[Fact]
+		public void Declare_variable_datatype()
+		{
+			GiveText("DECLARE @start datetime");
+			WhenTryParse(_parser.DeclareVariableExpr);
+			ThenResultShouldBe(new DeclareExpression()
+			{
+				File = "",
+				Content = _text,
+				Length = _text.Length,
+				Position = 0,
+				Name = "@start",
+				DataType = "datetime"
+			});
+		}
+
+
+
 		private void ThenResultShouldBe(SqlExpression expression)
 		{
+			if (!_parsed.IsSuccess())
+			{
+				throw new ParseException(_parsed.Error);
+			}
+
 			expression.ToExpectedObject()
 				.ShouldMatch(_parsed.Result[0]);
 		}
