@@ -153,60 +153,51 @@ namespace T1.ParserKit.SqlDom
 			}
 		}
 
-		public IParser ArithmeticOperatorExpr1(IParser atom)
+
+		public IParser GroupExpr(IParser atom)
 		{
-			var oper = ContainsSymbol("*", "/");
-			var expr = Parse.Chain(
-				atom,
-				oper,
-				atom
-			).MapResult(x => new ArithmeticOperatorExpression()
-			{
-				Left = (SqlExpression)x[0],
-				Oper = x[1].GetText(),
-				Right = (SqlExpression)x[2]
-			});
-			return Parse.Any(expr, atom);
+			var groupExpr = Parse.Chain(LParen, atom, RParen)
+				.MapResult(x => x[1]);
+			return groupExpr.Or(atom);
 		}
 
-		public IParser ArithmeticOperatorExpr2(IParser atom)
+		public IParser RecOperatorExpr(IParser item, IParser[] operators, Func<ITextSpan[], ITextSpan> mapResult)
 		{
-			var oper = ContainsSymbol("+", "-");
-			var expr = Parse.Chain(
-				atom,
-				oper,
-				atom
-			).MapResult(x => new ArithmeticOperatorExpression()
+			var expr = item;
+			foreach (var oper in operators)
 			{
-				Left = (SqlExpression)x[0],
-				Oper = x[1].GetText(),
-				Right = (SqlExpression)x[2]
-			});
-			return Parse.Any(expr, atom);
-		}
-
-		public IParser RecArithmeticOperatorExpr(IParser atom)
-		{
-			var group =
-				Parse.Chain(
-					LParen,
-					ArithmeticOperatorExpr2(ArithmeticOperatorExpr1(atom)),
-					RParen
-				).MapAssign<ArithmeticOperatorExpression>((x, expr) =>
+				IParser RecExpr(IParser atom)
 				{
-					var arithExpr = (ArithmeticOperatorExpression)x[1];
-					expr.Left = arithExpr.Left;
-					expr.Oper = arithExpr.Oper;
-					expr.Right = arithExpr.Right;
-				});
+					var operandExpr = Parse.Chain(atom, oper, atom)
+						.MapResult(mapResult);
+					return operandExpr.Or(atom);
+				}
+				expr = RecExpr(expr);
+			}
+			return expr.Or(item);
+		}
 
-			var expr1 = ArithmeticOperatorExpr1(group.Or(atom));
-			return ArithmeticOperatorExpr2(expr1);
+		public IParser RecOperator(IParser atom, IParser[] operators, Func<ITextSpan[], ITextSpan> mapResult)
+		{
+			var expr = RecOperatorExpr(atom, operators, mapResult);
+			var groupExpr = GroupExpr(expr);
+			return RecOperatorExpr(groupExpr, operators, mapResult);
 		}
 
 		public IParser ArithmeticOperatorExpr()
 		{
-			return RecArithmeticOperatorExpr(Atom);
+			return RecOperator(Atom, new[]
+			{
+				Symbol("*"),
+				Symbol("/"),
+				Symbol("+"),
+				Symbol("-")
+			}, x => new ArithmeticOperatorExpression
+			{
+				Left = (SqlExpression)x[0],
+				Oper = x[1].GetText(),
+				Right = (SqlExpression)x[2]
+			});
 		}
 
 		public IParser FilterExpr(IParser atom)
