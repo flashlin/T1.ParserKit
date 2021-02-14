@@ -13,8 +13,8 @@ namespace T1.ParserKit.SqlDom
 {
 	public class SqlParser
 	{
-		public IParser LParent => Symbol("(");
-		public IParser RParent => Symbol(")");
+		public IParser LParen => Symbol("(");
+		public IParser RParen => Symbol(")");
 
 		public IParser WithOptionExpr
 		{
@@ -22,9 +22,9 @@ namespace T1.ParserKit.SqlDom
 			{
 				return Parse.Chain(
 					Match("with"),
-					LParent,
+					LParen,
 					Match("nolock"),
-					RParent
+					RParen
 				).MapResult(x => new WithOptionExpression()
 				{
 					Nolock = true
@@ -162,9 +162,9 @@ namespace T1.ParserKit.SqlDom
 				atom
 			).MapResult(x => new ArithmeticOperatorExpression()
 			{
-				Left = (SqlExpression) x[0],
+				Left = (SqlExpression)x[0],
 				Oper = x[1].GetText(),
-				Right = (SqlExpression) x[2]
+				Right = (SqlExpression)x[2]
 			});
 			return Parse.Any(expr, atom);
 		}
@@ -187,7 +187,20 @@ namespace T1.ParserKit.SqlDom
 
 		public IParser RecArithmeticOperatorExpr(IParser atom)
 		{
-			var expr1 = ArithmeticOperatorExpr1(atom);
+			var group =
+				Parse.Chain(
+					LParen,
+					ArithmeticOperatorExpr2(ArithmeticOperatorExpr1(atom)),
+					RParen
+				).MapAssign<ArithmeticOperatorExpression>((x, expr) =>
+				{
+					var arithExpr = (ArithmeticOperatorExpression)x[1];
+					expr.Left = arithExpr.Left;
+					expr.Oper = arithExpr.Oper;
+					expr.Right = arithExpr.Right;
+				});
+
+			var expr1 = ArithmeticOperatorExpr1(group.Or(atom));
 			return ArithmeticOperatorExpr2(expr1);
 		}
 
