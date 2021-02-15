@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 using T1.ParserKit.Core;
 using T1.ParserKit.Helpers;
 using T1.ParserKit.SqlDom.Expressions;
@@ -36,10 +37,10 @@ namespace T1.ParserKit.SqlDom
 					onOFf,
 					SemiColon.Optional()
 					).MapResult(x => new SetOptionExpression()
-				{
-					OptionName = x[1].GetText(),
-					IsToggle = string.Equals(x[2].GetText().ToUpper(), "ON", StringComparison.Ordinal)
-				});
+					{
+						OptionName = x[1].GetText(),
+						IsToggle = string.Equals(x[2].GetText().ToUpper(), "ON", StringComparison.Ordinal)
+					});
 			}
 		}
 
@@ -52,10 +53,10 @@ namespace T1.ParserKit.SqlDom
 					Variable,
 					SqlDataType)
 					.MapResult(x => new DeclareExpression()
-				{
-					Name = x[1].GetText(),
-					DataType = x[2].GetText()
-				});
+					{
+						Name = x[1].GetText(),
+						DataType = x[2].GetText()
+					});
 			}
 		}
 
@@ -349,13 +350,37 @@ namespace T1.ParserKit.SqlDom
 			}
 		}
 
+		public IParser IfExpr(IParser factor)
+		{
+			var body = factor.AtLeastOnce()
+				.MapResult(x => new StatementsExpression()
+				{
+					Items = x.Cast<SqlExpression>().ToArray()
+				});
+
+			var ifExpr = Parse.Chain(
+				Match("IF"),
+				FilterExpr(Atom),
+				Match("BEGIN"),
+				body,
+				Match("END"))
+				.MapResult(x => new IfExpression()
+				{
+					Condition = (FilterExpression)x[1],
+					Body = (StatementsExpression)x[3]
+				});
+
+			return Parse.Any(ifExpr, factor);
+		}
+
 		public IParser StartExpr
 		{
 			get
 			{
-				return Parse.Any(RecSelectExpr(SelectExpr),
+				var startExpr = Parse.Any(RecSelectExpr(SelectExpr),
 					DeclareVariableExpr,
 					SetNocountExpr);
+				return IfExpr(startExpr);
 			}
 		}
 
