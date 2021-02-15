@@ -1,4 +1,6 @@
-﻿namespace T1.ParserKit.SqlDom.Expressions
+﻿using System.Collections.Generic;
+
+namespace T1.ParserKit.SqlDom.Expressions
 {
 	public class StatementsExpression : SqlExpression
 	{

@@ -467,6 +467,19 @@ namespace T1.ParserKit.Core
 			});
 		}
 
+		public static IParser RemapResult(this IParser p, Func<ITextSpan, IParseResult, IParseResult> remap)
+		{
+			return new Parser(p.Name, inp =>
+			{
+				var parsed = p.TryParse(inp);
+				if (!parsed.IsSuccess())
+				{
+					return parsed;
+				}
+				return remap(inp, parsed);
+			});
+		}
+
 		public static IParser MapAssign<T>(this IParser p, Action<ITextSpan[], T> f)
 			where T : ITextSpan, new()
 		{
@@ -667,5 +680,18 @@ namespace T1.ParserKit.Core
 			var groupExpr = GroupExpr(lparen, expr, rparen);
 			return RecOperatorExpr(groupExpr, operators, mapResult);
 		}
+
+		//public static IParser Ref(IParser reference)
+		//{
+		//	IParser parser = null;
+
+		//	return new Parser("Ref", inp =>
+		//	{
+		//		if (parser == null)
+		//			parser = reference();
+
+		//		return parser.TryParse(inp);
+		//	});
+		//}
 	}
 }
