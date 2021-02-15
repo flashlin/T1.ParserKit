@@ -326,13 +326,18 @@ namespace T1.ParserKit.SqlDom
 			}
 		}
 
+		public IParser StartExpr
+		{
+			get
+			{
+				return Parse.Any(RecSelectExpr(SelectExpr),
+					DeclareVariableExpr);
+			}
+		}
+
 		public SqlExpression[] ParseText(string code)
 		{
-			var startExpr = SelectExpr;
-
-			startExpr = RecSelectExpr(SelectExpr);
-
-			return startExpr.ParseText(code).Cast<SqlExpression>().ToArray();
+			return StartExpr.ParseText(code).Cast<SqlExpression>().ToArray();
 		}
 
 		public IParser Identifier()
