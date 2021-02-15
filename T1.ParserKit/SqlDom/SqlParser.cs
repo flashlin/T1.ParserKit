@@ -63,7 +63,11 @@ namespace T1.ParserKit.SqlDom
 				return Parse.Chain(
 					Symbol("@"),
 					Identifier()
-				).Merge();
+				).Merge()
+				.MapResult(x => new VariableExpression()
+				{
+					Name = x[0].GetText()
+				});
 			}
 		}
 
@@ -173,7 +177,7 @@ namespace T1.ParserKit.SqlDom
 		{
 			get
 			{
-				return Parse.Any(FieldExpr, NumberExpr);
+				return Parse.Any(FieldExpr, NumberExpr, Variable);
 			}
 		}
 
