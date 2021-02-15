@@ -15,12 +15,31 @@ namespace T1.ParserKit.SqlDom
 	{
 		public IParser LParen => Symbol("(");
 		public IParser RParen => Symbol(")");
+		public IParser SemiColon => Symbol(";");
 
 		public IParser SqlDataType
 		{
 			get
 			{
 				return ContainsText("DATETIME", "BIGINT");
+			}
+		}
+
+		public IParser SetNocountExpr
+		{
+			get
+			{
+				var onOFf = ContainsText("ON", "OFF");
+				return Parse.Chain(
+					Match("SET"),
+					Match("NOCOUNT"),
+					onOFf,
+					SemiColon.Optional()
+					).MapResult(x => new SetOptionExpression()
+				{
+					OptionName = x[1].GetText(),
+					IsToggle = string.Equals(x[2].GetText().ToUpper(), "ON", StringComparison.Ordinal)
+				});
 			}
 		}
 
@@ -335,7 +354,8 @@ namespace T1.ParserKit.SqlDom
 			get
 			{
 				return Parse.Any(RecSelectExpr(SelectExpr),
-					DeclareVariableExpr);
+					DeclareVariableExpr,
+					SetNocountExpr);
 			}
 		}
 

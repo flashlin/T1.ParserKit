@@ -30,6 +30,24 @@ namespace T1.ParserKitTests
 			});
 		}
 
+		[Fact]
+		public void Set_nocount_on()
+		{
+			GiveText("SET NOCOUNT ON;");
+			WhenParse();
+			ThenResultShouldBe(new SetOptionExpression()
+			{
+				File = String.Empty,
+				Content = _code,
+				Position = 0,
+				Length = _code.Length,
+				OptionName = "NOCOUNT",
+				IsToggle = true
+			});
+		}
+
+
+
 		private void WhenParse()
 		{
 			_parser = new SqlParser();
