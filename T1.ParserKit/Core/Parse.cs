@@ -307,6 +307,24 @@ namespace T1.ParserKit.Core
 			});
 		}
 
+		public static IParser Next(this IParser p1, Func<ITextSpan[], string> p2)
+		{
+			return new Parser(p1.Name, inp =>
+			{
+				var parsed = p1.TryParse(inp);
+				if (!parsed.IsSuccess())
+				{
+					return parsed;
+				}
+				var error = p2(parsed.Result);
+				if (error == string.Empty)
+				{
+					return parsed;
+				}
+				return Parse.Error(error, inp);
+			});
+		}
+
 		public static IParser ThenLeft(this IParser p1, IParser p2)
 		{
 			var name = $"{p1.Name}.>>{p2.Name}";

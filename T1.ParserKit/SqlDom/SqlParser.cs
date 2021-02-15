@@ -337,31 +337,19 @@ namespace T1.ParserKit.SqlDom
 
 		public IParser Identifier()
 		{
-			return SkipBlanks(SqlToken.Identifier.ThenLeft(NotKeyword()))
-				.Named("SqlIdentifier");
+			return SkipBlanks(SqlToken.Identifier.Next(NotKeyword));
 		}
 
-		protected IParser NotKeyword()
+		private static string NotKeyword(ITextSpan[] r)
 		{
-			return SqlTokenizer.KeywordsParser.Not().Named("!SqlKeyword");
-		}
-
-		protected bool IsKeyword(string text)
-		{
-			var parsed = SqlTokenizer.KeywordsParser.TryParseAllText(text);
-			return parsed.IsSuccess();
+			return SqlTokenizer.Keywords.Contains(r[0].GetText().ToUpper()) ? "keyword" : "";
 		}
 
 		protected IParser Match(string text)
 		{
-			if (IsKeyword(text))
-			{
-				return SkipBlanks(Parse.Equal(text, true)).Named($"{text}");
-			}
-
 			return SkipBlanks(
-				NotKeyword().ThenRight(Parse.Equal(text, true))
-				).Named($"{text}");
+				Parse.Equal(text, true).Assertion(true)
+			).Named($"{text}");
 		}
 
 		protected IParser Symbol(string text)
