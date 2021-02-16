@@ -75,6 +75,11 @@ namespace T1.ParserKit.Core
 			return Error(message, new[] { innerError }, rest);
 		}
 
+		protected IParser CreateParser(string name, Func<ITextSpan, IParseResult> func)
+		{
+			return new Parser(name, func);
+		}
+
 		public IParser Any(params IParser[] parsers)
 		{
 			return parsers.Choice();
@@ -87,7 +92,7 @@ namespace T1.ParserKit.Core
 
 		public IParser Assertion(bool isWords = true)
 		{
-			return new Parser("assertion", inp =>
+			return CreateParser("assertion", inp =>
 			{
 				if (inp.Eof())
 				{
@@ -123,7 +128,7 @@ namespace T1.ParserKit.Core
 
 		public IParser Eos()
 		{
-			return new Parser("eos", inp =>
+			return CreateParser("eos", inp =>
 			{
 				if (inp.Eof())
 				{
@@ -137,7 +142,7 @@ namespace T1.ParserKit.Core
 
 		public IParser Equal(string text, bool ignoreCase = false)
 		{
-			return new Parser($"{text}", (inp) =>
+			return CreateParser($"{text}", (inp) =>
 			{
 				var ch = inp.Substr(text.Length);
 				var ch1 = ignoreCase ? ch.ToLower() : ch;
@@ -153,7 +158,7 @@ namespace T1.ParserKit.Core
 
 		public IParser NotEqual(string text, bool ignoreCase = false)
 		{
-			return new Parser($"{text}", (inp) =>
+			return CreateParser($"{text}", (inp) =>
 			{
 				var ch = inp.Substr(text.Length);
 				var ch1 = ignoreCase ? ch.ToLower() : ch;
@@ -179,7 +184,7 @@ namespace T1.ParserKit.Core
 			}
 			var name = $"[{strTexts}]";
 
-			return new Parser(name, (inp) =>
+			return CreateParser(name, (inp) =>
 			{
 				var comparison = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
 				var maxText = inp.Substr(maxLen);
@@ -217,7 +222,7 @@ namespace T1.ParserKit.Core
 
 		public IParser Digit()
 		{
-			return new Parser("digit", inp =>
+			return CreateParser("digit", inp =>
 			{
 				var ch = inp.Substr(1);
 				if (char.IsDigit(ch[0]))
@@ -231,7 +236,7 @@ namespace T1.ParserKit.Core
 
 		public IParser Letter()
 		{
-			return new Parser("letter", inp =>
+			return CreateParser("letter", inp =>
 			{
 				var ch = inp.Substr(1);
 				if (char.IsLetter(ch[0]))
@@ -301,7 +306,7 @@ namespace T1.ParserKit.Core
 			IParser @operator, IParser operand,
 			Func<ITextSpan[], ITextSpan[], ITextSpan> apply)
 		{
-			return new Parser("ChainLeft1", inp =>
+			return CreateParser("ChainLeft1", inp =>
 			{
 				var parsed = p.TryParse(inp);
 				if (!parsed.IsSuccess())
@@ -345,7 +350,7 @@ namespace T1.ParserKit.Core
 		//{
 		//	IParser parser = null;
 
-		//	return new Parser("Ref", inp =>
+		//	return CreateParser("Ref", inp =>
 		//	{
 		//		if (parser == null)
 		//			parser = reference();
