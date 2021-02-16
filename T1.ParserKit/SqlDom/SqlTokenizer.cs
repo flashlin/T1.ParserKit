@@ -7,8 +7,6 @@ namespace T1.ParserKit.SqlDom
 {
 	public class SqlTokenizer
 	{
-		public Parse Parse { get; set; } = new Parse();
-
 		public string[] Symbols = new[]
 		{
 			"[", "]", ",", ".", ";", "@", "::", ":", "\\", "$",

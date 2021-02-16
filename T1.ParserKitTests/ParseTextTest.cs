@@ -10,13 +10,12 @@ namespace T1.ParserKitTests
 	{
 		private string _text;
 		private IParseResult _result;
-		private readonly Parse _parse = new Parse();
 
 		[Fact]
 		public void Letters()
 		{
 			GiveText("abc");
-			WhenParse(_parse.Letters());
+			WhenParse(Parse.Letters());
 			ThenResultShouldBe(new []{ "abc" }, 3);
 		}
 
@@ -24,7 +23,7 @@ namespace T1.ParserKitTests
 		public void Digits()
 		{
 			GiveText("123");
-			WhenParse(_parse.Digits());
+			WhenParse(Parse.Digits());
 			ThenResultShouldBe(new []{ "123" }, 3);
 		}
 
@@ -32,7 +31,7 @@ namespace T1.ParserKitTests
 		public void NotDigit_Letter()
 		{
 			GiveText("a");
-			WhenParse(_parse.Digit().Not().ThenRight(_parse.Letter()));
+			WhenParse(Parse.Digit().Not().ThenRight(Parse.Letter()));
 			ThenResultShouldBe(new []{ "a" }, 1);
 		}
 
@@ -40,7 +39,7 @@ namespace T1.ParserKitTests
 		public void NotDigit()
 		{
 			GiveText("a");
-			WhenParse(_parse.Digit().Not());
+			WhenParse(Parse.Digit().Not());
 			ThenResultShouldBe(new string[0], 0);
 		}
 
@@ -48,7 +47,7 @@ namespace T1.ParserKitTests
 		public void CStyleIdentifier()
 		{
 			GiveText("name");
-			WhenParse(_parse.CStyleIdentifier());
+			WhenParse(Parse.CStyleIdentifier());
 			ThenResultShouldBe(new []{ "name" }, 4);
 		}
 

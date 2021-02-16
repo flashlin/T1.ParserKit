@@ -7,8 +7,6 @@ namespace T1.ParserKit.Core
 {
 	public static class ParseCombinator
 	{
-		private static readonly Parse Parse = new Parse();
-
 		public static IParser Assertion(this IParser p, bool isWords)
 		{
 			return p.Then(Parse.Assertion(isWords));

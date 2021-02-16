@@ -14,8 +14,6 @@ namespace T1.ParserKit.SqlDom
 {
 	public class SqlParser
 	{
-		public Parse Parse { get; set; } = new Parse();
-
 		public IParser SqlIdentifier
 		{
 			get
