@@ -24,7 +24,7 @@ namespace T1.ParserKit.Core
 		{
 			return new ParseResult()
 			{
-				Result = new[] {textSpan},
+				Result = new[] { textSpan },
 				Rest = rest,
 				Error = ParseError.Empty,
 			};
@@ -72,13 +72,13 @@ namespace T1.ParserKit.Core
 
 		public static IParseResult Error(string message, ParseError innerError, ITextSpan rest)
 		{
-			return Error(message, new[] {innerError}, rest);
+			return Error(message, new[] { innerError }, rest);
 		}
 
 		public static IParser Choice(this IEnumerable<IParser> parsers)
 		{
 			var parsersArr = parsers.CastArray();
-			var name = 
+			var name =
 				"(" +
 				string.Join(" / ", parsersArr.Select(x => x.Name)) +
 				")";
@@ -108,7 +108,7 @@ namespace T1.ParserKit.Core
 
 		public static IParser Optional(this IParser p)
 		{
-			return p.Many(0,1);
+			return p.Many(0, 1);
 		}
 
 		public static IParser Many(this IParser p, int min = 0, int max = int.MaxValue)
@@ -129,7 +129,7 @@ namespace T1.ParserKit.Core
 			{
 				name = $"{p.Name}*";
 			}
-			
+
 			if (min == 1 && max == int.MaxValue)
 			{
 				name = $"{p.Name}+";
@@ -224,7 +224,7 @@ namespace T1.ParserKit.Core
 					if (!parsed.IsSuccess())
 					{
 						var ch = curr.Substr(20);
-						return Parse.Error($"Expect {name}, but got '{ch}' at {curr}.", 
+						return Parse.Error($"Expect {name}, but got '{ch}' at {curr}.",
 							parsed.Error, parsed.Rest);
 					}
 
@@ -255,7 +255,7 @@ namespace T1.ParserKit.Core
 				{
 					return Parse.Success(inp);
 				}
-				
+
 				var ch = inp.Substr(1);
 				var error = Parse.Error($"Expect assertion, but got '{ch}' at {inp}.", inp);
 
@@ -553,7 +553,7 @@ namespace T1.ParserKit.Core
 
 		public static IParser Contains(string[] texts, bool ignoreCase = false)
 		{
-			var sortedTexts = texts.OrderByDescending(x=>x.Length).ToArray();
+			var sortedTexts = texts.OrderByDescending(x => x.Length).ToArray();
 			var maxLen = sortedTexts[0].Length;
 
 			var strTexts = string.Join(",", texts);
@@ -590,7 +590,7 @@ namespace T1.ParserKit.Core
 
 		public static IParser Blank()
 		{
-			var chs = new[] {" ", "\t", "\r", "\n"};
+			var chs = new[] { " ", "\t", "\r", "\n" };
 			return Parse.Contains(chs).Named("blank");
 		}
 
@@ -679,6 +679,50 @@ namespace T1.ParserKit.Core
 			var expr = RecOperatorExpr(atom, operators, mapResult);
 			var groupExpr = GroupExpr(lparen, expr, rparen);
 			return RecOperatorExpr(groupExpr, operators, mapResult);
+		}
+
+		private static IParser ChainLeft1(IParser p,
+			IParser @operator, IParser operand,
+			Func<ITextSpan[], ITextSpan[], ITextSpan> apply)
+		{
+			return new Parser("ChainLeft1", inp =>
+			{
+				var parsed = p.TryParse(inp);
+				if (!parsed.IsSuccess())
+				{
+					return parsed;
+				}
+
+				var result = parsed;
+				var remainder = parsed.Rest;
+
+				var operatorResult = @operator.TryParse(remainder);
+				while (operatorResult.IsSuccess())
+				{
+					remainder = operatorResult.Rest;
+
+					var operandResult = operand.TryParse(remainder);
+					if (!operandResult.IsSuccess())
+					{
+						return operandResult;
+					}
+
+					var newResult = apply(result.Result, operandResult.Result);
+
+					result = Parse.Success(newResult, operatorResult.Rest);
+
+					remainder = operandResult.Rest;
+					operatorResult = @operator.TryParse(remainder);
+				}
+
+				return result;
+			});
+		}
+
+		public static IParser ChainLeft(IParser @operator, IParser operand,
+			Func<ITextSpan[], ITextSpan[], ITextSpan> apply)
+		{
+			return ChainLeft1(operand, @operator, operand, apply);
 		}
 
 		//public static IParser Ref(IParser reference)
