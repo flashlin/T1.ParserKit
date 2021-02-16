@@ -265,5 +265,130 @@ namespace T1.ParserKit.Core
 		{
 			return parser.Many(1);
 		}
+
+		public static IParser ManyDelimitedBy(this IParser parser, IParser delimited)
+		{
+			var tail = delimited.Then(parser);
+			return parser.Then(tail.AtLeastOnce());
+		}
+
+		public static IParseResult TryParseText(this IParser p, string code)
+		{
+			ITextSpan inp = new TextSpan()
+			{
+				File = string.Empty,
+				Content = code,
+				Length = code.Length,
+				Position = 0
+			};
+			return p.TryParse(inp);
+		}
+
+		public static IParseResult TryParseAllText(this IParser p, string code)
+		{
+			ITextSpan inp = new TextSpan()
+			{
+				File = string.Empty,
+				Content = code,
+				Length = code.Length,
+				Position = 0
+			};
+
+			var acc = new List<ITextSpan>();
+			var curr = inp;
+			IParseResult parsed = default;
+			do
+			{
+				parsed = p.TryParse(curr);
+				if (!parsed.IsSuccess())
+				{
+					return parsed;
+				}
+
+				acc.AddRange(parsed.Result);
+				curr = parsed.Rest;
+			} while (!curr.Eof());
+
+			return Parse.Success(acc, parsed.Rest);
+		}
+
+		public static IParser MapResult(this IParser p, Func<ITextSpan[], ITextSpan> f)
+		{
+			return new Parser(p.Name, inp =>
+			{
+				var parsed = p.TryParse(inp);
+				if (!parsed.IsSuccess())
+				{
+					return parsed;
+				}
+
+				var newResult = f(parsed.Result);
+				newResult.CopyTextSpan(parsed.Result);
+				return Parse.Success(newResult, parsed.Rest);
+			});
+		}
+
+		public static IParser RemapResult(this IParser p, Func<ITextSpan, IParseResult, IParseResult> remap)
+		{
+			return new Parser(p.Name, inp =>
+			{
+				var parsed = p.TryParse(inp);
+				if (!parsed.IsSuccess())
+				{
+					return parsed;
+				}
+				return remap(inp, parsed);
+			});
+		}
+
+		public static IParser MapAssign<T>(this IParser p, Action<ITextSpan[], T> f)
+			where T : ITextSpan, new()
+		{
+			return new Parser(p.Name, inp =>
+			{
+				var parsed = p.TryParse(inp);
+				if (!parsed.IsSuccess())
+				{
+					return parsed;
+				}
+
+				var newResult = new T();
+				newResult.CopyTextSpan(parsed.Result);
+				f(parsed.Result, newResult);
+				return Parse.Success(newResult, parsed.Rest);
+			});
+		}
+
+		public static ITextSpan[] ParseText(this IParser p, string code)
+		{
+			var parsed = p.TryParseAllText(code);
+			if (!parsed.IsSuccess())
+			{
+				throw new ParseException(parsed.Error);
+			}
+			return parsed.Result;
+		}
+
+		public static ITextSpan GetTextSpan(this string text)
+		{
+			return new TextSpan()
+			{
+				File = string.Empty,
+				Content = text,
+				Position = 0,
+				Length = text.Length
+			};
+		}
+
+		public static IParser LeftRecursive(this IParser factor,
+			params Func<IParser, IParser>[] exprs)
+		{
+			var f = factor;
+			foreach (var expr in exprs)
+			{
+				f = expr(f);
+			}
+			return f;
+		}
 	}
 }
