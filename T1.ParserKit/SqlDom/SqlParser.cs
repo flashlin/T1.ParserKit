@@ -373,6 +373,11 @@ namespace T1.ParserKit.SqlDom
 			return Parse.Any(ifExpr, factor);
 		}
 
+		public IParser RecStartExpr(IParser factor)
+		{
+			return IfExpr(StartExpr).Or(factor);
+		}
+
 		public IParser StartExpr
 		{
 			get
@@ -386,7 +391,7 @@ namespace T1.ParserKit.SqlDom
 
 		public SqlExpression[] ParseText(string code)
 		{
-			return StartExpr.ParseText(code).Cast<SqlExpression>().ToArray();
+			return RecStartExpr(StartExpr).ParseText(code).Cast<SqlExpression>().ToArray();
 		}
 
 		public IParser Identifier()

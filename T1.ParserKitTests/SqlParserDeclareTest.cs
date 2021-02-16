@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using ExpectedObjects;
 using T1.ParserKit.Core;
 using T1.ParserKit.SqlDom;
@@ -129,76 +130,111 @@ namespace T1.ParserKitTests
 		{
 			GiveText("if @name=1 BEGIN if @id=2 BEGIN select name from customer END END");
 			WhenParse();
-			ThenResultShouldBe(new IfExpression()
+			var actual = (IfExpression)_result[0];
+
+			new FilterExpression
 			{
-				File = String.Empty,
+				Left = new VariableExpression
+				{
+					Name = "@name",
+					File = "",
+					Length = 5,
+					Position = 3,
+					Content = _code
+				},
+				Oper = "=",
+				Right = new NumberExpression
+				{
+					Value = 1,
+					ValueTypeFullname = "System.Int32",
+					File = "",
+					Length = 1,
+					Position = 9,
+					Content = _code
+				},
+				File = "",
+				Length = 7,
+				Position = 3,
+				Content = _code
+			}.ToExpectedObject()
+				.ShouldMatch(actual.Condition);
+
+			new IfExpression()
+			{
+				File = "",
+				Length = 44,
+				Position = 17,
 				Content = _code,
-				Position = 0,
-				Length = _code.Length,
 				Condition = new FilterExpression
 				{
 					Left = new VariableExpression
 					{
-						Name = "@name",
+						Name = "@id",
 						File = "",
-						Length = 5,
-						Position = 3,
+						Length = 3,
+						Position = 20,
 						Content = _code
 					},
 					Oper = "=",
 					Right = new NumberExpression
 					{
-						Value = 1,
+						Value = 2,
 						ValueTypeFullname = typeof(int).FullName,
 						File = "",
 						Length = 1,
-						Position = 9,
+						Position = 24,
 						Content = _code
 					},
 					File = "",
-					Length = 7,
-					Position = 3,
+					Length = 5,
+					Position = 20,
 					Content = _code
 				},
-				Body = new StatementsExpression
+				Body = new StatementsExpression()
 				{
-					Items = new SqlExpression[] { new SelectExpression
+					File = "",
+					Length = 25,
+					Position = 32,
+					Content = _code,
+					Items = new SqlExpression[]
 					{
-						Fields = new FieldsExpression
+						new SelectExpression
 						{
-							Items = new List<SqlExpression> {
-								new FieldExpression
-								{
-									Name = "name",
-									File = string.Empty,
-									Length = 4,
-									Position = 24,
-									Content = _code
-								}},
-								File = string.Empty,
-								Length = 4,
-								Position = 24,
-								Content = _code
+							Fields = new FieldsExpression
+							{
+								 Items = new List<SqlExpression> 
+								 { 
+									 new FieldExpression
+									 {
+										  Name = "name",
+										  File = "",
+										  Length = 4,
+										  Position = 39,
+										  Content = _code
+									 }
+								 },
+								 File = "",
+								 Length = 4,
+								 Position = 39,
+								 Content = _code
 							},
 							From = new TableExpression
 							{
-								Name = "customer",
-								File = string.Empty,
-								Length = 8,
-								Position = 34,
-								Content = _code
+								 Name = "customer",
+								 File = "",
+								 Length = 8,
+								 Position = 49,
+								 Content = _code
 							},
-							File = string.Empty,
+							File = "",
 							Length = 25,
-							Position = 17,
+							Position = 32,
 							Content = _code
-						}},
-					File = "",
-					Length = 25,
-					Position = 17,
-					Content = "if @name=1 BEGIN select name from customer END"
+						}
+					}
 				}
-			});
+			}.ToExpectedObject()
+				.ShouldMatch(actual.Body.Items[0]);
 		}
 
 		private void WhenParse()
@@ -216,6 +252,12 @@ namespace T1.ParserKitTests
 		{
 			expression.ToExpectedObject()
 				.ShouldMatch(_result[0]);
+		}
+
+		private void ThenJsonResultShouldBe(string expected)
+		{
+			var jsonResult = Newtonsoft.Json.JsonConvert.SerializeObject(_result[0]);
+			Assert.Equal(expected, jsonResult);
 		}
 	}
 }
