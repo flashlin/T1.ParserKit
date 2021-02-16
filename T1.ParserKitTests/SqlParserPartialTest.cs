@@ -14,6 +14,7 @@ namespace T1.ParserKitTests
 		private string _text;
 		private readonly SqlParser _parser;
 		private IParseResult _parsed;
+		private SqlTokenizer SqlTokenizer = new SqlTokenizer();
 
 		public SqlParserPartialTest()
 		{

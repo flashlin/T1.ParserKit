@@ -7,6 +7,8 @@ namespace T1.ParserKit.SqlDom
 {
 	public class SqlTokenizer
 	{
+		public Parse Parse { get; set; } = new Parse();
+
 		public string[] Symbols = new[]
 		{
 			"[", "]", ",", ".", ";", "@", "::", ":", "\\", "$",
@@ -47,14 +49,27 @@ namespace T1.ParserKit.SqlDom
 			"YEAR", "ZONE"
 		};
 
-		public static IParser KeywordsParser =>
+		public IParser KeywordsParser =>
 			Parse.Contains(Keywords, true).Assertion(true);
 
 		public IParser SymbolsParser =>
 			Parse.Contains(Symbols).Assertion(false);
 
-		
-		public IParser TmpVariable => Parse.Equal("@").Then(SqlToken.Identifier)
+		public IParser SqlIdentifier
+		{
+			get
+			{
+				var start = Parse.Equal("[");
+				var body = Parse.NotEqual("]").Many(1);
+				var end = Parse.Equal("]");
+				var identifier = Parse.Chain(start, body, end).Merge();
+				return identifier.Or(Parse.CStyleIdentifier())
+					.Named("SqlIdentifier");
+			}
+		}
+
+
+		public IParser TmpVariable => Parse.Equal("@").Then(SqlIdentifier)
 			.Named("variable");
 
 		public ITextSpan[] Tokenize(string code)
@@ -63,7 +78,7 @@ namespace T1.ParserKit.SqlDom
 				Parse.Blanks().Skip(),
 				KeywordsParser,
 				Parse.Digits(),
-				SqlToken.Identifier,
+				SqlIdentifier,
 				TmpVariable,
 				SymbolsParser
 			).Many(1, 1).Then(Parse.Eos());

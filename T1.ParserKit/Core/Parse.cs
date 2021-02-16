@@ -8,7 +8,7 @@ using T1.Standard.Extensions;
 
 namespace T1.ParserKit.Core
 {
-	public static class Parse
+	public class Parse
 	{
 		public static IParseResult Success(ITextSpan rest)
 		{
@@ -75,17 +75,17 @@ namespace T1.ParserKit.Core
 			return Error(message, new[] { innerError }, rest);
 		}
 
-		public static IParser Any(params IParser[] parsers)
+		public IParser Any(params IParser[] parsers)
 		{
 			return parsers.Choice();
 		}
 
-		public static IParser Chain(params IParser[] parsers)
+		public IParser Chain(params IParser[] parsers)
 		{
 			return parsers.Chain();
 		}
 
-		public static IParser Assertion(bool isWords = true)
+		public IParser Assertion(bool isWords = true)
 		{
 			return new Parser("assertion", inp =>
 			{
@@ -119,9 +119,9 @@ namespace T1.ParserKit.Core
 				}
 				return error;
 			});
-		}
+		}	
 
-		public static IParser Eos()
+		public IParser Eos()
 		{
 			return new Parser("eos", inp =>
 			{
@@ -135,7 +135,7 @@ namespace T1.ParserKit.Core
 			});
 		}
 
-		public static IParser Equal(string text, bool ignoreCase = false)
+		public IParser Equal(string text, bool ignoreCase = false)
 		{
 			return new Parser($"{text}", (inp) =>
 			{
@@ -151,7 +151,7 @@ namespace T1.ParserKit.Core
 			});
 		}
 
-		public static IParser NotEqual(string text, bool ignoreCase = false)
+		public IParser NotEqual(string text, bool ignoreCase = false)
 		{
 			return new Parser($"{text}", (inp) =>
 			{
@@ -167,7 +167,7 @@ namespace T1.ParserKit.Core
 			});
 		}
 
-		public static IParser Contains(string[] texts, bool ignoreCase = false)
+		public IParser Contains(string[] texts, bool ignoreCase = false)
 		{
 			var sortedTexts = texts.OrderByDescending(x => x.Length).ToArray();
 			var maxLen = sortedTexts[0].Length;
@@ -204,18 +204,18 @@ namespace T1.ParserKit.Core
 			});
 		}
 
-		public static IParser Blank()
+		public IParser Blank()
 		{
 			var chs = new[] { " ", "\t", "\r", "\n" };
-			return Parse.Contains(chs).Named("blank");
+			return Contains(chs).Named("blank");
 		}
 
-		public static IParser Blanks()
+		public IParser Blanks()
 		{
 			return Blank().Many(1).Named("blanks");
 		}
 
-		public static IParser Digit()
+		public IParser Digit()
 		{
 			return new Parser("digit", inp =>
 			{
@@ -229,7 +229,7 @@ namespace T1.ParserKit.Core
 			});
 		}
 
-		public static IParser Letter()
+		public IParser Letter()
 		{
 			return new Parser("letter", inp =>
 			{
@@ -243,20 +243,20 @@ namespace T1.ParserKit.Core
 			});
 		}
 
-		public static IParser Digits()
+		public IParser Digits()
 		{
 			return Digit().Many(1).Merge().Named("digits");
 		}
 
-		public static IParser Letters()
+		public IParser Letters()
 		{
 			return Letter().Many(1).Merge().Named("letters");
 		}
 
-		public static IParser CStyleIdentifier()
+		public IParser CStyleIdentifier()
 		{
-			var underscore = Parse.Equal("_");
-			var body = Parse.Any(underscore, Letters(), Digits()).Many();
+			var underscore = Equal("_");
+			var body = Any(underscore, Letters(), Digits()).Many();
 
 			var identifierCharacters1 =
 				underscore.Then(body);
@@ -266,21 +266,21 @@ namespace T1.ParserKit.Core
 			return identifierCharacters1.Or(identifierCharacters2).Merge().Named("CStyleIdentifier");
 		}
 
-		public static IParser GroupExpr(IParser lparen, IParser atom, IParser rparen)
+		public IParser GroupExpr(IParser lparen, IParser atom, IParser rparen)
 		{
-			var groupExpr = Parse.Chain(lparen, atom, rparen)
+			var groupExpr = Chain(lparen, atom, rparen)
 				.MapResult(x => x[1]);
 			return groupExpr.Or(atom);
 		}
 
-		public static IParser RecOperatorExpr(IParser item, IParser[] operators, Func<ITextSpan[], ITextSpan> mapResult)
+		public IParser RecOperatorExpr(IParser item, IParser[] operators, Func<ITextSpan[], ITextSpan> mapResult)
 		{
 			var expr = item;
 			foreach (var oper in operators)
 			{
 				IParser RecExpr(IParser atom)
 				{
-					var operandExpr = Parse.Chain(atom, oper, atom)
+					var operandExpr = Chain(atom, oper, atom)
 						.MapResult(mapResult);
 					return operandExpr.Or(atom);
 				}
@@ -289,7 +289,7 @@ namespace T1.ParserKit.Core
 			return expr.Or(item);
 		}
 
-		public static IParser RecGroupOperatorExpr(IParser lparen, IParser atom, IParser rparen,
+		public IParser RecGroupOperatorExpr(IParser lparen, IParser atom, IParser rparen,
 			IParser[] operators, Func<ITextSpan[], ITextSpan> mapResult)
 		{
 			var expr = RecOperatorExpr(atom, operators, mapResult);
@@ -297,7 +297,7 @@ namespace T1.ParserKit.Core
 			return RecOperatorExpr(groupExpr, operators, mapResult);
 		}
 
-		private static IParser ChainLeft1(IParser p,
+		private IParser ChainLeft1(IParser p,
 			IParser @operator, IParser operand,
 			Func<ITextSpan[], ITextSpan[], ITextSpan> apply)
 		{
@@ -335,7 +335,7 @@ namespace T1.ParserKit.Core
 			});
 		}
 
-		public static IParser ChainLeft(IParser @operator, IParser operand,
+		public IParser ChainLeft(IParser @operator, IParser operand,
 			Func<ITextSpan[], ITextSpan[], ITextSpan> apply)
 		{
 			return ChainLeft1(operand, @operator, operand, apply);

@@ -10,12 +10,13 @@ namespace T1.ParserKitTests
 	{
 		private string _text;
 		private IParseResult _result;
+		private readonly Parse _parse = new Parse();
 
 		[Fact]
 		public void Letters()
 		{
 			GiveText("abc");
-			WhenParse(Parse.Letters());
+			WhenParse(_parse.Letters());
 			ThenResultShouldBe(new []{ "abc" }, 3);
 		}
 
@@ -23,7 +24,7 @@ namespace T1.ParserKitTests
 		public void Digits()
 		{
 			GiveText("123");
-			WhenParse(Parse.Digits());
+			WhenParse(_parse.Digits());
 			ThenResultShouldBe(new []{ "123" }, 3);
 		}
 
@@ -31,7 +32,7 @@ namespace T1.ParserKitTests
 		public void NotDigit_Letter()
 		{
 			GiveText("a");
-			WhenParse(Parse.Digit().Not().ThenRight(Parse.Letter()));
+			WhenParse(_parse.Digit().Not().ThenRight(_parse.Letter()));
 			ThenResultShouldBe(new []{ "a" }, 1);
 		}
 
@@ -39,7 +40,7 @@ namespace T1.ParserKitTests
 		public void NotDigit()
 		{
 			GiveText("a");
-			WhenParse(Parse.Digit().Not());
+			WhenParse(_parse.Digit().Not());
 			ThenResultShouldBe(new string[0], 0);
 		}
 
@@ -47,12 +48,9 @@ namespace T1.ParserKitTests
 		public void CStyleIdentifier()
 		{
 			GiveText("name");
-			WhenParse(Parse.CStyleIdentifier());
+			WhenParse(_parse.CStyleIdentifier());
 			ThenResultShouldBe(new []{ "name" }, 4);
 		}
-
-
-
 
 		private void ThenResultShouldBe(string[] expecteds, int consumed)
 		{

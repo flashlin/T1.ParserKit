@@ -14,6 +14,22 @@ namespace T1.ParserKit.SqlDom
 {
 	public class SqlParser
 	{
+		public Parse Parse { get; set; } = new Parse();
+
+		public IParser SqlIdentifier
+		{
+			get
+			{
+				var start = Parse.Equal("[");
+				var body = Parse.NotEqual("]").Many(1);
+				var end = Parse.Equal("]");
+				var identifier = Parse.Chain(start, body, end).Merge();
+				return identifier.Or(Parse.CStyleIdentifier())
+					.Named("SqlIdentifier");
+			}
+		}
+
+
 		public IParser LParen => Symbol("(");
 		public IParser RParen => Symbol(")");
 		public IParser SemiColon => Symbol(";");
@@ -396,7 +412,7 @@ namespace T1.ParserKit.SqlDom
 
 		public IParser Identifier()
 		{
-			return SkipBlanks(SqlToken.Identifier.Next(NotKeyword));
+			return SkipBlanks(SqlIdentifier.Next(NotKeyword));
 		}
 
 		private static string NotKeyword(ITextSpan[] r)
