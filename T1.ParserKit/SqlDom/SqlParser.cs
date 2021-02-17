@@ -98,26 +98,29 @@ namespace T1.ParserKit.SqlDom
 			});
 		}
 
+		static readonly string[] DatediffDatepartStr = new[]
+		{
+			"year", "quarter", "month", "dayofyear", "day",
+			"week", "hour", "minute", "second", "millisecond",
+			"microsecond", "nanosecond"
+		};
+
+		static readonly string[] DatediffAbbreviationDatepartStr = new[]
+		{
+			"yy", "yyyy", "qq", "q", "mm", "m",
+			"dy", "y", "dd", "d", "wk", "ww",
+			"hh", "mi", "n", "ss", "s", "ms",
+			"mcs", "ns"
+		};
+
+		private static readonly string[] DatediffDatepart = DatediffDatepartStr
+			.Concat(DatediffAbbreviationDatepartStr)
+			.ToArray();
+
 		//DATEDIFF(dd, 0, GETDATE())
 		public IParser FuncDatediff(IParser factor)
 		{
-			var datepartStr = new[]
-			{
-				"year", "quarter", "month", "dayofyear", "day",
-				"week", "hour", "minute", "second", "millisecond",
-				"microsecond", "nanosecond"
-			};
-
-			var abbreviationDatepartStr = new[]
-			{
-				"yy", "yyyy", "qq", "q", "mm", "m",
-				"dy", "y", "dd", "d", "wk", "ww",
-				"hh", "mi", "n", "ss", "s", "ms",
-				"mcs", "ns"
-			};
-
-			var datepart = ContainsText(datepartStr.Concat(abbreviationDatepartStr)
-				.ToArray())
+			var datepart = ContainsText(DatediffDatepart)
 				.MapResult(x => new SqlOptionNameExpression()
 				{
 					Value = x[0].GetText()
