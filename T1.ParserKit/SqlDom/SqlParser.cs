@@ -540,31 +540,6 @@ namespace T1.ParserKit.SqlDom
 			return Parse.Any(ifExpr, factor);
 		}
 
-		public IParser RecStartExpr(IParser factor)
-		{
-			var ifExpr = IfExpr(StartExpr);
-			var sqlFuncExpr = SqlFunctions(ifExpr).Or(SqlFunctions(Atom));
-			return Parse.Any(
-				ifExpr,
-				sqlFuncExpr,
-				factor);
-		}
-
-		public IParser StartExpr
-		{
-			get
-			{
-				var startExpr = Parse.Any(
-					RecSelectExpr(SelectExpr),
-					DeclareVariableExpr,
-					SetNocountExpr);
-
-				var ifExpr = IfExpr(startExpr);
-
-				return SqlFunctions(ifExpr);
-			}
-		}
-
 		public IParser Recursive(IParser factor, IEnumerable<Func<IParser, IParser>> parsers)
 		{
 			var curr = (IParser)null;
@@ -575,7 +550,7 @@ namespace T1.ParserKit.SqlDom
 			return curr;
 		}
 
-		public IParser StartExpr2()
+		public IParser StartExpr()
 		{
 			var statementExpr = Parse.Any(
 				RecSelectExpr(SelectExpr),
@@ -597,8 +572,7 @@ namespace T1.ParserKit.SqlDom
 
 		public SqlExpression[] ParseText(string code)
 		{
-			return StartExpr2().ParseText(code).Cast<SqlExpression>().ToArray();
-			return RecStartExpr(StartExpr).ParseText(code).Cast<SqlExpression>().ToArray();
+			return StartExpr().ParseText(code).Cast<SqlExpression>().ToArray();
 		}
 
 		public IParser Identifier()
