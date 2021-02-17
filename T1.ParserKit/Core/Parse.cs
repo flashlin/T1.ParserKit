@@ -167,12 +167,19 @@ namespace T1.ParserKit.Core
 			});
 		}
 
-		public static IParser Contains(string[] texts, bool ignoreCase = false)
+		private static string[] SortTexts(IEnumerable<string> texts)
 		{
-			var sortedTexts = texts.OrderByDescending(x => x.Length).ToArray();
+			var textsArr = texts.CastArray();
+			var sortedTexts = textsArr.OrderByDescending(x => x.Length).ToArray();
+			return sortedTexts;
+		}
+
+		public static IParser Contains(IEnumerable<string> texts, bool ignoreCase = false)
+		{
+			var sortedTexts = SortTexts(texts);
 			var maxLen = sortedTexts[0].Length;
 
-			var strTexts = string.Join(",", texts);
+			var strTexts = string.Join(",", sortedTexts);
 			if (ignoreCase)
 			{
 				strTexts = $"'{strTexts}'";
