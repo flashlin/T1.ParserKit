@@ -27,7 +27,6 @@ namespace T1.ParserKit.SqlDom
 			}
 		}
 
-
 		public IParser LParen => Symbol("(");
 		public IParser RParen => Symbol(")");
 		public IParser SemiColon => Symbol(";");
@@ -38,6 +37,54 @@ namespace T1.ParserKit.SqlDom
 			{
 				return ContainsText("DATETIME", "BIGINT");
 			}
+		}
+
+		//DATEADD(DD,-1,DATEDIFF(dd, 0, GETDATE()))
+		public IParser FuncDateadd(IParser factor)
+		{
+			var datepartStr = new[] 
+			{
+				"year", "quarter", "month", "dayofyear", "day",
+				"week", "weekday", "hour", "minute", "second", "millisecond", "microsecond",
+				"nanosecond"
+			};
+
+			var abbreviationDatepartStr = new[]
+			{
+				"yy", "yyyy", "qq", "q", "mm", "m", "dy", "y",
+				"dd", "d", "wk", "ww", "dw", "w", "hh", "mi", "n",
+				"ss", "s", "ms", "mcs", "ns"
+			};
+
+			var datepart = ContainsText(
+				datepartStr.Concat(abbreviationDatepartStr)
+				.ToArray());
+
+			return Parse.Chain(
+				Match("DATEADD"),
+				LParen,
+				datepart,
+				Comma,
+				factor,
+				RParen
+			);
+		}
+
+		//ISNULL(@SblimitExpiredDate, xxx)
+		public IParser FuncIsnull(IParser factor)
+		{
+			return Parse.Chain(
+				Match("ISNULL"),
+				LParen,
+				factor,
+				Comma,
+				factor,
+				RParen)
+				.MapResult(x => new SqlFunctionExpression()
+				{
+					Name = "ISNULL",
+					Parameters = new []{ (SqlExpression)x[2], (SqlExpression)x[4] }
+				});
 		}
 
 		public IParser SetNocountExpr
@@ -251,13 +298,31 @@ namespace T1.ParserKit.SqlDom
 				});
 		}
 
-		public IParser NumberExpr =>
-			SkipBlanks(Parse.Digits().Assertion(true)).Named("NumberExpr")
-				.MapResult(x => new NumberExpression()
-				{
-					ValueTypeFullname = typeof(int).FullName,
-					Value = int.Parse(x[0].GetText())
-				});
+		public IParser NumberExpr
+		{
+			get
+			{
+				var number = SkipBlanks(Parse.Digits().Assertion(true))
+					.Named("NumberExpr")
+					.MapResult(x => new NumberExpression()
+					{
+						ValueTypeFullname = typeof(int).FullName,
+						Value = int.Parse(x[0].GetText())
+					});
+
+				var negativeNumber = Parse.Chain(
+						Symbol("-"),
+						number)
+					.MapResult(x =>
+					{
+						var numExpr = (NumberExpression)x[1];
+						numExpr.Value = -(int)numExpr.Value;
+						return numExpr;
+					});
+
+				return Parse.Any(negativeNumber, number);
+			}
+		}
 
 		public IParser WhereExpr
 		{
