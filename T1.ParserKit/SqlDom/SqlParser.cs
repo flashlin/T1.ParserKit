@@ -39,10 +39,23 @@ namespace T1.ParserKit.SqlDom
 			}
 		}
 
+		public IParser FuncGetdate()
+		{
+			return Parse.Chain(
+				Match("GETDATE"),
+				LParen,
+				RParen)
+				.MapResult(x => new SqlFunctionExpression()
+				{
+					Name = "GETDATE",
+					Parameters = new SqlExpression[0]
+				});
+		}
+
 		//DATEADD(DD,-1,DATEDIFF(dd, 0, GETDATE()))
 		public IParser FuncDateadd(IParser factor)
 		{
-			var datepartStr = new[] 
+			var datepartStr = new[]
 			{
 				"year", "quarter", "month", "dayofyear", "day",
 				"week", "weekday", "hour", "minute", "second", "millisecond", "microsecond",
@@ -58,7 +71,11 @@ namespace T1.ParserKit.SqlDom
 
 			var datepart = ContainsText(
 				datepartStr.Concat(abbreviationDatepartStr)
-				.ToArray());
+				.ToArray())
+				.MapResult(x => new SqlOptionNameExpression()
+				{
+					Value = x[0].GetText()
+				});
 
 			return Parse.Chain(
 				Match("DATEADD"),
@@ -66,8 +83,75 @@ namespace T1.ParserKit.SqlDom
 				datepart,
 				Comma,
 				factor,
+				Comma,
+				factor,
 				RParen
-			);
+			).MapResult(x => new SqlFunctionExpression()
+			{
+				Name = "DATEADD",
+				Parameters = new[]
+				{
+					(SqlExpression)x[2],
+					(SqlExpression)x[4],
+					(SqlExpression)x[6],
+				}
+			});
+		}
+
+		//DATEDIFF(dd, 0, GETDATE())
+		public IParser FuncDatediff(IParser factor)
+		{
+			var datepartStr = new[]
+			{
+				"year", "quarter", "month", "dayofyear", "day",
+				"week", "hour", "minute", "second", "millisecond",
+				"microsecond", "nanosecond"
+			};
+
+			var abbreviationDatepartStr = new[]
+			{
+				"yy", "yyyy", "qq", "q", "mm", "m",
+				"dy", "y", "dd", "d", "wk", "ww",
+				"hh", "mi", "n", "ss", "s", "ms",
+				"mcs", "ns"
+			};
+
+			var datepart = ContainsText(datepartStr.Concat(abbreviationDatepartStr)
+				.ToArray())
+				.MapResult(x => new SqlOptionNameExpression()
+				{
+					Value = x[0].GetText()
+				});
+
+			return Parse.Chain(
+				Match("DATEDIFF"),
+				LParen,
+				datepart,
+				Comma,
+				NumberExpr,
+				Comma,
+				factor,
+				RParen
+				).MapResult(x => new SqlFunctionExpression()
+				{
+					Name = "DATEDIFF",
+					Parameters = new[]
+				{
+					(SqlExpression)x[2],
+					(SqlExpression)x[4],
+					(SqlExpression)x[6]
+				}
+				});
+		}
+
+		public IParser SqlFunctions(IParser factor)
+		{
+			return Parse.Any(
+				FuncGetdate(),
+				FuncDateadd(factor),
+				FuncIsnull(factor),
+				FuncDatediff(factor),
+				factor);
 		}
 
 		//ISNULL(@SblimitExpiredDate, xxx)
@@ -83,7 +167,7 @@ namespace T1.ParserKit.SqlDom
 				.MapResult(x => new SqlFunctionExpression()
 				{
 					Name = "ISNULL",
-					Parameters = new []{ (SqlExpression)x[2], (SqlExpression)x[4] }
+					Parameters = new[] { (SqlExpression)x[2], (SqlExpression)x[4] }
 				});
 		}
 
@@ -258,7 +342,11 @@ namespace T1.ParserKit.SqlDom
 		{
 			get
 			{
-				return Parse.Any(FieldExpr, NumberExpr, Variable);
+				return Parse.Any(
+					FuncGetdate(),
+					FieldExpr,
+					NumberExpr,
+					Variable);
 			}
 		}
 
@@ -454,22 +542,62 @@ namespace T1.ParserKit.SqlDom
 
 		public IParser RecStartExpr(IParser factor)
 		{
-			return IfExpr(StartExpr).Or(factor);
+			var ifExpr = IfExpr(StartExpr);
+			var sqlFuncExpr = SqlFunctions(ifExpr).Or(SqlFunctions(Atom));
+			return Parse.Any(
+				ifExpr,
+				sqlFuncExpr,
+				factor);
 		}
 
 		public IParser StartExpr
 		{
 			get
 			{
-				var startExpr = Parse.Any(RecSelectExpr(SelectExpr),
+				var startExpr = Parse.Any(
+					RecSelectExpr(SelectExpr),
 					DeclareVariableExpr,
 					SetNocountExpr);
-				return IfExpr(startExpr);
+
+				var ifExpr = IfExpr(startExpr);
+
+				return SqlFunctions(ifExpr);
 			}
+		}
+
+		public IParser Recursive(IParser factor, IEnumerable<Func<IParser, IParser>> parsers)
+		{
+			var curr = (IParser)null;
+			foreach (var parser in parsers)
+			{
+				curr = parser(curr ?? factor);
+			}
+			return curr;
+		}
+
+		public IParser StartExpr2()
+		{
+			var statementExpr = Parse.Any(
+				RecSelectExpr(SelectExpr),
+				DeclareVariableExpr,
+				SetNocountExpr,
+				SqlFunctions(Atom));
+
+			var ifExpr = IfExpr(statementExpr);
+
+			var lastExpr =
+				Recursive(ifExpr, new Func<IParser, IParser>[]
+				{
+					IfExpr,
+					SqlFunctions
+				});
+
+			return lastExpr;
 		}
 
 		public SqlExpression[] ParseText(string code)
 		{
+			return StartExpr2().ParseText(code).Cast<SqlExpression>().ToArray();
 			return RecStartExpr(StartExpr).ParseText(code).Cast<SqlExpression>().ToArray();
 		}
 
