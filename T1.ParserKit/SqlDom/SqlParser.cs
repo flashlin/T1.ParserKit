@@ -55,23 +55,7 @@ namespace T1.ParserKit.SqlDom
 		//DATEADD(DD,-1,DATEDIFF(dd, 0, GETDATE()))
 		public IParser FuncDateadd(IParser factor)
 		{
-			var datepartStr = new[]
-			{
-				"year", "quarter", "month", "dayofyear", "day",
-				"week", "weekday", "hour", "minute", "second", "millisecond", "microsecond",
-				"nanosecond"
-			};
-
-			var abbreviationDatepartStr = new[]
-			{
-				"yy", "yyyy", "qq", "q", "mm", "m", "dy", "y",
-				"dd", "d", "wk", "ww", "dw", "w", "hh", "mi", "n",
-				"ss", "s", "ms", "mcs", "ns"
-			};
-
-			var datepart = ContainsText(
-				datepartStr.Concat(abbreviationDatepartStr)
-				.ToArray())
+			var datepart = ContainsText(DateaddDetepart)
 				.MapResult(x => new SqlOptionNameExpression()
 				{
 					Value = x[0].GetText()
@@ -115,6 +99,23 @@ namespace T1.ParserKit.SqlDom
 
 		private static readonly string[] DatediffDatepart = DatediffDatepartStr
 			.Concat(DatediffAbbreviationDatepartStr)
+			.ToArray();
+
+		private static readonly string[] DateaddDatepartStr = new[]
+		{
+			"year", "quarter", "month", "dayofyear", "day",
+			"week", "weekday", "hour", "minute", "second", "millisecond", "microsecond",
+			"nanosecond"
+		};
+
+		private static readonly string[] DateaddAbbreviationDatepartStr = new[]
+		{
+			"yy", "yyyy", "qq", "q", "mm", "m", "dy", "y",
+			"dd", "d", "wk", "ww", "dw", "w", "hh", "mi", "n",
+			"ss", "s", "ms", "mcs", "ns"
+		};
+
+		private static readonly string[] DateaddDetepart = DateaddDatepartStr.Concat(DateaddAbbreviationDatepartStr)
 			.ToArray();
 
 		//DATEDIFF(dd, 0, GETDATE())
