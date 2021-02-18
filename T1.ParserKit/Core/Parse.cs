@@ -166,12 +166,12 @@ namespace T1.ParserKit.Core
 			});
 		}
 
-		public static IParser Contains(IEnumerable<string> texts, bool ignoreCase = false)
+		public static IParser Contains(IEnumerable<string> sortedTexts, bool ignoreCase = false)
 		{
-			var sortedTexts = texts.CastArray();
-			var maxLen = sortedTexts[0].Length;
+			var textsArr = sortedTexts.CastArray();
+			var maxLen = textsArr[0].Length;
 
-			var strTexts = string.Join(",", sortedTexts);
+			var strTexts = string.Join(",", textsArr);
 			if (ignoreCase)
 			{
 				strTexts = $"'{strTexts}'";
@@ -184,12 +184,12 @@ namespace T1.ParserKit.Core
 				var maxText = inp.Substr(maxLen);
 				var matched = false;
 				var consumed = 0;
-				for (var i = 0; i < sortedTexts.Length && !matched; i++)
+				for (var i = 0; i < textsArr.Length && !matched; i++)
 				{
-					matched = maxText.StartsWith(sortedTexts[i], comparison);
+					matched = maxText.StartsWith(textsArr[i], comparison);
 					if (matched)
 					{
-						consumed = sortedTexts[i].Length;
+						consumed = textsArr[i].Length;
 					}
 				}
 
