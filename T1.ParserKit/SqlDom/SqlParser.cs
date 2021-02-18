@@ -584,9 +584,12 @@ namespace T1.ParserKit.SqlDom
 			return SkipBlanks(SqlIdentifier.Next(NotKeyword));
 		}
 
+		private static readonly HashSet<string> Keywords = new HashSet<string>(
+			SqlTokenizer.Keywords.Concat(SqlTokenizer.Keywords.Select(x=>x.ToLower())));
+
 		private static string NotKeyword(ITextSpan[] r)
 		{
-			return SqlTokenizer.Keywords.Contains(r[0].GetText().ToUpper()) ? "keyword" : "";
+			return Keywords.Contains(r[0].GetText()) ? "keyword" : "";
 		}
 
 		protected IParser Match(string text)
