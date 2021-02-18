@@ -158,7 +158,8 @@ namespace T1.ParserKit.Core
 		public static IParser ManyDelimitedBy(this IParser parser, IParser delimited)
 		{
 			var tail = delimited.Then(parser);
-			return parser.Then(tail.AtLeastOnce());
+			//return parser.Then(tail.AtLeastOnce());
+			return Parse.Any(parser.Then(tail.AtLeastOnce()), parser);
 		}
 
 		public static IParser MapAssign<T>(this IParser p, Action<ITextSpan[], T> f)

@@ -432,6 +432,77 @@ namespace T1.ParserKit.SqlDom
 			}
 		}
 
+		public IParser DatabaseDboSchemaName =>
+			Parse.Chain(Identifier(),
+				Symbol("."),
+				Identifier(),
+				Symbol("."),
+				Identifier()
+			).Merge()
+			.MapResult(x => new ObjectNameExpression()
+			{
+				Name = x[0].GetText()
+			});
+
+		private IParser DboSchemaName =>
+			Parse.Chain(Identifier(),
+				Symbol("."),
+				Identifier()
+			).Merge()
+			.MapResult(x => new ObjectNameExpression()
+			{
+				Name = x[0].GetText()
+			});
+
+		private IParser SchemaName =>
+			Identifier()
+			.MapResult(x=>new ObjectNameExpression()
+			{
+				Name = x[0].GetText()
+			});
+
+		private IParser DatabaseSchemaObjectName =>
+			Parse.Any(DatabaseDboSchemaName, DboSchemaName, SchemaName);
+
+
+		private IParser SetFieldEqualExpr(IParser factor)
+		{
+			return Parse.Chain(
+				Match("SET"),
+				SchemaName,
+				Symbol("="),
+				factor)
+				.MapResult(x => new UpdateSetFieldExpression()
+				{
+					FieldName = x[1].GetText(),
+					AssignExpr = (SqlExpression)x[3]
+				});
+		}
+
+		private IParser SetFieldEqualExprs(IParser factor)
+		{
+			return SetFieldEqualExpr(factor).ManyDelimitedBy(Comma)
+				.MapResult(x => new ManySqlExpression()
+				{
+					Items = x.TakeEvery(1).ToArray()
+				});
+		}
+
+		public IParser UpdateExpr(IParser factor)
+		{
+			var updateExpr = Parse.Chain(
+				Match("UPDATE"),
+				DatabaseSchemaObjectName,
+				SetFieldEqualExprs(factor),
+				WhereExpr.Optional()
+			).MapResult(x => new UpdateExpression()
+			{
+				SetFields = ((ManySqlExpression)x[2]).Items.Cast<UpdateSetFieldExpression>().ToArray(),
+				WhereExpr = x.FirstCast<WhereExpression>()
+			});
+			return Parse.Any(updateExpr, factor);
+		}
+
 		public IParser SelectExpr =>
 			Parse.Chain(
 				Match("SELECT"),
@@ -569,9 +640,10 @@ namespace T1.ParserKit.SqlDom
 				SqlFunctions(Atom));
 
 			var ifExpr = IfExpr(statementExpr);
+			var updateExpr = UpdateExpr(ifExpr);
 
 			var lastExpr =
-				Recursive(ifExpr, new Func<IParser, IParser>[]
+				Recursive(updateExpr, new Func<IParser, IParser>[]
 				{
 					IfExpr,
 					SqlFunctions
@@ -591,7 +663,7 @@ namespace T1.ParserKit.SqlDom
 		}
 
 		private static readonly HashSet<string> Keywords = new HashSet<string>(
-			SqlTokenizer.Keywords.Concat(SqlTokenizer.Keywords.Select(x=>x.ToLower())));
+			SqlTokenizer.Keywords.Concat(SqlTokenizer.Keywords.Select(x => x.ToLower())));
 
 		private static string NotKeyword(ITextSpan[] r)
 		{
