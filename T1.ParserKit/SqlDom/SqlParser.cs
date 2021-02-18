@@ -529,9 +529,15 @@ namespace T1.ParserKit.SqlDom
 					Items = x.Cast<SqlExpression>().ToArray()
 				});
 
+			var groupFilterExpr =
+				Parse.Chain(LParen, FilterExpr(Atom), RParen)
+					.MapResult(x => x[1]);
+
+			var conditionExpr = Parse.Any(groupFilterExpr, FilterExpr(Atom));
+
 			var ifExpr = Parse.Chain(
 				Match("IF"),
-				FilterExpr(Atom),
+				conditionExpr,
 				Match("BEGIN"),
 				body,
 				Match("END"))

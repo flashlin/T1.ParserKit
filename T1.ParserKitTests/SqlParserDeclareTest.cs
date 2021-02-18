@@ -126,6 +126,88 @@ namespace T1.ParserKitTests
 		}
 
 		[Fact]
+		public void If_L_variable_eq_1_R_begin_select_field_from_table_end()
+		{
+			GiveText("if (@name=1) BEGIN select name from customer END");
+			WhenParse();
+			ThenResultShouldBe(new IfExpression()
+			{
+				File = String.Empty,
+				Content = _code,
+				Position = 0,
+				Length = _code.Length,
+				Condition = new FilterExpression
+				{
+					Left = new VariableExpression
+					{
+						Name = "@name",
+						File = "",
+						Length = 5,
+						Position = 4,
+						Content = _code
+					},
+					Oper = "=",
+					Right = new NumberExpression
+					{
+						Value = 1,
+						ValueTypeFullname = typeof(int).FullName,
+						File = "",
+						Length = 1,
+						Position = 10,
+						Content = _code
+					},
+					File = "",
+					Length = 9,
+					Position = 3,
+					Content = _code
+				},
+				Body = new StatementsExpression
+				{
+					Items = new SqlExpression[]
+					{
+						new SelectExpression
+						{
+							Fields = new FieldsExpression
+							{
+								Items = new List<SqlExpression>
+								{
+									new FieldExpression
+									{
+										Name = "name",
+										File = string.Empty,
+										Length = 4,
+										Position = 26,
+										Content = _code
+									}
+								},
+								File = string.Empty,
+								Length = 4,
+								Position = 26,
+								Content = _code
+							},
+							From = new TableExpression
+							{
+								Name = "customer",
+								File = string.Empty,
+								Length = 8,
+								Position = 36,
+								Content = _code
+							},
+							File = string.Empty,
+							Length = 25,
+							Position = 19,
+							Content = _code
+						}
+					},
+					File = "",
+					Length = 25,
+					Position = 19,
+					Content = _code
+				}
+			});
+		}
+
+		[Fact]
 		public void If_variable_eq_1_begin_nest_if_select_field_from_table_end()
 		{
 			GiveText("if @name=1 BEGIN if @id=2 BEGIN select name from customer END END");
@@ -202,8 +284,8 @@ namespace T1.ParserKitTests
 						{
 							Fields = new FieldsExpression
 							{
-								 Items = new List<SqlExpression> 
-								 { 
+								 Items = new List<SqlExpression>
+								 {
 									 new FieldExpression
 									 {
 										  Name = "name",
