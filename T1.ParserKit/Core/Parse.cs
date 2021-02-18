@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using T1.ParserKit.Helpers;
 using T1.Standard.Common;
 using T1.Standard.Extensions;
@@ -167,16 +166,9 @@ namespace T1.ParserKit.Core
 			});
 		}
 
-		private static string[] SortTexts(IEnumerable<string> texts)
-		{
-			var textsArr = texts.CastArray();
-			var sortedTexts = textsArr.OrderByDescending(x => x.Length).ToArray();
-			return sortedTexts;
-		}
-
 		public static IParser Contains(IEnumerable<string> texts, bool ignoreCase = false)
 		{
-			var sortedTexts = SortTexts(texts);
+			var sortedTexts = texts.CastArray();
 			var maxLen = sortedTexts[0].Length;
 
 			var strTexts = string.Join(",", sortedTexts);

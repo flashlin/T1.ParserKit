@@ -99,6 +99,7 @@ namespace T1.ParserKit.SqlDom
 
 		private static readonly string[] DatediffDatepart = DatediffDatepartStr
 			.Concat(DatediffAbbreviationDatepartStr)
+			.OrderByDescending(x => x.Length)
 			.ToArray();
 
 		private static readonly string[] DateaddDatepartStr = new[]
@@ -116,6 +117,7 @@ namespace T1.ParserKit.SqlDom
 		};
 
 		private static readonly string[] DateaddDetepart = DateaddDatepartStr.Concat(DateaddAbbreviationDatepartStr)
+			.OrderByDescending(x => x.Length)
 			.ToArray();
 
 		//DATEDIFF(dd, 0, GETDATE())
@@ -179,7 +181,7 @@ namespace T1.ParserKit.SqlDom
 		{
 			get
 			{
-				var onOFf = ContainsText("ON", "OFF");
+				var onOFf = ContainsText("OFF", "ON");
 				return Parse.Chain(
 					Match("SET"),
 					Match("NOCOUNT"),
