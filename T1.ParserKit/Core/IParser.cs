@@ -3,6 +3,6 @@
 	public interface IParser
 	{
 		string Name { get; set; }
-		IParseResult TryParse(ITextSpan inp);
+		IParseResult TryParse(IInputReader inp);
 	}
 }

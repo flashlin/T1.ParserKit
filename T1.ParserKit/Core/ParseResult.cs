@@ -6,7 +6,7 @@ namespace T1.ParserKit.Core
 	{
 		public ITextSpan[] Result { get; set; }
 		public ParseError Error { get; set; }
-		public ITextSpan Rest { get; set; }
+		public IInputReader Rest { get; set; }
 
 		public bool IsSuccess()
 		{

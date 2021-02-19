@@ -9,7 +9,7 @@ namespace T1.ParserKit.Core
 {
 	public static class Parse
 	{
-		public static IParseResult Success(ITextSpan rest)
+		public static IParseResult Success(IInputReader rest)
 		{
 			return new ParseResult()
 			{
@@ -19,7 +19,7 @@ namespace T1.ParserKit.Core
 			};
 		}
 
-		public static IParseResult Success(ITextSpan textSpan, ITextSpan rest)
+		public static IParseResult Success(ITextSpan textSpan, IInputReader rest)
 		{
 			return new ParseResult()
 			{
@@ -29,7 +29,7 @@ namespace T1.ParserKit.Core
 			};
 		}
 
-		public static IParseResult Success(IEnumerable<ITextSpan> textSpanList, ITextSpan rest)
+		public static IParseResult Success(IEnumerable<ITextSpan> textSpanList, IInputReader rest)
 		{
 			return new ParseResult()
 			{
@@ -39,7 +39,7 @@ namespace T1.ParserKit.Core
 			};
 		}
 
-		public static IParseResult Error(string message, ITextSpan rest)
+		public static IParseResult Error(string message, IInputReader rest)
 		{
 			return new ParseResult()
 			{
@@ -54,7 +54,7 @@ namespace T1.ParserKit.Core
 			};
 		}
 
-		public static IParseResult Error(string message, IEnumerable<ParseError> innerErrors, ITextSpan rest)
+		public static IParseResult Error(string message, IEnumerable<ParseError> innerErrors, IInputReader rest)
 		{
 			return new ParseResult()
 			{
@@ -69,7 +69,7 @@ namespace T1.ParserKit.Core
 			};
 		}
 
-		public static IParseResult Error(string message, ParseError innerError, ITextSpan rest)
+		public static IParseResult Error(string message, ParseError innerError, IInputReader rest)
 		{
 			return Error(message, new[] { innerError }, rest);
 		}

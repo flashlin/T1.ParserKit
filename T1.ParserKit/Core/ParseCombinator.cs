@@ -285,7 +285,7 @@ namespace T1.ParserKit.Core
 			return parsed.Result;
 		}
 
-		public static IParser RemapResult(this IParser p, Func<ITextSpan, IParseResult, IParseResult> remap)
+		public static IParser RemapResult(this IParser p, Func<IInputReader, IParseResult, IParseResult> remap)
 		{
 			return new Parser(p.Name, inp =>
 			{
@@ -351,13 +351,7 @@ namespace T1.ParserKit.Core
 		}
 		public static IParseResult TryParseAllText(this IParser p, string code)
 		{
-			ITextSpan inp = new TextSpan()
-			{
-				File = string.Empty,
-				Content = code,
-				Length = code.Length,
-				Position = 0
-			};
+			IInputReader inp = new StringInputReader(code);
 
 			var acc = new List<ITextSpan>();
 			var curr = inp;
@@ -379,13 +373,7 @@ namespace T1.ParserKit.Core
 
 		public static IParseResult TryParseText(this IParser p, string code)
 		{
-			ITextSpan inp = new TextSpan()
-			{
-				File = string.Empty,
-				Content = code,
-				Length = code.Length,
-				Position = 0
-			};
+			IInputReader inp = new StringInputReader(code);
 			return p.TryParse(inp);
 		}
 	}

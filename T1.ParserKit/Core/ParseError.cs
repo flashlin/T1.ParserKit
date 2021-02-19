@@ -16,7 +16,7 @@ namespace T1.ParserKit.Core
 
 		public string Message { get; set; }
 
-		public ITextSpan Inp { get; set; }
+		public IInputReader Inp { get; set; }
 
 		public string GetErrorMessage(int tabs = 0)
 		{

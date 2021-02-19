@@ -4,7 +4,7 @@
 	{
 		ITextSpan[] Result { get; set; }
 		ParseError Error { get; set; }
-		ITextSpan Rest { get; set; }
+		IInputReader Rest { get; set; }
 		bool IsSuccess();
 	}
 }

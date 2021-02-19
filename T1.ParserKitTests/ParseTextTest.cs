@@ -60,7 +60,7 @@ namespace T1.ParserKitTests
 
 		private void WhenParse(IParser parser)
 		{
-			var inp = _text.GetTextSpan();
+			var inp = new StringInputReader(_text);
 			_result = parser.TryParse(inp);
 		}
 
