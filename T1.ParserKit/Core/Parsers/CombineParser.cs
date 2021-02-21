@@ -6,15 +6,18 @@ namespace T1.ParserKit.Core.Parsers
 {
 	public static class CombineParser
 	{
-		public static IParser<string> Many(this IParser<string> parser)
+		public static IParser<TextSpan> Many(this IParser<TextSpan> parser)
 		{
-			StringBuilder Seed() => new StringBuilder();
-			StringBuilder AccFunc(StringBuilder builder, string c) => builder.Append(c);
-			string ResultSelector(StringBuilder builder) => builder.ToString();
+			TextSpan Seed() => TextSpan.Empty;
+			TextSpan AccFunc(TextSpan builder, TextSpan c)
+			{
+				return builder + c;
+			}
+			TextSpan ResultSelector(TextSpan builder) => builder;
 			return parser.Aggregate(Seed, AccFunc, ResultSelector);
 		}
 
-		public static IParser<string> Many1(this IParser<string> parser)
+		public static IParser<TextSpan> Many1(this IParser<TextSpan> parser)
 		{
 			return from x in parser
 				from xs in Many(parser)

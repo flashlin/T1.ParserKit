@@ -69,21 +69,6 @@ namespace T1.ParserKit.Core
 			};
 		}
 
-		public static void CopyTextSpan(this ITextSpan to, IEnumerable<ITextSpan> from)
-		{
-			var fromArr = from.CastArray();
-			if (fromArr.Length == 0)
-			{
-				return;
-			}
-			var hd = fromArr.First();
-			var tl = fromArr.Last();
-			to.File = hd.File;
-			to.Content = hd.Content;
-			to.Position = hd.Position;
-			to.Length = tl.Position + tl.Length - hd.Position;
-		}
-
 		public static T FirstCast<T>(this IEnumerable<ITextSpan> textSpans)
 			where T : ITextSpan
 		{

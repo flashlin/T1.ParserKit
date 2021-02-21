@@ -43,7 +43,7 @@ namespace T1.ParserKit.Core
 			});
 		}
 
-		public static IParser<string> Match(string text)
+		public static IParser<TextSpan> Match(string text)
 		{
 			return Lexeme(
 				from value in Parse.Match(text)
@@ -51,12 +51,12 @@ namespace T1.ParserKit.Core
 				select value);
 		}
 
-		public static IParser<string> Symbol(string symbol)
+		public static IParser<TextSpan> Symbol(string symbol)
 		{
 			return Lexeme(Parse.Equal(symbol));
 		}
 
-		public static IParser<string> Contains(params string[] texts)
+		public static IParser<TextSpan> Contains(params string[] texts)
 		{
 			var sorted = texts.OrderByDescending(x => x.Length);
 			return Parse.Contains(texts).ThenLeft(Assertion());

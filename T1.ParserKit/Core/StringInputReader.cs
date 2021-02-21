@@ -73,7 +73,7 @@
 			return new TextSpan()
 			{
 				File = "",
-				Content = _text,
+				Content = Substr(len),
 				Position = _position,
 				Length = len
 			};

@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using T1.Standard.Extensions;
 
 namespace T1.ParserKit.Core
 {
@@ -25,6 +28,37 @@ namespace T1.ParserKit.Core
 				text = Content.Substring(Position, Length);
 			}
 			return $"Pos:{Position} '{text}'";
+		}
+
+		public static TextSpan From(IEnumerable<ITextSpan> from)
+		{
+			var fromArr = from.CastArray();
+			if (fromArr.Length == 0)
+			{
+				return TextSpan.Empty;
+			}
+			var hd = fromArr.First();
+			var tl = fromArr.Last();
+
+			return new TextSpan
+			{
+				File = hd.File,
+				Content = string.Join("", fromArr.Select(x => x.Content)),
+				Position = hd.Position,
+				Length = tl.Position + tl.Length - hd.Position
+			};
+		}
+
+
+		public static TextSpan operator +(TextSpan a, TextSpan b)
+		{
+			return new TextSpan()
+			{
+				File = a.File,
+				Content = a.Content + b.Content,
+				Position = a.Position,
+				Length = a.Length + b.Length
+			};
 		}
 	}
 }

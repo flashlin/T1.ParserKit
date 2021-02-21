@@ -15,9 +15,9 @@ namespace T1.ParserKit.SqlDom
 {
 	public class SqlParser
 	{
-		public static IParser<string> SqlIdentifier = _SqlIdentifier();
+		public static IParser<TextSpan> SqlIdentifier = _SqlIdentifier();
 
-		public static IParser<string> _SqlIdentifier()
+		public static IParser<TextSpan> _SqlIdentifier()
 		{
 			var start = Parse.Equal("[");
 			var body = Parse.NotEqual("]").Many1();
@@ -27,22 +27,27 @@ namespace T1.ParserKit.SqlDom
 					.Named("SqlIdentifier");
 		}
 
-		public static IParser<string> LParen = ParseToken.Symbol("(");
-		public static IParser<string> RParen = ParseToken.Symbol(")");
-		public static IParser<string> SemiColon = ParseToken.Symbol(";");
+		public static IParser<TextSpan> LParen = ParseToken.Symbol("(");
+		public static IParser<TextSpan> RParen = ParseToken.Symbol(")");
+		public static IParser<TextSpan> SemiColon = ParseToken.Symbol(";");
 
-		public static IParser<string> SqlDataType =
+		public static IParser<TextSpan> SqlDataType =
 			ParseToken.Contains("DATETIME", "BIGINT");
 
 		public static IParser<SqlFunctionExpression> FuncGetdate =
 			from getdate in ParseToken.Match("GETDATE")
 			from lparen in LParen
 			from rparen in RParen
-			select new SqlFunctionExpression()
+			select new[]{ getdate, lparen, rparen }.Reduce(x =>
+			new SqlFunctionExpression
 			{
+				File = x.File,
+				Content = x.Content,
+				Position	= x.Position,
+				Length = x.Length,
 				Name = "GETDATE",
 				Parameters = new SqlExpression[0]
-			};
+			});
 
 		////DATEADD(DD,-1,DATEDIFF(dd, 0, GETDATE()))
 		//public IParser FuncDateadd(IParser factor)

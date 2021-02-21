@@ -8,6 +8,18 @@ namespace T1.ParserKitTests
 		private string _text;
 		private IParseResult<object> _parsed;
 
+		protected void ThenResultShouldBe(string expected)
+		{
+			if (!_parsed.IsSuccess())
+			{
+				throw new ParseException(_parsed.Error);
+			}
+
+			var actualResult = (TextSpan)_parsed.Result;
+			expected.ToExpectedObject()
+				.ShouldMatch(actualResult.Content);
+		}
+
 		protected void ThenResultShouldBe<T>(T expected)
 		{
 			if (!_parsed.IsSuccess() )
