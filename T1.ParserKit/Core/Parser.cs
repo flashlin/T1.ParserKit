@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace T1.ParserKit.Core
 {
-	public class Parser : IParser
+	public class Parser<T> : IParser<T>
 	{
-		private readonly Func<IInputReader, IParseResult> _func;
+		private readonly Func<IInputReader, IParseResult<T>> _func;
 
-		public Parser(string name, Func<IInputReader, IParseResult> func)
+		public Parser(string name, Func<IInputReader, IParseResult<T>> func)
 		{
 			_func = func;
 			Name = name;
@@ -15,7 +15,7 @@ namespace T1.ParserKit.Core
 
 		public string Name { get; set; }
 
-		public IParseResult TryParse(IInputReader inp)
+		public IParseResult<T> TryParse(IInputReader inp)
 		{
 			return _func(inp);
 		}

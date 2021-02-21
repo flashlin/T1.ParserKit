@@ -1,7 +1,17 @@
-﻿namespace T1.ParserKit.Core
+﻿using System;
+
+namespace T1.ParserKit.Core
 {
 	public struct TextSpan : ITextSpan
 	{
+		public static TextSpan Empty = new TextSpan()
+		{
+			File = string.Empty,
+			Content = string.Empty,
+			Position = -1,
+			Length = 0
+		};
+
 		public string File { get; set; }
 		public string Content { get; set; }
 		public int Position { get; set; }

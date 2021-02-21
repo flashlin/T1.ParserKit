@@ -1,8 +1,8 @@
 ﻿namespace T1.ParserKit.Core
 {
-	public interface IParser
+	public interface IParser<T>
 	{
 		string Name { get; set; }
-		IParseResult TryParse(IInputReader inp);
+		IParseResult<T> TryParse(IInputReader inp);
 	}
 }

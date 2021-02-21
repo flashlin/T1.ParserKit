@@ -1,8 +1,9 @@
 ﻿namespace T1.ParserKit.Core
 {
-	public interface IParseResult
+	public interface IParseResult<T>
 	{
-		ITextSpan[] Result { get; set; }
+		ITextSpan TextSpan { get; set; }
+		T Result { get; set; }
 		ParseError Error { get; set; }
 		IInputReader Rest { get; set; }
 		bool IsSuccess();

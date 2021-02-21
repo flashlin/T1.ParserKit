@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using T1.Standard.IO;
 
 namespace T1.ParserKit.Core
@@ -40,6 +41,10 @@ namespace T1.ParserKit.Core
 
 		public override string ToString()
 		{
+			if (Message == string.Empty)
+			{
+				return String.Empty;
+			}
 			return $"{Message} at {Inp}\r\n" + GetErrorMessage();
 		}
 

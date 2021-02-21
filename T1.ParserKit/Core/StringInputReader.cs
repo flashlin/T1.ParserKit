@@ -13,6 +13,11 @@
 			_position = 0;
 		}
 
+		public int GetPosition()
+		{
+			return _position;
+		}
+
 		public bool Eof()
 		{
 			if (_position < 0)
@@ -34,6 +39,9 @@
 			{
 				return this;
 			}
+
+			_position += len;
+			return this;
 			return new StringInputReader(_text)
 			{
 				_position = _position + len

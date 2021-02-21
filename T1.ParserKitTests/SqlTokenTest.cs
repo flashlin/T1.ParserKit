@@ -9,15 +9,32 @@
 
 //namespace T1.ParserKitTests
 //{
-//	public class SqlParserPartialTest
+//	public class SqlTokenTest
 //	{
 //		private string _text;
 //		private readonly SqlParser _parser;
-//		private IParseResult<object> _parsed;
+//		private IParseResult _parsed;
+//		private SqlTokenizer SqlTokenizer = new SqlTokenizer();
 
-//		public SqlParserPartialTest()
+//		public SqlTokenTest()
 //		{
 //			_parser = new SqlParser();
+//		}
+
+//		[Fact]
+//		public void Keyword()
+//		{
+//			var code = "from";
+//			var rc = SqlTokenizer.KeywordsParser.ParseText(code);
+//			Assert.Equal("from", rc.GetText());
+//		}
+
+//		[Fact]
+//		public void SelectKeyword()
+//		{
+//			var code = "select";
+//			var parsed = SqlTokenizer.KeywordsParser.TryParseAllText(code);
+//			Assert.True(parsed.IsSuccess());
 //		}
 
 //		[Fact]
@@ -384,6 +401,7 @@
 //				DataType = "datetime"
 //			});
 //		}
+
 
 
 //		private void ThenResultShouldBe(SqlExpression expression)
