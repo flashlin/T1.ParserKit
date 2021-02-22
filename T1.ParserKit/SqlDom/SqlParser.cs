@@ -691,18 +691,6 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<TextSpan> Identifier =
 			ParseToken.Lexeme(SqlIdentifierExcludeKeyword);
 
-		//private static string NotKeyword(ITextSpan[] r)
-		//{
-		//	return Keywords.Contains(r[0].GetText()) ? "keyword" : "";
-		//}
-
-		//protected IParser Match(string text)
-		//{
-		//	return SkipBlanks(
-		//		Parse.Equal(text, true).Assertion(true)
-		//	).Named($"{text}");
-		//}
-
 		//protected static IParser Symbol(string text)
 		//{
 		//	return SkipBlanks(
