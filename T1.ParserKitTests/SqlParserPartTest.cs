@@ -87,5 +87,19 @@ namespace T1.ParserKitTests
 				Value = 123
 			});
 		}
+
+		[Fact]
+		public void NagativeInteger()
+		{
+			GiveText("-32");
+			WhenParse(SqlParser.NegativeIntegerExpr);
+			ThenResultShouldBe(new NumberExpression()
+			{
+				ValueTypeFullname = typeof(int).FullName,
+				Value = -32
+			});
+		}
+
+
 	}
 }

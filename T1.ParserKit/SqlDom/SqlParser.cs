@@ -32,6 +32,7 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<TextSpan> SemiColon = ParseToken.Symbol(";");
 		public static IParser<TextSpan> Dot = ParseToken.Symbol(".");
 		public static IParser<TextSpan> Comma =	ParseToken.Symbol(",");
+		public static IParser<TextSpan> Minus =	ParseToken.Symbol("-");
 
 		public static IParser<TextSpan> SqlDataType =
 			ParseToken.Contains("DATETIME", "BIGINT");
@@ -404,6 +405,14 @@ namespace T1.ParserKit.SqlDom
 				{
 					ValueTypeFullname = typeof(int).FullName,
 					Value = int.Parse(x.Text)
+				});
+
+		public static IParser<NumberExpression> NegativeIntegerExpr =
+			ParseToken.Lexeme(Minus, Parse.Digits)
+				.MapResult(x => new NumberExpression()
+				{
+					ValueTypeFullname = typeof(int).FullName,
+					Value = int.Parse($"{x[0].Text}{x[1].Text}")
 				});
 
 		//public IParser NumberExpr

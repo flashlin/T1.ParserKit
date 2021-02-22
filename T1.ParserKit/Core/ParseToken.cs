@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using T1.ParserKit.Core.Parsers;
 
 namespace T1.ParserKit.Core
 {
@@ -15,6 +17,13 @@ namespace T1.ParserKit.Core
 
 			return from _ in Parse.Blanks.Optional()
 					 from value in parser
+					 select value;
+		}
+
+		public static IParser<IEnumerable<T>> Lexeme<T>(params IParser<T>[] parsers)
+		{
+			return from _ in Parse.Blanks.Optional()
+					 from value in parsers.Sequence()
 					 select value;
 		}
 
