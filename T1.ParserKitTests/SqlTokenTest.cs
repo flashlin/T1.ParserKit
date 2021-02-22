@@ -19,6 +19,14 @@ namespace T1.ParserKitTests
 			ThenResultShouldFail();
 		}
 
+		[Fact]
+		public void NonKeyword()
+		{
+			GiveText("name");
+			WhenParse(SqlParser.Identifier);
+			ThenResultShouldBe("name");
+		}
+
 		//[Fact]
 		//public void SelectKeyword()
 		//{
