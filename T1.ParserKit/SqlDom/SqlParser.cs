@@ -34,35 +34,31 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<TextSpan> SqlDataType =
 			ParseToken.Contains("DATETIME", "BIGINT");
 
+		//public static IParser<SqlFunctionExpression> FuncGetdate =
+		//	Parse.Sequence(ParseToken.Match("GETDATE"),
+		//			LParen,
+		//			RParen)
+		//		.MapResult(x =>
+		//		{
+		//			var xs = x.CastArray();
+		//			return new SqlFunctionExpression()
+		//			{
+		//				TextSpan = xs.GetTextSpan(),
+		//				Name = "GETDATE",
+		//				Parameters = new SqlExpression[0]
+		//			};
+		//		});
+
 		public static IParser<SqlFunctionExpression> FuncGetdate =
-			Parse.Sequence(ParseToken.Match("GETDATE"),
-					LParen,
-					RParen)
-				.MapResult(x =>
-				{
-					var xs = x.CastArray();
-					return new SqlFunctionExpression()
-					{
-						TextSpan = xs.GetTextSpan(),
-						Name = "GETDATE",
-						Parameters = new SqlExpression[0]
-					};
-				});
-
-
-			//from getdate in ParseToken.Match("GETDATE")
-			//from lparen in LParen
-			//from rparen in RParen
-			//select new[]{ getdate, lparen, rparen }.Reduce(x =>
-			//new SqlFunctionExpression
-			//{
-			//	File = x.File,
-			//	Content = x.Content,
-			//	Position	= x.Position,
-			//	Length = x.Length,
-			//	Name = "GETDATE",
-			//	Parameters = new SqlExpression[0]
-			//});
+			from getdate in ParseToken.Match("GETDATE")
+			from lparen in LParen
+			from rparen in RParen
+			select new SqlFunctionExpression
+			{
+				TextSpan = new[] { getdate, lparen, rparen }.GetTextSpan(),
+				Name = "GETDATE",
+				Parameters = new SqlExpression[0]
+			};
 
 		////DATEADD(DD,-1,DATEDIFF(dd, 0, GETDATE()))
 		//public IParser FuncDateadd(IParser factor)
