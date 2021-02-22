@@ -75,5 +75,17 @@ namespace T1.ParserKitTests
 				From = "db1.customer"
 			});
 		}
+
+		[Fact]
+		public void Integer()
+		{
+			GiveText("123");
+			WhenParse(SqlParser.IntegerExpr);
+			ThenResultShouldBe(new NumberExpression()
+			{
+				ValueTypeFullname = typeof(int).FullName,
+				Value = 123
+			});
+		}
 	}
 }
