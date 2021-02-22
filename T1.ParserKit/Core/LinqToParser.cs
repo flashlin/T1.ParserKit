@@ -48,14 +48,14 @@ namespace T1.ParserKit.Core
 			{
 				return func(parsed.Result);
 			}
-			return Parse.Error<TResult>(parsed.Error, parsed.Rest);
+			return Parse.Error<TResult>(parsed.Error);
 		}
 
 		public static IParseResult<TResult> Select<T, TResult>(
 			this IParseResult<T> parsed, 
 			Func<T, TResult> func)
 		{
-			return parsed.Select(x => Parse.Success(parsed.TextSpan, func(x), parsed.Rest));
+			return parsed.Select(x => Parse.Success(func(x)));
 		}
 
 		public static IParseResult<TResult> SelectMany<T1, T2, TResult>(

@@ -33,10 +33,8 @@ namespace T1.ParserKit.Core
 		{
 			return new ParseResult<object>()
 			{
-				TextSpan = parsed.TextSpan,
 				Result = parsed.Result,
 				Error = parsed.Error,
-				Rest = parsed.Rest
 			};
 		}
 
@@ -113,18 +111,15 @@ namespace T1.ParserKit.Core
 		public static IEnumerable<IParseResult<T>> TryParseAllText<T>(this IParser<T> p, string code)
 		{
 			IInputReader inp = new StringInputReader(code);
-			var curr = inp;
 			do
 			{
-				var parsed = p.TryParse(curr);
+				var parsed = p.TryParse(inp);
 				if (!parsed.IsSuccess())
 				{
 					yield return parsed;
 					break;
 				}
-
-				curr = parsed.Rest;
-			} while (!curr.Eof());
+			} while (!inp.Eof());
 		}
 
 		public static IParseResult<T> TryParseText<T>(this IParser<T> p, string code)

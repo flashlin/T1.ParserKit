@@ -27,7 +27,7 @@ namespace T1.ParserKit.Core.Parsers
 				return result;
 
 			var ch = inp.Substr(20);
-			return Parse.Error<T>($"Expect {resultValue}, but got '{ch}' at {inp}.", inp);
+			return Parse.Error<T>($"Expect {resultValue}, but got '{ch}' at {inp}.", inp.GetPosition());
 		}
 	}
 }

@@ -11,85 +11,68 @@ namespace T1.ParserKit.Core
 {
 	public static class Parse
 	{
-		public static IParseResult<T> Success<T>(IInputReader rest)
+		public static IParseResult<T> Success<T>()
 		{
 			return new ParseResult<T>()
 			{
-				TextSpan = default,
 				Result = default,
-				Rest = rest,
 				Error = ParseError.Empty,
 			};
 		}
 
-		public static IParseResult<T> Success<T>(ITextSpan textSpan, IInputReader rest)
-			where T : ITextSpan
+		public static IParseResult<T> Success<T>(T result)
 		{
 			return new ParseResult<T>()
 			{
-				TextSpan = textSpan,
-				Result = (T)textSpan,
-				Rest = rest,
-				Error = ParseError.Empty,
-			};
-		}
-
-		public static IParseResult<T> Success<T>(ITextSpan textSpan, T result, IInputReader rest)
-		{
-			return new ParseResult<T>()
-			{
-				TextSpan = textSpan,
 				Result = result,
-				Rest = rest,
 				Error = ParseError.Empty,
 			};
 		}
 
-		public static IParseResult<T> Error<T>(string message, IInputReader rest)
+		public static IParseResult<T> Error<T>(string message, int position)
 		{
 			return new ParseResult<T>()
 			{
-				TextSpan = default,
 				Result = default,
-				Rest = rest,
 				Error = new ParseError()
 				{
 					Message = message,
-					Inp = rest,
+					Position = position,
 					InnerErrors = new ParseError[0]
 				}
 			};
 		}
 
-		public static IParseResult<T> Error<T>(ParseError error, IInputReader rest)
+		public static IParseResult<T> Error<T>(ParseError error)
 		{
 			return new ParseResult<T>()
 			{
-				TextSpan = default,
 				Result = default,
-				Rest = rest,
 				Error = error
 			};
 		}
 
-		public static IParseResult<T> Error<T>(string message, IEnumerable<ParseError> innerErrors, IInputReader rest)
+		public static IParseResult<T> Error<T>(string message,
+			IEnumerable<ParseError> innerErrors,
+			int position)
 		{
 			return new ParseResult<T>()
 			{
 				Result = default,
-				Rest = rest,
 				Error = new ParseError()
 				{
 					Message = message,
-					Inp = rest,
+					Position = position,
 					InnerErrors = innerErrors.CastArray()
 				}
 			};
 		}
 
-		public static IParseResult<T> Error<T>(string message, ParseError innerError, IInputReader rest)
+		public static IParseResult<T> Error<T>(string message,
+			ParseError innerError,
+			int position)
 		{
-			return Error<T>(message, new[] { innerError }, rest);
+			return Error<T>(message, new[] { innerError }, position);
 		}
 
 		//public static IParser<T> SymbolAssertion<T>()
@@ -125,6 +108,22 @@ namespace T1.ParserKit.Core
 			return rc.Cast<ITextSpan>().Reduce(fn);
 		}
 
+		public static IParser<TResult> MapResult<T, TResult>(this IParser<IEnumerable<T>> p,
+			Func<IEnumerable<T>, TResult> map)
+		{
+			return new Parser<TResult>(p.Name, inp =>
+			{
+				var parsed = p.TryParse(inp);
+				if (!parsed.IsSuccess())
+				{
+					return Parse.Error<TResult>(parsed.Error);
+				}
+
+				var result = map(parsed.Result);
+				return Parse.Success<TResult>(result);
+			});
+		}
+
 		public static TResult Reduce<TResult>(this IEnumerable<ITextSpan> rc, Func<ITextSpan, TResult> fn)
 		{
 			var rcArr = rc.CastArray();
@@ -145,9 +144,9 @@ namespace T1.ParserKit.Core
 				if (text == ch)
 				{
 					var textSpan = inp.Consume(text.Length);
-					return Parse.Success<TextSpan>(textSpan, inp.AdvanceBy(text.Length));
+					return Parse.Success<TextSpan>(textSpan);
 				}
-				return Parse.Error<TextSpan>($"Expect {text}, but got '{ch}' at {inp}.", inp);
+				return Parse.Error<TextSpan>($"Expect {text}, but got '{ch}' at {inp}.", inp.GetPosition());
 			});
 		}
 
@@ -159,9 +158,9 @@ namespace T1.ParserKit.Core
 				if (text != ch)
 				{
 					var textSpan = inp.Consume(text.Length);
-					return Parse.Success<TextSpan>(textSpan, inp.AdvanceBy(text.Length));
+					return Parse.Success<TextSpan>(textSpan);
 				}
-				return Parse.Error<TextSpan>($"Expect {text}, but got '{ch}' at {inp}.", inp);
+				return Parse.Error<TextSpan>($"Expect {text}, but got '{ch}' at {inp}.", inp.GetPosition());
 			});
 		}
 
@@ -175,9 +174,9 @@ namespace T1.ParserKit.Core
 				if (text1 == ch1)
 				{
 					var textSpan = inp.Consume(text.Length);
-					return Parse.Success<TextSpan>(textSpan,inp.AdvanceBy(text.Length));
+					return Parse.Success<TextSpan>(textSpan);
 				}
-				return Parse.Error<TextSpan>($"Expect {text}, but got '{ch}' at {inp}.", inp);
+				return Parse.Error<TextSpan>($"Expect {text}, but got '{ch}' at {inp}.", inp.GetPosition());
 			});
 		}
 
@@ -191,9 +190,9 @@ namespace T1.ParserKit.Core
 				if (text1 != ch1)
 				{
 					var textSpan = inp.Consume(text.Length);
-					return Parse.Success<TextSpan>(textSpan,inp.AdvanceBy(text.Length));
+					return Parse.Success<TextSpan>(textSpan);
 				}
-				return Parse.Error<TextSpan>($"Expect {text}, but got '{ch}' at {inp}.", inp);
+				return Parse.Error<TextSpan>($"Expect {text}, but got '{ch}' at {inp}.", inp.GetPosition());
 			});
 		}
 
@@ -431,11 +430,11 @@ namespace T1.ParserKit.Core
 
 				if (!matched)
 				{
-					return Parse.Error<TextSpan>($"Expect {name}, but got '{maxText}' at {inp}.", inp);
+					return Parse.Error<TextSpan>($"Expect {name}, but got '{maxText}' at {inp}.", inp.GetPosition());
 				}
 
 				var span = inp.Consume(consumed);
-				return Parse.Success<TextSpan>(span,inp.AdvanceBy(consumed));
+				return Parse.Success<TextSpan>(span);
 			});
 		}
 
@@ -466,10 +465,10 @@ namespace T1.ParserKit.Core
 				var ch = inp.Substr(1);
 				if (ch != string.Empty && char.IsDigit(ch[0]))
 				{
-					return Parse.Success<TextSpan>(inp.Consume(1),inp.AdvanceBy(1));
+					return Parse.Success<TextSpan>(inp.Consume(1));
 				}
 
-				return Parse.Error<TextSpan>($"Expect digit, but got '{ch}' at {inp}.", inp);
+				return Parse.Error<TextSpan>($"Expect digit, but got '{ch}' at {inp}.", inp.GetPosition());
 			});
 
 		public static IParser<TextSpan> Letter =
@@ -478,9 +477,9 @@ namespace T1.ParserKit.Core
 				var ch = inp.Substr(1);
 				if (ch != string.Empty && char.IsLetter(ch[0]))
 				{
-					return Parse.Success<TextSpan>(inp.Consume(1),inp.AdvanceBy(1));
+					return Parse.Success<TextSpan>(inp.Consume(1));
 				}
-				return Parse.Error<TextSpan>($"Expect letter, but got '{ch}' at {inp}.", inp);
+				return Parse.Error<TextSpan>($"Expect letter, but got '{ch}' at {inp}.", inp.GetPosition());
 			});
 
 		public static IParser<TextSpan> Digits =
@@ -592,27 +591,6 @@ namespace T1.ParserKit.Core
 		public static IEnumerable<TResult> GetAccumResults<TResult>(this IEnumerable<IParseResult<TResult>> accum)
 		{
 			return accum.Select(x => x.Result);
-		}
-
-		public static ITextSpan GetAccumTextSpan<T>(this IEnumerable<IParseResult<T>> accum)
-		{
-			var accumArry = accum.CastArray();
-			var first = accumArry.First().TextSpan;
-			var textSpan = first;
-			var last = accumArry.Last().TextSpan;
-			textSpan.Length = last.Position + last.Length - first.Position;
-			return textSpan;
-		}
-
-		public static IParseResult<T> GetAccumResult<T>(
-			this IEnumerable<IParseResult<T>> accum,
-			Func<IEnumerable<IParseResult<T>>, T> apply,
-			IParseResult<T> parsed)
-		{
-			var accumArr = accum.CastArray();
-			var result = apply(accumArr);
-			var textSpan = accumArr.GetAccumTextSpan();
-			return Parse.Success(textSpan, result, parsed.Rest);
 		}
 	}
 }

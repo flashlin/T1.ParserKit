@@ -2,10 +2,16 @@
 {
 	public interface IInputReader
 	{
-		bool Eof();
 		IInputReader AdvanceBy(int len);
-		string Substr(int len);
-		ITextSpan Consume(int len);
+
+		TextSpan Consume(int len);
+
+		bool Eof();
+		string GetFile();
+
 		int GetPosition();
+
+		string Substr(int len);
+		void Seek(int offset);
 	}
 }

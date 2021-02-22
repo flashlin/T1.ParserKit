@@ -13,7 +13,7 @@
 
 		public IParseResult<T> TryParse(IInputReader inp)
 		{
-			return Parse.Error<T>(_errorMessage, inp);
+			return Parse.Error<T>(_errorMessage, inp.GetPosition());
 		}
 	}
 }

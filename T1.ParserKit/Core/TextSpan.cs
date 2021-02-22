@@ -22,6 +22,11 @@ namespace T1.ParserKit.Core
 
 		public override string ToString()
 		{
+			if (Position == -1)
+			{
+				return "{EOS}";
+			}
+
 			var text = "";
 			if (Length > 0)
 			{
@@ -49,9 +54,30 @@ namespace T1.ParserKit.Core
 			};
 		}
 
-
 		public static TextSpan operator +(TextSpan a, TextSpan b)
 		{
+			if (a.Equals(TextSpan.Empty))
+			{
+				return new TextSpan()
+				{
+					File = b.File,
+					Content = b.Content,
+					Position = b.Position,
+					Length = b.Length
+				};
+			}
+
+			if (b.Equals(TextSpan.Empty))
+			{
+				return new TextSpan()
+				{
+					File = a.File,
+					Content = a.Content,
+					Position = a.Position,
+					Length = a.Length
+				};
+			}
+
 			return new TextSpan()
 			{
 				File = a.File,

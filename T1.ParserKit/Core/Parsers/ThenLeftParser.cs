@@ -19,12 +19,14 @@
 			{
 				return parsed1;
 			}
+			var pos = inp.GetPosition();
 
 			var parsed2 = _p2.TryParse(inp);
 			if (!parsed2.IsSuccess())
 			{
-				return Parse.Error<T1>(parsed1.Error, inp);
+				return Parse.Error<T1>(parsed1.Error);
 			}
+			inp.Seek(pos);
 			return parsed1;
 		}
 	}

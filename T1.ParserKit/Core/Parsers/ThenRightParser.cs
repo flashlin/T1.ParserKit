@@ -21,7 +21,7 @@ namespace T1.ParserKit.Core.Parsers
 			var parsed1 = _p1.TryParse(inp);
 			if (!parsed1.IsSuccess())
 			{
-				return Parse.Error<T2>(parsed1.Error, inp);
+				return Parse.Error<T2>(parsed1.Error);
 			}
 			return _p2.TryParse(inp);
 		}

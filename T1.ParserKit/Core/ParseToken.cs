@@ -22,24 +22,24 @@ namespace T1.ParserKit.Core
 			{
 				if (inp.Eof())
 				{
-					return Parse.Success<string>(inp);
+					return Parse.Success<string>();
 				}
 
 				var blank = Parse.Blank.TryParse(inp);
 				if (blank.IsSuccess())
 				{
-					return Parse.Success<string>(inp);
+					return Parse.Success<string>();
 				}
 
 				var ch = inp.Substr(1);
-				var error = Parse.Error<string>($"Expect assertion, but got '{ch}' at {inp}.", inp);
+				var error = Parse.Error<string>($"Expect assertion, but got '{ch}' at {inp}.", inp.GetPosition());
 
 				var letter = Parse.Letter.TryParse(inp);
 				if (letter.IsSuccess())
 				{
 					return error;
 				}
-				return Parse.Success<string>(inp);
+				return Parse.Success<string>();
 			});
 		}
 

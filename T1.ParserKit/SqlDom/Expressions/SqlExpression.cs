@@ -5,11 +5,12 @@ using T1.ParserKit.Core;
 
 namespace T1.ParserKit.SqlDom.Expressions
 {
-	public abstract class SqlExpression : ITextSpan
+	public abstract class SqlExpression
 	{
-		public string File { get; set; }
-		public int Length { get; set; }
-		public int Position { get; set; }
-		public string Content { get; set; }
+		public TextSpan TextSpan { get; set; }
+		//public string File { get; set; }
+		//public int Length { get; set; }
+		//public int Position { get; set; }
+		//public string Content { get; set; }
 	}
 }

@@ -13,9 +13,19 @@
 			_position = 0;
 		}
 
+		public string GetFile()
+		{
+			return "";
+		}
+
 		public int GetPosition()
 		{
 			return _position;
+		}
+
+		public void Seek(int offset)
+		{
+			_position = offset;
 		}
 
 		public bool Eof()
@@ -42,10 +52,6 @@
 
 			_position += len;
 			return this;
-			return new StringInputReader(_text)
-			{
-				_position = _position + len
-			};
 		}
 
 		public string Substr(int len)
@@ -57,26 +63,29 @@
 			return _text.Substring(_position, maxLen);
 		}
 
-		public ITextSpan Consume(int len)
+		public TextSpan Consume(int len)
 		{
 			if (Eof())
 			{
-				return new TextSpan()
-				{
-					File = "",
-					Content = "",
-					Position = -1,
-					Length = 0
-				};
+				return TextSpan.Empty;
 			}
 
-			return new TextSpan()
+			var textSpan = new TextSpan()
 			{
-				File = "",
+				File = string.Empty,
 				Content = Substr(len),
 				Position = _position,
 				Length = len
 			};
+
+			AdvanceBy(len);
+			return textSpan;
+		}
+
+		public override string ToString()
+		{
+			var ch = Substr(20);
+			return $"Pos:{_position} Rest='{ch}'";
 		}
 	}
 }

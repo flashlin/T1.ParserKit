@@ -1,4 +1,7 @@
-﻿namespace T1.ParserKit.Core
+﻿using System;
+using T1.ParserKit.SqlDom.Expressions;
+
+namespace T1.ParserKit.Core
 {
 	public interface IParser<T>
 	{

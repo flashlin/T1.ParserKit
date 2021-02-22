@@ -2,12 +2,10 @@
 
 namespace T1.ParserKit.Core
 {
-	public struct ParseResult<T> : IParseResult<T>
+	public class ParseResult<T> : IParseResult<T>
 	{
-		public ITextSpan TextSpan { get; set; }
 		public T Result { get; set; }
 		public ParseError Error { get; set; }
-		public IInputReader Rest { get; set; }
 
 		public bool IsSuccess()
 		{
@@ -18,7 +16,7 @@ namespace T1.ParserKit.Core
 		{
 			if (IsSuccess())
 			{
-				return TextSpan.GetText();
+				return $"{Result}";
 			}
 			return Error.Message;
 		}

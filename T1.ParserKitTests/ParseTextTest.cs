@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using T1.ParserKit.Core;
 using T1.ParserKit.Core.Parsers;
 using Xunit;
@@ -70,7 +71,7 @@ namespace T1.ParserKitTests
 		{
 			GiveText("a");
 			WhenParse(Parse.Equal("b").Many());
-			ThenResultShouldBe("");
+			ThenResultShouldBe(null);
 		}
 
 		[Fact]
@@ -80,5 +81,19 @@ namespace T1.ParserKitTests
 			WhenParse(Parse.CStyleIdentifier);
 			ThenResultShouldBe("name");
 		}
+
+		[Fact]
+		public void Sequence()
+		{
+			GiveText("ab");
+			WhenParse(Parse.Sequence(
+				Parse.Match("a"),
+				Parse.Match("b")
+				).Merge()
+			);
+			ThenResultShouldBe("ab");
+		}
+
+
 	}
 }

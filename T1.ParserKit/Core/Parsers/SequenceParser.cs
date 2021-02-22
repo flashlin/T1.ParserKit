@@ -16,23 +16,20 @@ namespace T1.ParserKit.Core.Parsers
 
 		public IParseResult<IEnumerable<T>> TryParse(IInputReader inp)
 		{
-			var acc = new List<IParseResult<T>>(_parsers.Length);
-			var curr = inp;
+			var acc = new T[_parsers.Length];
+			var idx = 0;
 
-			IParseResult<T> parsed = null;
 			foreach (var parser in _parsers)
 			{
-				parsed = parser.TryParse(curr);
+				var parsed = parser.TryParse(inp);
 				if (!parsed.IsSuccess())
 				{
-					return Parse.Error<IEnumerable<T>>(parsed.Error, curr);
+					return Parse.Error<IEnumerable<T>>(parsed.Error);
 				}
-				acc.Add(parsed);
-				curr = parsed.Rest;
+				acc[idx] = parsed.Result;
+				idx++;
 			}
-
-			var textSpan = acc.GetAccumTextSpan();
-			return Parse.Success(textSpan, acc.GetAccumResults(), parsed.Rest);
+			return Parse.Success<IEnumerable<T>>(acc);
 		}
 	}
 }

@@ -8,11 +8,11 @@
 		{
 			if (inp.Eof())
 			{
-				return Parse.Success<T>(inp);
+				return Parse.Success<T>();
 			}
 
 			var ch = inp.Substr(20);
-			return Parse.Error<T>($"Expected EOS, but got '{ch}' at {inp}.", inp);
+			return Parse.Error<T>($"Expected EOS, but got '{ch}' at {inp}.", inp.GetPosition());
 		}
 	}
 }

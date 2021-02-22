@@ -16,9 +16,9 @@ namespace T1.ParserKit.Core.Parsers
 		{
 			var result = _parser.TryParse(inp);
 			if (result.IsSuccess())
-				return Parse.Error<Unit>($"Expect {_parser.Name}, but got '{result.Result}' at {inp}.", inp);
+				return Parse.Error<Unit>($"Expect {_parser.Name}, but got '{result.Result}' at {inp}.", inp.GetPosition());
 
-			return Parse.Success(inp.Consume(0), Unit.Instance, inp);
+			return Parse.Success(Unit.Instance);
 		}
 	}
 }

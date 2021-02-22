@@ -25,45 +25,23 @@ namespace T1.ParserKit.Core.Parsers
 		public IParseResult<TResult> TryParse(IInputReader inp)
 		{
 			TAccum acc = _seed();
-
 			var position = inp.GetPosition();
-			IParseResult<T> lastParsed = null;
-			IParseResult<T> parsed = null;
-			var curr = inp;
-
 			do
 			{
-				parsed = _parser.TryParse(curr);
+				var parsed = _parser.TryParse(inp);
 				if (!parsed.IsSuccess())
 				{
 					break;
 				}
-				lastParsed = parsed;
 				acc = _accFunc(acc, parsed.Result);
-				curr = parsed.Rest;
 			} while (true);
 
-			if (lastParsed == null)
+			if (position == inp.GetPosition())
 			{
-				return Parse.Success(TextSpan.Empty, _resultSelector(acc), parsed.Rest);
+				return Parse.Success<TResult>();
 			}
 
-			var textSpan = GetParsedTextSpan(inp, lastParsed);
-			return Parse.Success(textSpan, _resultSelector(acc), parsed.Rest);
-		}
-
-		private static TextSpan GetParsedTextSpan(IInputReader inp, IParseResult<T> parsed)
-		{
-			var consumed = parsed.TextSpan.Position + parsed.TextSpan.Length - inp.GetPosition();
-
-			var textSpan = new TextSpan
-			{
-				File = parsed.TextSpan.File,
-				Content = inp.Substr(consumed),
-				Position = inp.GetPosition(),
-				Length = consumed
-			};
-			return textSpan;
+			return Parse.Success(_resultSelector(acc));
 		}
 	}
 }

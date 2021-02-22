@@ -4,12 +4,12 @@ using T1.Standard.IO;
 
 namespace T1.ParserKit.Core
 {
-	public struct ParseError
+	public class ParseError
 	{
 		public static ParseError Empty = new ParseError()
 		{
 			Message = string.Empty,
-			Inp = default,
+			Position = -1,
 			InnerErrors = new ParseError[0]
 		};
 
@@ -17,7 +17,7 @@ namespace T1.ParserKit.Core
 
 		public string Message { get; set; }
 
-		public IInputReader Inp { get; set; }
+		public int Position { get; set; }
 
 		public string GetErrorMessage(int tabs = 0)
 		{
@@ -43,40 +43,9 @@ namespace T1.ParserKit.Core
 		{
 			if (Message == string.Empty)
 			{
-				return String.Empty;
+				return string.Empty;
 			}
-			return $"{Message} at {Inp}\r\n" + GetErrorMessage();
-		}
-
-		public static bool operator !=(ParseError c1, ParseError c2)
-		{
-			return !c1.Equals(c2);
-		}
-
-		public static bool operator ==(ParseError c1, ParseError c2)
-		{
-			return c1.Equals(c2);
-		}
-
-		public bool Equals(ParseError other)
-		{
-			return Message == other.Message && Equals(Inp, other.Inp) && Equals(InnerErrors, other.InnerErrors);
-		}
-
-		public override bool Equals(object obj)
-		{
-			return obj is ParseError other && Equals(other);
-		}
-
-		public override int GetHashCode()
-		{
-			unchecked
-			{
-				var hashCode = (Message != null ? Message.GetHashCode() : 0);
-				hashCode = (hashCode * 397) ^ (Inp != null ? Inp.GetHashCode() : 0);
-				hashCode = (hashCode * 397) ^ (InnerErrors != null ? InnerErrors.GetHashCode() : 0);
-				return hashCode;
-			}
+			return $"{Message} at {Position}\r\n" + GetErrorMessage();
 		}
 	}
 }

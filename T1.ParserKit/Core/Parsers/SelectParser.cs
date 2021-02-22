@@ -19,9 +19,10 @@ namespace T1.ParserKit.Core.Parsers
 		{
 			var result = _parser.TryParse(inp);
 			if (!result.IsSuccess())
-				return Parse.Error<TResult>(result.Error, inp);
-
-			return Parse.Success(result.TextSpan, _mapFunc(result).Result, result.Rest);
+			{
+				return Parse.Error<TResult>(result.Error);
+			}
+			return Parse.Success(_mapFunc(result).Result);
 		}
 	}
 }

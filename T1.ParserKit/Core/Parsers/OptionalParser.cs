@@ -17,7 +17,7 @@
 			var parsed = _parser.TryParse(inp);
 			if (!parsed.IsSuccess())
 			{
-				return Parse.Success<T>(inp);
+				return Parse.Success<T>();
 			}
 
 			return parsed;

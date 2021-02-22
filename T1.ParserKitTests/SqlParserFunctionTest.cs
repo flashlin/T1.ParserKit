@@ -22,10 +22,13 @@ namespace T1.ParserKitTests
 			WhenParse(SqlParser.FuncGetdate);
 			ThenResultShouldBe(new SqlFunctionExpression()
 			{
-				File = String.Empty,
-				Content = _code,
-				Position = 0,
-				Length = _code.Length,
+				TextSpan = new TextSpan()
+				{
+					File = String.Empty,
+					Content = _code,
+					Position = 0,
+					Length = _code.Length,
+				},
 				Name = "GETDATE",
 				Parameters = new SqlExpression[0]
 			});
