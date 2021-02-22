@@ -415,31 +415,8 @@ namespace T1.ParserKit.SqlDom
 					Value = int.Parse($"{x[0].Text}{x[1].Text}")
 				});
 
-		//public IParser NumberExpr
-		//{
-		//	get
-		//	{
-		//		var number = SkipBlanks(Parse.Digits().Assertion(true))
-		//			.Named("NumberExpr")
-		//			.MapResult(x => new NumberExpression()
-		//			{
-		//				ValueTypeFullname = typeof(int).FullName,
-		//				Value = int.Parse(x[0].GetText())
-		//			});
-
-		//		var negativeNumber = Parse.Chain(
-		//				Symbol("-"),
-		//				number)
-		//			.MapResult(x =>
-		//			{
-		//				var numExpr = (NumberExpression)x[1];
-		//				numExpr.Value = -(int)numExpr.Value;
-		//				return numExpr;
-		//			});
-
-		//		return Parse.Any(negativeNumber, number);
-		//	}
-		//}
+		public static IParser<NumberExpression> NumberExpr =
+			Parse.Any(NegativeIntegerExpr, IntegerExpr);
 
 		//public IParser WhereExpr
 		//{

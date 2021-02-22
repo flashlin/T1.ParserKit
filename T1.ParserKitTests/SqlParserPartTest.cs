@@ -100,6 +100,30 @@ namespace T1.ParserKitTests
 			});
 		}
 
+		[Fact]
+		public void NumberExpr_NagativeInteger()
+		{
+			GiveText("-32");
+			WhenParse(SqlParser.NumberExpr);
+			ThenResultShouldBe(new NumberExpression()
+			{
+				ValueTypeFullname = typeof(int).FullName,
+				Value = -32
+			});
+		}
+
+		[Fact]
+		public void NumberExpr_Integer()
+		{
+			GiveText("32");
+			WhenParse(SqlParser.NumberExpr);
+			ThenResultShouldBe(new NumberExpression()
+			{
+				ValueTypeFullname = typeof(int).FullName,
+				Value = 32
+			});
+		}
+
 
 	}
 }
