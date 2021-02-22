@@ -109,7 +109,7 @@ namespace T1.ParserKit.Core
 		}
 
 		public static IParser<TResult> MapResult<T, TResult>(this IParser<IEnumerable<T>> p,
-			Func<IEnumerable<T>, TResult> map)
+			Func<T[], TResult> map)
 		{
 			return new Parser<TResult>(p.Name, inp =>
 			{
@@ -119,7 +119,8 @@ namespace T1.ParserKit.Core
 					return Parse.Error<TResult>(parsed.Error);
 				}
 
-				var result = map(parsed.Result);
+				var resultArr = parsed.Result.CastArray();
+				var result = map(resultArr);
 				return Parse.Success<TResult>(result);
 			});
 		}

@@ -267,6 +267,31 @@ namespace T1.ParserKit.SqlDom
 		//		});
 		//	return Parse.Any(assignField, fieldExpr);
 		//}
+		
+		private static readonly HashSet<string> Keywords = new HashSet<string>(
+			SqlToken.Keywords.Concat(SqlToken.Keywords.Select(x => x.ToLower())));
+
+		public static IParser<TextSpan> SqlIdentifierExcludeKeyword =
+			SqlIdentifier.TransferToNext(rc =>
+			{
+				var ch = rc.Content;
+				if (Keywords.Contains($"{ch}"))
+				{
+					return $"Expect not keyword, but got '{ch}'";
+				}
+				return "";
+			});
+		
+		public static IParser<TextSpan> Identifier =
+			ParseToken.Lexeme(SqlIdentifierExcludeKeyword);
+
+		public static IParser<FieldExpression> TableFieldExpr2 =
+			Parse.Sequence(Identifier, Dot, Identifier)
+				.MapResult(x => new FieldExpression()
+				{
+					Name = x[2].Content,
+					From = x[0].Content
+				});
 
 		//public IParser FieldExpr
 		//{
@@ -673,23 +698,6 @@ namespace T1.ParserKit.SqlDom
 		//{
 		//	return SkipBlanks(SqlIdentifier.Next(NotKeyword));
 		//}
-
-		private static readonly HashSet<string> Keywords = new HashSet<string>(
-			SqlToken.Keywords.Concat(SqlToken.Keywords.Select(x => x.ToLower())));
-
-		public static IParser<TextSpan> SqlIdentifierExcludeKeyword =
-			SqlIdentifier.TransferToNext(rc =>
-			{
-				var ch = rc.Content;
-				if (Keywords.Contains($"{ch}"))
-				{
-					return $"Expect not keyword, but got '{ch}'";
-				}
-				return "";
-			});
-
-		public static IParser<TextSpan> Identifier =
-			ParseToken.Lexeme(SqlIdentifierExcludeKeyword);
 
 		//protected static IParser Symbol(string text)
 		//{
