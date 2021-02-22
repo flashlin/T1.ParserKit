@@ -20,7 +20,7 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<TextSpan> _SqlIdentifier()
 		{
 			var start = Parse.Equal("[");
-			var body = Parse.NotEqual("]").Many(1);
+			var body = Parse.NotEqual("]").Many1();
 			var end = Parse.Equal("]");
 			var identifier = Parse.Sequence(start, body, end).Merge();
 			return identifier.Or(Parse.CStyleIdentifier)

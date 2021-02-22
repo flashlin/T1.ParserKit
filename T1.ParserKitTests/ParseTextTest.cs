@@ -67,11 +67,12 @@ namespace T1.ParserKitTests
 		}
 
 		[Fact]
+
 		public void Many_empty()
 		{
 			GiveText("a");
 			WhenParse(Parse.Equal("b").Many());
-			ThenResultShouldBe("");
+			ThenResultShouldBe(null);
 		}
 
 		[Fact]
