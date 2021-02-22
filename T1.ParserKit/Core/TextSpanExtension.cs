@@ -10,8 +10,8 @@ namespace T1.ParserKit.Core
 	{
 		public static string Substr(this ITextSpan textSpan, int len)
 		{
-			var maxLen = (len > textSpan.Content.Length) ? textSpan.Content.Length : len;
-			return textSpan.Content.Substring(0, maxLen);
+			var maxLen = (len > textSpan.Text.Length) ? textSpan.Text.Length : len;
+			return textSpan.Text.Substring(0, maxLen);
 		}
 
 		public static T FirstCast<T>(this IEnumerable<ITextSpan> textSpans)
@@ -29,21 +29,21 @@ namespace T1.ParserKit.Core
 			var prev = hd;
 
 			var str = new StringBuilder();
-			str.Append(hd.Content);
+			str.Append(hd.Text);
 			foreach (var span in arr.Skip(1))
 			{
 				if (span.Position != prev.Position + prev.Length)
 				{
 					str.Append(" ");
 				}
-				str.Append(span.Content);
+				str.Append(span.Text);
 				prev = span;
 			}
 			return new TextSpan()
 			{
 				File = hd.File,
 				Position = hd.Position,
-				Content = str.ToString(),
+				Text = str.ToString(),
 				Length = tl.Position + tl.Length - hd.Position
 			};
 		}

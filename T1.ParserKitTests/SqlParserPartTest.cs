@@ -17,5 +17,19 @@ namespace T1.ParserKitTests
 				From = "customer"
 			});
 		}
+
+		[Fact]
+		public void Database_table_name()
+		{
+			GiveText("db1.customer.name");
+			WhenParse(SqlParser.TableFieldExpr);
+			ThenResultShouldBe(new FieldExpression()
+			{
+				Name = "name",
+				From = "db1.customer"
+			});
+		}
+
+
 	}
 }

@@ -18,7 +18,7 @@ namespace T1.ParserKitTests
 
 			var actualResult = (TextSpan)_parsed.Result;
 			expected.ToExpectedObject()
-				.ShouldMatch(actualResult.Content);
+				.ShouldMatch(actualResult.Text);
 		}
 
 		protected void ThenResultShouldFail()

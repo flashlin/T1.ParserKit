@@ -125,6 +125,22 @@ namespace T1.ParserKit.Core
 			});
 		}
 
+		public static IParser<TResult> MapResult<T, TResult>(this IParser<T> p,
+			Func<T, TResult> map)
+		{
+			return new Parser<TResult>(p.Name, inp =>
+			{
+				var parsed = p.TryParse(inp);
+				if (!parsed.IsSuccess())
+				{
+					return Parse.Error<TResult>(parsed.Error);
+				}
+
+				var result = map(parsed.Result);
+				return Parse.Success<TResult>(result);
+			});
+		}
+
 		public static TResult Reduce<TResult>(this IEnumerable<ITextSpan> rc, Func<ITextSpan, TResult> fn)
 		{
 			var rcArr = rc.CastArray();
@@ -474,7 +490,7 @@ namespace T1.ParserKit.Core
 				return new TextSpan()
 				{
 					File = resultArr[0].File,
-					Content = string.Join("", resultArr.Select(x1 => x1.Content)),
+					Text = string.Join("", resultArr.Select(x1 => x1.Text)),
 					Position = resultArr[0].Position,
 					Length = resultArr.Sum(x2 => x2.Length)
 				};

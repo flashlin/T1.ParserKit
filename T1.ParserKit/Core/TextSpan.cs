@@ -10,13 +10,13 @@ namespace T1.ParserKit.Core
 		public static TextSpan Empty = new TextSpan()
 		{
 			File = string.Empty,
-			Content = string.Empty,
+			Text = string.Empty,
 			Position = -1,
 			Length = 0
 		};
 
 		public string File { get; set; }
-		public string Content { get; set; }
+		public string Text { get; set; }
 		public int Position { get; set; }
 		public int Length { get; set; }
 
@@ -30,7 +30,7 @@ namespace T1.ParserKit.Core
 			var text = "";
 			if (Length > 0)
 			{
-				text = Content.Substring(Position, Length);
+				text = Text.Substring(Position, Length);
 			}
 			return $"Pos:{Position} '{text}'";
 		}
@@ -48,7 +48,7 @@ namespace T1.ParserKit.Core
 			return new TextSpan
 			{
 				File = hd.File,
-				Content = string.Join("", fromArr.Select(x => x.Content)),
+				Text = string.Join("", fromArr.Select(x => x.Text)),
 				Position = hd.Position,
 				Length = tl.Position + tl.Length - hd.Position
 			};
@@ -61,7 +61,7 @@ namespace T1.ParserKit.Core
 				return new TextSpan()
 				{
 					File = b.File,
-					Content = b.Content,
+					Text = b.Text,
 					Position = b.Position,
 					Length = b.Length
 				};
@@ -72,7 +72,7 @@ namespace T1.ParserKit.Core
 				return new TextSpan()
 				{
 					File = a.File,
-					Content = a.Content,
+					Text = a.Text,
 					Position = a.Position,
 					Length = a.Length
 				};
@@ -81,7 +81,7 @@ namespace T1.ParserKit.Core
 			return new TextSpan()
 			{
 				File = a.File,
-				Content = a.Content + b.Content,
+				Text = a.Text + b.Text,
 				Position = a.Position,
 				Length = a.Length + b.Length
 			};

@@ -274,7 +274,7 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<TextSpan> SqlIdentifierExcludeKeyword =
 			SqlIdentifier.TransferToNext(rc =>
 			{
-				var ch = rc.Content;
+				var ch = rc.Text;
 				if (Keywords.Contains($"{ch}"))
 				{
 					return $"Expect not keyword, but got '{ch}'";
@@ -285,62 +285,35 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<TextSpan> Identifier =
 			ParseToken.Lexeme(SqlIdentifierExcludeKeyword);
 
+		public static IParser<FieldExpression> TableFieldExpr1 =
+			Identifier.MapResult(x => new FieldExpression()
+				{
+					Name = x.Text
+				});
+
 		public static IParser<FieldExpression> TableFieldExpr2 =
 			Parse.Sequence(Identifier, Dot, Identifier)
 				.MapResult(x => new FieldExpression()
 				{
-					Name = x[2].Content,
-					From = x[0].Content
+					Name = x[2].Text,
+					From = x[0].Text
 				});
+
+		public static IParser<FieldExpression> TableFieldExpr3 =
+			Parse.Sequence(Identifier, Dot, Identifier, Dot, Identifier)
+				.MapResult(x => new FieldExpression()
+				{
+					Name = x[4].Text,
+					From = $"{x[0].Text}.{x[2].Text}"
+				});
+
+		public static IParser<FieldExpression> TableFieldExpr =
+			Parse.Any(TableFieldExpr3, TableFieldExpr2, TableFieldExpr1);
 
 		//public IParser FieldExpr
 		//{
 		//	get
 		//	{
-		//		var tableField =
-		//			Parse.Chain(Identifier(), Symbol("."), Identifier())
-		//				.MapAssign<FieldExpression>((x, expr) =>
-		//				{
-		//					expr.Name = x[2].GetText();
-		//					expr.From = x[0].GetText();
-		//				});
-
-		//		var field = Identifier()
-		//			.MapAssign<FieldExpression>((x, expr) =>
-		//			{
-		//				expr.Name = x[0].GetText();
-		//			});
-
-		//		var field1 = Parse.Any(tableField, field)
-		//			.MapResult(x =>
-		//			{
-		//				return x[0];
-		//			})
-		//			.Named("FieldExpr1");
-
-		//		var field2 = new[]
-		//		{
-		//			field1,
-		//			Identifier()
-		//		}.Chain(TODO).MapResult(x =>
-		//		{
-		//			var expr = (FieldExpression)x[0];
-		//			expr.AliasName = x[1].GetText();
-		//			return expr;
-		//		}).Named("FieldExpr2");
-
-		//		var field3 = new[]
-		//		{
-		//			field1,
-		//			Match("as"),
-		//			Identifier()
-		//		}.Chain(TODO).MapResult(x =>
-		//		{
-		//			var expr = (FieldExpression)x[0];
-		//			expr.AliasName = x[2].GetText();
-		//			return expr;
-		//		}).Named("FieldExpr3");
-
 		//		return Parse.Any(field3, field2, field1).Named("FieldExpr");
 		//	}
 		//}

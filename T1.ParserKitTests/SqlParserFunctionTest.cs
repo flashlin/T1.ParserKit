@@ -25,7 +25,7 @@ namespace T1.ParserKitTests
 				TextSpan = new TextSpan()
 				{
 					File = String.Empty,
-					Content = _code,
+					Text = _code,
 					Position = 0,
 					Length = _code.Length,
 				},

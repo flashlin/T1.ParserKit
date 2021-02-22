@@ -73,7 +73,7 @@
 			var textSpan = new TextSpan()
 			{
 				File = string.Empty,
-				Content = Substr(len),
+				Text = Substr(len),
 				Position = _position,
 				Length = len
 			};
