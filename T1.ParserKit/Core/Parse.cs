@@ -256,6 +256,33 @@ namespace T1.ParserKit.Core
 			return new OptionalParser<T>(p);
 		}
 
+		public static TryParser<T> Try<T>(this IParser<T> p)
+		{
+			return new TryParser<T>(p);
+		}
+
+		public static IParser<T> TransferToNext<T>(this IParser<T> p, Func<T, string> mapParseResult)
+		{
+			return new Parser<T>($"{p.Name}->", inp =>
+			{
+				var pos = inp.GetPosition();
+				var parsed = p.TryParse(inp);
+				if (!parsed.IsSuccess())
+				{
+					return parsed;
+				}
+
+				var errorMessage = mapParseResult(parsed.Result);
+				if (!string.IsNullOrEmpty(errorMessage))
+				{
+					inp.Seek(pos);
+					return Parse.Error<T>($"{errorMessage} at {inp}.", inp.GetPosition());
+				}
+
+				return parsed;
+			});
+		}
+
 		public static IParser<T> LeftRecursive<T>(this IParser<T> factor,
 			params Func<IParser<T>, IParser<T>>[] exprs)
 		{

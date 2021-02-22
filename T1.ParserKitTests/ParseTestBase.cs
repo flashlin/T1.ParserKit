@@ -1,5 +1,6 @@
 using ExpectedObjects;
 using T1.ParserKit.Core;
+using Xunit;
 
 namespace T1.ParserKitTests
 {
@@ -18,6 +19,11 @@ namespace T1.ParserKitTests
 			var actualResult = (TextSpan)_parsed.Result;
 			expected.ToExpectedObject()
 				.ShouldMatch(actualResult.Content);
+		}
+
+		protected void ThenResultShouldFail()
+		{
+			Assert.False(_parsed.IsSuccess());
 		}
 
 		protected void ThenResultShouldBe<T>(T expected)

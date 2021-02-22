@@ -30,6 +30,7 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<TextSpan> LParen = ParseToken.Symbol("(");
 		public static IParser<TextSpan> RParen = ParseToken.Symbol(")");
 		public static IParser<TextSpan> SemiColon = ParseToken.Symbol(";");
+		public static IParser<TextSpan> Dot = ParseToken.Symbol(".");
 
 		public static IParser<TextSpan> SqlDataType =
 			ParseToken.Contains("DATETIME", "BIGINT");
@@ -667,13 +668,28 @@ namespace T1.ParserKit.SqlDom
 		//	return StartExpr().ParseText(code).Cast<SqlExpression>().ToArray();
 		//}
 
-		//public IParser Identifier()
+		//public IParser<TextSpan> Identifier =
+		//	ParseToken.Lexeme(SqlIdentifier);
 		//{
 		//	return SkipBlanks(SqlIdentifier.Next(NotKeyword));
 		//}
 
-		//private static readonly HashSet<string> Keywords = new HashSet<string>(
-		//	SqlTokenizer.Keywords.Concat(SqlTokenizer.Keywords.Select(x => x.ToLower())));
+		private static readonly HashSet<string> Keywords = new HashSet<string>(
+			SqlToken.Keywords.Concat(SqlToken.Keywords.Select(x => x.ToLower())));
+
+		public static IParser<TextSpan> SqlIdentifierExcludeKeyword =
+			SqlIdentifier.TransferToNext(rc =>
+			{
+				var ch = rc.Content;
+				if (Keywords.Contains($"{ch}"))
+				{
+					return $"Expect not keyword, but got '{ch}'";
+				}
+				return "";
+			});
+
+		public static IParser<TextSpan> Identifier =
+			ParseToken.Lexeme(SqlIdentifierExcludeKeyword);
 
 		//private static string NotKeyword(ITextSpan[] r)
 		//{
