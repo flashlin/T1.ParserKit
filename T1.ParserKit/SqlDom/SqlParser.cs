@@ -20,7 +20,7 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<TextSpan> _SqlIdentifier()
 		{
 			var start = Parse.Equal("[");
-			var body = Parse.NotEqual("]").Many1();
+			var body = Parse.NotEqual("]").Many(1);
 			var end = Parse.Equal("]");
 			var identifier = Parse.Sequence(start, body, end).Merge();
 			return identifier.Or(Parse.CStyleIdentifier)
@@ -308,7 +308,8 @@ namespace T1.ParserKit.SqlDom
 				});
 
 		public static IParser<FieldExpression> TableFieldExpr =
-			Parse.Any(TableFieldExpr3, TableFieldExpr2, TableFieldExpr1);
+			Parse.Any(TableFieldExpr3, TableFieldExpr2, TableFieldExpr1)
+				.Named(nameof(TableFieldExpr));
 
 		//public IParser FieldExpr
 		//{

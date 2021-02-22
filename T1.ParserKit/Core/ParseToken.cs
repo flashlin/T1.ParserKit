@@ -11,6 +11,8 @@ namespace T1.ParserKit.Core
 
 		public static IParser<T> Lexeme<T>(IParser<T> parser)
 		{
+			return Parse.Blanks.Optional().Then(parser, (a, b) => b);
+
 			return from _ in Parse.Blanks.Optional()
 					 from value in parser
 					 select value;

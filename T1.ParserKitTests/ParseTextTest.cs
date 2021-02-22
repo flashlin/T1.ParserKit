@@ -71,7 +71,7 @@ namespace T1.ParserKitTests
 		{
 			GiveText("a");
 			WhenParse(Parse.Equal("b").Many());
-			ThenResultShouldBe(null);
+			ThenResultShouldBe("");
 		}
 
 		[Fact]

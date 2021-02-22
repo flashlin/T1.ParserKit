@@ -155,7 +155,7 @@ namespace T1.ParserKit.Core
 
 		public static IParser<TextSpan> Equal(string text)
 		{
-			return new Parser<TextSpan>($"{text}", (inp) =>
+			return new Parser<TextSpan>($"\"{text}\"", (inp) =>
 			{
 				var ch = inp.Substr(text.Length);
 				if (text == ch)
@@ -169,7 +169,7 @@ namespace T1.ParserKit.Core
 
 		public static IParser<TextSpan> NotEqual(string text)
 		{
-			return new Parser<TextSpan>($"{text}", (inp) =>
+			return new Parser<TextSpan>($"^\"{text}\"", (inp) =>
 			{
 				var ch = inp.Substr(text.Length);
 				if (text != ch)
@@ -183,7 +183,7 @@ namespace T1.ParserKit.Core
 
 		public static IParser<TextSpan> Match(string text)
 		{
-			return new Parser<TextSpan>($"{text}", (inp) =>
+			return new Parser<TextSpan>($"'{text}'", (inp) =>
 			{
 				var ch = inp.Substr(text.Length);
 				var ch1 = ch.ToLower();
@@ -199,7 +199,7 @@ namespace T1.ParserKit.Core
 
 		public static IParser<TextSpan> NotMatch(string text)
 		{
-			return new Parser<TextSpan>($"{text}", (inp) =>
+			return new Parser<TextSpan>($"^'{text}'", (inp) =>
 			{
 				var ch = inp.Substr(text.Length);
 				var ch1 = ch.ToLower();
@@ -311,69 +311,77 @@ namespace T1.ParserKit.Core
 			return f;
 		}
 
-		//public static IParser<T> Many<T>(this IParser<T> p,
-		//	Func<IEnumerable<IParseResult<T>>, T> apply,
-		//	int min = 0, int max = int.MaxValue)
-		//{
-		//	var name = $"{p.Name}({min},{max})";
+		private static IParseResult<T2> MapAccumSuccess<T1, T2>(IEnumerable<T1> accum, Func<T1[], T2> map)
+		{
+			var accumArr = accum.CastArray();
+			return Parse.Success<T2>(map(accumArr));
+		}
 
-		//	if (max == int.MaxValue)
-		//	{
-		//		name = $"{p.Name}({min})";
-		//	}
+		public static IParser<T2> Many<T1, T2>(this IParser<T1> p,
+			Func<T1[], T2> apply,
+			int min = 0, int max = int.MaxValue)
+		{
+			var name = $"{p.Name}({min},{max})";
 
-		//	if (min == 0 && max == 1)
-		//	{
-		//		name = $"{p.Name}?";
-		//	}
+			if (max == int.MaxValue)
+			{
+				name = $"{p.Name}({min})";
+			}
 
-		//	if (min == 0 && max == int.MaxValue)
-		//	{
-		//		name = $"{p.Name}*";
-		//	}
+			if (min == 0 && max == 1)
+			{
+				name = $"{p.Name}?";
+			}
 
-		//	if (min == 1 && max == int.MaxValue)
-		//	{
-		//		name = $"{p.Name}+";
-		//	}
+			if (min == 0 && max == int.MaxValue)
+			{
+				name = $"{p.Name}*";
+			}
 
-		//	return new Parser<T>(name, (inp) =>
-		//	{
-		//		var acc = new List<IParseResult<T>>();
-		//		var curr = inp;
-		//		var count = 0;
-		//		var ch = inp.Substr(20);
-		//		IParseResult<T> parsed = null;
-		//		while (!curr.Eof())
-		//		{
-		//			parsed = p.TryParse(curr);
-		//			if (!parsed.IsSuccess())
-		//			{
-		//				if (min <= count && count <= max)
-		//				{
-		//					return acc.GetAccumResult(apply, parsed);
-		//				}
+			if (min == 1 && max == int.MaxValue)
+			{
+				name = $"{p.Name}+";
+			}
 
-		//				return Parse.Error<T>($"Expect {name}, but got {ch} at {inp}", inp);
-		//			}
+			return new Parser<T2>(name, (inp) =>
+			{
+				var acc = new List<T1>();
+				var count = 0;
+				var ch = inp.Substr(20);
+				while (!inp.Eof())
+				{
+					var parsed = p.TryParse(inp);
+					if (!parsed.IsSuccess())
+					{
+						if (min <= count && count <= max)
+						{
+							return MapAccumSuccess(acc, apply);
+						}
 
-		//			acc.Add(parsed);
-		//			curr = parsed.Rest;
-		//			count++;
-		//			if (count == max && count >= min)
-		//			{
-		//				return acc.GetAccumResult(apply, parsed);
-		//			}
-		//		}
+						return Parse.Error<T2>($"Expect {name}, but got {ch} at {inp}", inp.GetPosition());
+					}
 
-		//		if (min <= count && count <= max)
-		//		{
-		//			return acc.GetAccumResult(apply, parsed);
-		//		}
+					acc.Add(parsed.Result);
+					count++;
+					if (count == max && count >= min)
+					{
+						return MapAccumSuccess(acc, apply);
+					}
+				}
 
-		//		return Parse.Error<T>($"Expect {name}, but got EOF at {inp}", inp);
-		//	});
-		//}
+				if (min <= count && count <= max)
+				{
+					return MapAccumSuccess(acc, apply);
+				}
+
+				return Parse.Error<T2>($"Expect {name}, but got EOF at {inp}", inp.GetPosition());
+			});
+		}
+
+		public static IParser<TextSpan> Many(this IParser<TextSpan> p, int min = 0, int max = int.MaxValue)
+		{
+			return p.Many(accum => accum.GetTextSpan(), min, max);
+		}
 
 		//public static IParser<T> ManyDelimitedBy<T>(this IParser<T> parser, IParser<T> delimited,
 		//	Func<IEnumerable<IParseResult<T>>, T> apply)
@@ -421,6 +429,30 @@ namespace T1.ParserKit.Core
 		//		return Parse.Success<T>(inp);
 		//	});
 		//}
+
+		public static IParser<T3> Then<T1, T2, T3>(this IParser<T1> p1, 
+			IParser<T2> p2, 
+			Func<T1, T2, T3> combine)
+		{
+			var name = $"{p1.Name} {p2.Name}";
+			return new Parser<T3>(name, inp =>
+			{
+				var parsed1 = p1.TryParse(inp);
+				if (!parsed1.IsSuccess())
+				{
+					return Parse.Error<T3>(parsed1.Error);
+				}
+
+				var parsed2 = p2.TryParse(inp);
+				if (!parsed2.IsSuccess())
+				{
+					return Parse.Error<T3>(parsed2.Error);
+				}
+
+				var result = combine(parsed1.Result, parsed2.Result);
+				return Parse.Success<T3>(result);
+			});
+		}
 
 		public static IParser<T2> ThenRight<T1, T2>(this IParser<T1> p1, IParser<T2> p2)
 		{
@@ -501,7 +533,7 @@ namespace T1.ParserKit.Core
 			Contains(new[] { " ", "\t", "\r", "\n" }).Named("blank");
 
 		public static IParser<TextSpan> Blanks =
-			Blank.Many1().Named("blanks");
+			Blank.Many(1).Named("blanks");
 
 		public static IParser<TextSpan> Digit =
 			new Parser<TextSpan>("digit", inp =>
@@ -527,10 +559,10 @@ namespace T1.ParserKit.Core
 			});
 
 		public static IParser<TextSpan> Digits =
-			Digit.Many1().Named("digits");
+			Digit.Many(1).Named("digits");
 
 		public static IParser<TextSpan> Letters =
-			Letter.Many1().Named("letters");
+			Letter.Many(1).Named("letters");
 
 		public static IParser<TextSpan> CStyleIdentifier = CStyleIdentifierF().Named(nameof(CStyleIdentifier));
 

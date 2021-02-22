@@ -5,13 +5,14 @@ namespace T1.ParserKit.Core.Parsers
 	public class SelectParser<TSource, TResult> : IParser<TResult>
 	{
 		private readonly IParser<TSource> _parser;
-		private readonly Func<IParseResult<TSource>, IParseResult<TResult>> _mapFunc;
+		private readonly Func<IParseResult<TSource>, TResult> _mapFunc;
 
 		public SelectParser(IParser<TSource> parser,
-			Func<IParseResult<TSource>, IParseResult<TResult>> mapFunc)
+			Func<IParseResult<TSource>, TResult> mapFunc)
 		{
 			_parser = parser;
 			_mapFunc = mapFunc;
+			Name = $"{parser.Name}";
 		}
 
 		public string Name { get; set; }
@@ -22,7 +23,7 @@ namespace T1.ParserKit.Core.Parsers
 			{
 				return Parse.Error<TResult>(result.Error);
 			}
-			return Parse.Success(_mapFunc(result).Result);
+			return Parse.Success(_mapFunc(result));
 		}
 	}
 }

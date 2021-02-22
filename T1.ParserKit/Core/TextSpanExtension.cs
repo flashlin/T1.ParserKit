@@ -24,6 +24,12 @@ namespace T1.ParserKit.Core
 			where T : ITextSpan
 		{
 			var arr = textSpans.CastArray();
+
+			if (arr.Length == 0)
+			{
+				return TextSpan.Empty;
+			}
+
 			var hd = arr.First();
 			var tl = arr.Last();
 			var prev = hd;
