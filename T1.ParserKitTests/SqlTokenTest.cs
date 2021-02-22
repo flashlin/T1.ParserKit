@@ -12,7 +12,7 @@ namespace T1.ParserKitTests
 	public class SqlTokenTest : ParseTestBase
 	{
 		[Fact]
-		public void Keyword()
+		public void NonIdentifier()
 		{
 			GiveText("from");
 			WhenParse(SqlParser.Identifier);
@@ -20,20 +20,22 @@ namespace T1.ParserKitTests
 		}
 
 		[Fact]
-		public void NonKeyword()
+		public void Identifier()
 		{
 			GiveText("name");
 			WhenParse(SqlParser.Identifier);
 			ThenResultShouldBe("name");
 		}
 
-		//[Fact]
-		//public void SelectKeyword()
-		//{
-		//	var code = "select";
-		//	var parsed = SqlTokenizer.KeywordsParser.TryParseAllText(code);
-		//	Assert.True(parsed.IsSuccess());
-		//}
+		[Theory]
+		[InlineData("where")]
+		[InlineData("select")]
+		public void MoreNonIdentifier(string keyword)
+		{
+			GiveText(keyword);
+			WhenParse(SqlParser.Identifier);
+			ThenResultShouldFail();
+		}
 
 		//[Fact]
 		//public void NotSqlIdentifier()
