@@ -38,31 +38,6 @@ namespace T1.ParserKitTests
 		}
 
 		//[Fact]
-		//public void NotSqlIdentifier()
-		//{
-		//	GiveText("from");
-		//	Assert.Throws<ParseException>(() => _parser.Identifier().ParseText(_text));
-		//}
-
-		//[Fact]
-		//public void SqlIdentifier()
-		//{
-		//	GiveText("name");
-		//	WhenTryParse(_parser.Identifier());
-		//	ThenResultShouldBe("name", 4);
-		//}
-
-		//[Theory]
-		//[InlineData("where")]
-		//public void Identifier_Parse_Keywords(string keyword)
-		//{
-		//	GiveText(keyword);
-		//	WhenTryParse(_parser.Identifier());
-		//	ThenResultShouldFail();
-		//}
-
-
-		//[Fact]
 		//public void SqlIdentifier_from()
 		//{
 		//	GiveText("name from");
