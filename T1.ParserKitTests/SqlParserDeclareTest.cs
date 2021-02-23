@@ -40,6 +40,18 @@ namespace T1.ParserKitTests
 			});
 		}
 
+		[Fact]
+		public void Set_nocount_on2()
+		{
+			GiveText("SET NOCOUNT ON");
+			WhenParse(SqlParser.SetNocountExpr);
+			ThenResultShouldBe(new SetOptionExpression()
+			{
+				OptionName = "NOCOUNT",
+				IsToggle = true
+			});
+		}
+
 		//[Fact]
 		//public void If_variable_eq_1_begin_select_field_from_table_end()
 		//{
