@@ -272,7 +272,7 @@ namespace T1.ParserKit.Core
 			return parsers.Chain();
 		}
 
-		public static IParser<IEnumerable<T>> Sequence<T>(IEnumerable<IParser<T>> parsers)
+		public static IParser<IEnumerable<T>> Seq<T>(IEnumerable<IParser<T>> parsers)
 		{
 			return new SequenceParser<T>(parsers);
 		}
@@ -482,8 +482,6 @@ namespace T1.ParserKit.Core
 		{
 			return new EosParser<T>();
 		}
-
-
 
 		public static IParser<TextSpan> Contains(IEnumerable<string> sortedTexts, bool ignoreCase = false)
 		{

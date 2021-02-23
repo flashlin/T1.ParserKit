@@ -15,7 +15,7 @@ namespace T1.ParserKitTests
 		private IParseResult<object> _result;
 
 		[Fact]
-		public void Getdate()
+		public void FuncGetdate()
 		{
 			GiveText("GETDATE()");
 			WhenParse(SqlParser.FuncGetdate);
@@ -32,6 +32,27 @@ namespace T1.ParserKitTests
 				Parameters = new SqlExpression[0]
 			});
 		}
+
+		[Fact]
+		public void SqlFunctions_Getdate()
+		{
+			GiveText("GETDATE()");
+			WhenParse(SqlParser.SqlFunctions(SqlParser.Atom));
+			ThenResultShouldBe(new SqlFunctionExpression()
+			{
+				TextSpan = new TextSpan()
+				{
+					File = String.Empty,
+					Text = _code,
+					Position = 0,
+					Length = _code.Length,
+				},
+				Name = "GETDATE",
+				Parameters = new SqlExpression[0]
+			});
+		}
+
+
 
 		//[Fact]
 		//public void Datediff_dd_0_getdate()

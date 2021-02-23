@@ -66,34 +66,33 @@ namespace T1.ParserKit.SqlDom
 			};
 
 		////DATEADD(DD,-1,DATEDIFF(dd, 0, GETDATE()))
-		//public IParser FuncDateadd(IParser factor)
-		//{
-		//	var datepart = ContainsText(DateaddDetepart)
-		//		.MapResult(x => new SqlOptionNameExpression()
-		//		{
-		//			Value = x[0].GetText()
-		//		});
+		public static IParser<SqlFunctionExpression> FuncDateadd(IParser<SqlExpression> factor)
+		{
+			var datepart = SqlToken.ContainsWord(SqlToken.DateaddDetepart)
+				.MapResult(x => new SqlOptionNameExpression()
+				{
+					Value = x.Text
+				});
 
-		//	return Parse.Chain(
-		//		Match("DATEADD"),
-		//		LParen,
-		//		datepart,
-		//		Comma,
-		//		factor,
-		//		Comma,
-		//		factor,
-		//		RParen
-		//	).MapResult(x => new SqlFunctionExpression()
-		//	{
-		//		Name = "DATEADD",
-		//		Parameters = new[]
-		//		{
-		//			(SqlExpression)x[2],
-		//			(SqlExpression)x[4],
-		//			(SqlExpression)x[6],
-		//		}
-		//	});
-		//}
+			return from dateadd in SqlToken.Word("DATEADD")
+				from lparen in LParen
+				from tDatepart in datepart
+				from comma1 in Comma
+				from tFactor1 in factor
+				from comma2 in Comma
+				from tFactor2 in factor
+				from rparen in RParen
+				select new SqlFunctionExpression()
+				{
+					Name = "DATEADD",
+					Parameters = new SqlExpression[]
+					{
+						tDatepart,
+						tFactor1,
+						tFactor2
+					}
+				};
+		}
 
 		//static readonly string[] DatediffDatepartStr = new[]
 		//{
@@ -112,24 +111,6 @@ namespace T1.ParserKit.SqlDom
 
 		//private static readonly string[] DatediffDatepart = DatediffDatepartStr
 		//	.Concat(DatediffAbbreviationDatepartStr)
-		//	.OrderByDescending(x => x.Length)
-		//	.ToArray();
-
-		//private static readonly string[] DateaddDatepartStr = new[]
-		//{
-		//	"year", "quarter", "month", "dayofyear", "day",
-		//	"week", "weekday", "hour", "minute", "second", "millisecond", "microsecond",
-		//	"nanosecond"
-		//};
-
-		//private static readonly string[] DateaddAbbreviationDatepartStr = new[]
-		//{
-		//	"yy", "yyyy", "qq", "q", "mm", "m", "dy", "y",
-		//	"dd", "d", "wk", "ww", "dw", "w", "hh", "mi", "n",
-		//	"ss", "s", "ms", "mcs", "ns"
-		//};
-
-		//private static readonly string[] DateaddDetepart = DateaddDatepartStr.Concat(DateaddAbbreviationDatepartStr)
 		//	.OrderByDescending(x => x.Length)
 		//	.ToArray();
 
@@ -163,15 +144,15 @@ namespace T1.ParserKit.SqlDom
 		//		});
 		//}
 
-		//public IParser SqlFunctions(IParser factor)
-		//{
-		//	return Parse.Any(
-		//		FuncGetdate(),
-		//		FuncDateadd(factor),
-		//		FuncIsnull(factor),
-		//		FuncDatediff(factor),
-		//		factor);
-		//}
+		public static IParser<SqlExpression> SqlFunctions(IParser<SqlExpression> factor)
+		{
+			return Parse.AnyCast<SqlExpression>(
+				FuncGetdate,
+				FuncDateadd(factor),
+				//FuncIsnull(factor),
+				//FuncDatediff(factor),
+				factor);
+		}
 
 		////ISNULL(@SblimitExpiredDate, xxx)
 		//public IParser FuncIsnull(IParser factor)

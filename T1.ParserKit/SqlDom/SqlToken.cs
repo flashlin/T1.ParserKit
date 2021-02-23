@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using T1.ParserKit.Core;
 
 namespace T1.ParserKit.SqlDom
 {
@@ -39,5 +40,36 @@ namespace T1.ParserKit.SqlDom
 			"VALUES", "VARCHAR", "VARYING", "VIEW", "WHEN", "WHENEVER", "WHERE", "WITH", "WORK", "WRITE",
 			"YEAR", "ZONE"
 		};
+
+		private static readonly string[] DateaddDatepartStr = new[]
+		{
+			"year", "quarter", "month", "dayofyear", "day",
+			"week", "weekday", "hour", "minute", "second", "millisecond", "microsecond",
+			"nanosecond"
+		};
+
+		private static readonly string[] DateaddAbbreviationDatepartStr = new[]
+		{
+			"yy", "yyyy", "qq", "q", "mm", "m", "dy", "y",
+			"dd", "d", "wk", "ww", "dw", "w", "hh", "mi", "n",
+			"ss", "s", "ms", "mcs", "ns"
+		};
+
+		public static readonly string[] DateaddDetepart = DateaddDatepartStr.Concat(DateaddAbbreviationDatepartStr)
+			.OrderByDescending(x => x.Length)
+			.ToArray();
+
+		public static IParser<TextSpan> Word(string text)
+		{
+			return ParseToken.Lexeme(ParseToken.Match(text));
+		}
+
+		public static IParser<TextSpan> ContainsWord(string[] texts)
+		{
+			var sortedTexts = texts
+				.OrderByDescending(x => x.Length)
+				.ToArray();
+			return ParseToken.Lexeme(ParseToken.Matchs(sortedTexts));
+		}
 	}
 }
