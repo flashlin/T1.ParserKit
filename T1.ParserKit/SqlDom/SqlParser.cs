@@ -310,14 +310,6 @@ namespace T1.ParserKit.SqlDom
 			Parse.Any(TableFieldExpr3, TableFieldExpr2, TableFieldExpr1)
 				.Named(nameof(TableFieldExpr));
 
-		//public IParser FieldExpr
-		//{
-		//	get
-		//	{
-		//		return Parse.Any(field3, field2, field1).Named("FieldExpr");
-		//	}
-		//}
-
 		//public IParser RecFieldExpr(IParser factor)
 		//{
 		//	return VariableAssignFieldExpr(factor);
