@@ -8,6 +8,22 @@ namespace T1.ParserKit.Core
 {
 	public static class ParserExtension
 	{
+		public static IParser<T2> CastParser<T1, T2>(this IParser<T1> p)
+			where T1 : T2
+		{
+			var name = p.Name;
+			return new Parser<T2>(name, inp =>
+			{
+				var parsed = p.TryParse(inp);
+				if (!parsed.IsSuccess())
+				{
+					return Parse.Error<T2>(parsed.Error);
+				}
+
+				return Parse.Success<T2>(parsed.Result);
+			});
+		}
+
 		public static IParseResult<T> ParseText<T>(this IParser<T> p, string code)
 		{
 			var parsed = p.TryParseText(code);

@@ -12,7 +12,6 @@ namespace T1.ParserKitTests
 	public class SqlParserFunctionTest
 	{
 		private string _code;
-		private SqlParser _parser;
 		private IParseResult<object> _result;
 
 		[Fact]

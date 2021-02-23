@@ -1,4 +1,5 @@
-﻿using T1.ParserKit.SqlDom;
+﻿using T1.ParserKit.Core;
+using T1.ParserKit.SqlDom;
 using T1.ParserKit.SqlDom.Expressions;
 using Xunit;
 
@@ -124,6 +125,16 @@ namespace T1.ParserKitTests
 			});
 		}
 
-
+		[Fact]
+		public void Atom_Integer()
+		{
+			GiveText("32");
+			WhenParse(SqlParser.Atom);
+			ThenResultShouldBe(new NumberExpression()
+			{
+				ValueTypeFullname = typeof(int).FullName,
+				Value = 32
+			});
+		}
 	}
 }

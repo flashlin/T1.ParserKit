@@ -29,6 +29,15 @@ namespace T1.ParserKit.Core
 			};
 		}
 
+		public static IParseResult<T> Success<T>(object result)
+		{
+			return new ParseResult<T>()
+			{
+				Result = (T)result,
+				Error = ParseError.Empty,
+			};
+		}
+
 		public static IParseResult<T> Error<T>(string message, int position)
 		{
 			return new ParseResult<T>()
@@ -73,6 +82,11 @@ namespace T1.ParserKit.Core
 			int position)
 		{
 			return Error<T>(message, new[] { innerError }, position);
+		}
+
+		public static IParser<T> AnyCast<T>(params object[] parsers)
+		{
+			return parsers.AnyCastParser<T>();
 		}
 
 		//public static IParser<T> SymbolAssertion<T>()

@@ -9,11 +9,12 @@ using T1.ParserKit.Core.Parsers;
 using T1.ParserKit.Helpers;
 using T1.ParserKit.SqlDom.Expressions;
 using T1.Standard.Common;
+using T1.Standard.DynamicCode;
 using T1.Standard.Extensions;
 
 namespace T1.ParserKit.SqlDom
 {
-	public class SqlParser
+	public static class SqlParser
 	{
 		public static IParser<TextSpan> SqlIdentifier = _SqlIdentifier();
 
@@ -31,8 +32,8 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<TextSpan> RParen = ParseToken.Symbol(")");
 		public static IParser<TextSpan> SemiColon = ParseToken.Symbol(";");
 		public static IParser<TextSpan> Dot = ParseToken.Symbol(".");
-		public static IParser<TextSpan> Comma =	ParseToken.Symbol(",");
-		public static IParser<TextSpan> Minus =	ParseToken.Symbol("-");
+		public static IParser<TextSpan> Comma = ParseToken.Symbol(",");
+		public static IParser<TextSpan> Minus = ParseToken.Symbol("-");
 
 		public static IParser<TextSpan> SqlDataType =
 			ParseToken.Contains("DATETIME", "BIGINT");
@@ -269,7 +270,7 @@ namespace T1.ParserKit.SqlDom
 		//		});
 		//	return Parse.Any(assignField, fieldExpr);
 		//}
-		
+
 		private static readonly HashSet<string> Keywords = new HashSet<string>(
 			SqlToken.Keywords.Concat(SqlToken.Keywords.Select(x => x.ToLower())));
 
@@ -283,15 +284,15 @@ namespace T1.ParserKit.SqlDom
 				}
 				return "";
 			});
-		
+
 		public static IParser<TextSpan> Identifier =
 			ParseToken.Lexeme(SqlIdentifierExcludeKeyword);
 
 		public static IParser<FieldExpression> TableFieldExpr1 =
 			Identifier.MapResult(x => new FieldExpression()
-				{
-					Name = x.Text
-				});
+			{
+				Name = x.Text
+			});
 
 		public static IParser<FieldExpression> TableFieldExpr2 =
 			Parse.Sequence(Identifier, Dot, Identifier)
@@ -351,18 +352,6 @@ namespace T1.ParserKit.SqlDom
 		//	}
 		//}
 
-		//public IParser Atom
-		//{
-		//	get
-		//	{
-		//		return Parse.Any(
-		//			FuncGetdate(),
-		//			FieldExpr,
-		//			NumberExpr,
-		//			Variable);
-		//	}
-		//}
-
 		//public IParser ArithmeticOperatorExpr(IParser atom)
 		//{
 		//	return Parse.RecGroupOperatorExpr(LParen, atom, RParen, new[]
@@ -417,6 +406,26 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<NumberExpression> NumberExpr =
 			Parse.Any(NegativeIntegerExpr, IntegerExpr);
+
+		//public static IParser<T> AnyCast<T>(params IParser<object>[] parsers)
+		//	where T: SqlExpression
+		//{
+		//	return parsers.Any();
+		//}
+
+		//public static IParser<SqlExpression> CastSqlParser<T>(this IParser<T> p)
+		//	where T : SqlExpression
+		//{
+		//	return p.CastParser<T, SqlExpression>();
+		//}
+
+		public static IParser<SqlExpression> Atom =
+			Parse.AnyCast<SqlExpression>(
+					FuncGetdate,
+					//		FieldExpr,
+					NumberExpr
+					//Variable
+					);
 
 		//public IParser WhereExpr
 		//{

@@ -1,12 +1,53 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using T1.Standard.DynamicCode;
 using T1.Standard.Extensions;
 
 namespace T1.ParserKit.Core.Parsers
 {
 	public static class CombineParser
 	{
+		public static IParser<T> CastParser<T>(this object parser)
+		{
+			var parserType = parser.GetType();
+
+			var nameGetter = DynamicProperty.GetProperty(parserType, nameof(Parser<object>.Name));
+			var tryParseMethod = parserType.GetMethod(nameof(Parser<object>.TryParse));
+			var tryParse = DynamicMethod.GetMethod(tryParseMethod);
+			
+			var parseResult = tryParseMethod.ReturnType;
+			var isSuccess = DynamicMethod.GetMethod(parseResult,
+				nameof(IParseResult<object>.IsSuccess));
+			var errorGetter = DynamicProperty.GetProperty(parseResult, nameof(IParseResult<object>.Error));
+			var resultGetter = DynamicProperty.GetProperty(parseResult, nameof(IParseResult<object>.Result));
+			var name = (string)nameGetter(parser);
+			return new Parser<T>(name, inp =>
+			{
+				var parsed = tryParse(parser, new object[] { inp });
+				if (!(bool)isSuccess(parsed, new object[0]))
+				{
+					var error = (ParseError)errorGetter(parsed);
+					return Parse.Error<T>(error);
+				}
+
+				var result = resultGetter(parsed);
+				return Parse.Success<T>(result);
+			});
+		}
+
+		public static IParser<T> AnyCastParser<T>(this IEnumerable<object> parsers)
+		{
+			var parsersArr = parsers.CastArray();
+			var parsersTArr = new IParser<T>[parsersArr.Length];
+			foreach (var p in parsersArr.SelectWithIndex())
+			{
+				parsersTArr[p.index] = p.value.CastParser<T>();
+			}
+			return parsersTArr.Any<T>();
+		}
+
 		public static IParser<TextSpan> Many(this IParser<TextSpan> parser)
 		{
 			TextSpan Seed() => TextSpan.Empty;

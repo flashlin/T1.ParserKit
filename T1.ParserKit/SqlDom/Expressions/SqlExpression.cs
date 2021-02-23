@@ -5,7 +5,7 @@ using T1.ParserKit.Core;
 
 namespace T1.ParserKit.SqlDom.Expressions
 {
-	public abstract class SqlExpression
+	public class SqlExpression
 	{
 		public TextSpan TextSpan { get; set; }
 		//public string File { get; set; }
