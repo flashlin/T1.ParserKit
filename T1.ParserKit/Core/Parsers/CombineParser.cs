@@ -37,8 +37,55 @@ namespace T1.ParserKit.Core.Parsers
 			});
 		}
 
+		public static IParser<T> MapParser<T>(this IEnumerable<object> parsers, 
+			Func<IParser<T>[], IParser<T>> map)
+		{
+			var parsersArr = parsers.CastArray();
+			var parsersTArr = new IParser<T>[parsersArr.Length];
+			foreach (var p in parsersArr.SelectWithIndex())
+			{
+				parsersTArr[p.index] = p.value.CastParser<T>();
+			}
+			return map(parsersTArr);
+		}
+
+		public static IParser<IEnumerable<T>> MapParser<T>(this IEnumerable<object> parsers,
+			Func<IParser<T>[], IParser<IEnumerable<T>>> map)
+		{
+			var parsersArr = parsers.CastArray();
+			var parsersTArr = new IParser<T>[parsersArr.Length];
+			foreach (var p in parsersArr.SelectWithIndex())
+			{
+				parsersTArr[p.index] = p.value.CastParser<T>();
+			}
+			return map(parsersTArr);
+		}
+
+		public static IParser<IEnumerable<T>> MapParser<T>(this IEnumerable<object> parsers,
+			Func<IParser<TextSpan>, IParser<T>> mapParser,
+			Func<IParser<T>[], IParser<IEnumerable<T>>> mapParsers)
+		{
+			var parsersArr = parsers.CastArray();
+			var parsersTArr = new IParser<T>[parsersArr.Length];
+			foreach (var p in parsersArr.SelectWithIndex())
+			{
+				var parserType = p.value.GetType();
+
+				if (parserType.IsGenericType && parserType.GetGenericArguments()[0] == typeof(TextSpan))
+				{
+					parsersTArr[p.index] = mapParser((IParser<TextSpan>)p.value);
+				}
+				else
+				{
+					parsersTArr[p.index] = p.value.CastParser<T>();
+				}
+			}
+			return mapParsers(parsersTArr);
+		}
+
 		public static IParser<T> AnyCastParser<T>(this IEnumerable<object> parsers)
 		{
+			return parsers.MapParser<T>(x => x.Any());
 			var parsersArr = parsers.CastArray();
 			var parsersTArr = new IParser<T>[parsersArr.Length];
 			foreach (var p in parsersArr.SelectWithIndex())

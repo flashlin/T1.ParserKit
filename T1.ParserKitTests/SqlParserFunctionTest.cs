@@ -92,6 +92,41 @@ namespace T1.ParserKitTests
 			});
 		}
 
+		[Fact]
+		public void SqlFunctions_isnull()
+		{
+			GiveText("isnull(@name, 50)");
+			WhenParse(SqlParser.SqlFunctions(SqlParser.Atom));
+			ThenResultShouldBe(new SqlFunctionExpression()
+			{
+				Name = "ISNULL",
+				Parameters = new SqlExpression[]
+				{
+					new VariableExpression
+					{
+						Name = "@name",
+						TextSpan = new TextSpan
+						{
+							Position = 0,
+							Length = 0
+						}
+					},
+					new NumberExpression
+					{
+						Value = 50,
+						ValueTypeFullname = typeof(int).FullName,
+					}
+				},
+				TextSpan = new TextSpan
+				{
+					Position = 0,
+					Length = 0
+				},
+			});
+		}
+
+
+
 		//[Fact]
 		//public void Dateadd_d_1_datediff_getdate()
 		//{

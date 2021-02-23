@@ -89,6 +89,18 @@ namespace T1.ParserKit.Core
 			return parsers.AnyCastParser<T>();
 		}
 
+		public static IParser<IEnumerable<T>> SeqCast<T>(params object[] parsers)
+		{
+			return parsers.MapParser<T>(x => Parse.Seq(x));
+		}
+
+		public static IParser<IEnumerable<T>> SeqCast<T>(
+			Func<IParser<TextSpan>, IParser<T>> map, 
+			params object[] parsers)
+		{
+			return parsers.MapParser<T>(map, x => Parse.Seq(x));
+		}
+
 		//public static IParser<T> SymbolAssertion<T>()
 		//{
 		//	return new Parser<T>("symbolAssertion", inp =>

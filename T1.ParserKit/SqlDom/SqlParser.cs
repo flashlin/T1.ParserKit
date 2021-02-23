@@ -16,6 +16,22 @@ namespace T1.ParserKit.SqlDom
 {
 	public static class SqlParser
 	{
+		public static IParser<SqlExpression> MapSqlExpr(this IParser<TextSpan> p)
+		{
+			return new Parser<SqlExpression>(p.Name, inp =>
+			{
+				var parsed = p.TryParse(inp);
+				if (!parsed.IsSuccess())
+				{
+					return Parse.Error<SqlExpression>(parsed.Error);
+				}
+				return Parse.Success(new SqlExpression()
+				{
+					TextSpan = parsed.Result
+				});
+			});
+		}
+
 		public static IParser<TextSpan> SqlIdentifier = _SqlIdentifier();
 
 		public static IParser<TextSpan> _SqlIdentifier()
@@ -123,33 +139,38 @@ namespace T1.ParserKit.SqlDom
 					 };
 		}
 
+		//ISNULL(@SblimitExpiredDate, xxx)
+		public static IParser<SqlFunctionExpression> FuncIsnull(IParser<SqlExpression> factor)
+		{
+			return Parse.SeqCast<SqlExpression>(MapSqlExpr,
+				SqlToken.Word("ISNULL"),
+				LParen,
+				factor,
+				Comma,
+				factor,
+				RParen)
+				.MapResult(x => new SqlFunctionExpression()
+				{
+					Name = "ISNULL",
+					Parameters = new[]
+					{
+						x[2], x[4]
+					}
+				});
+		}
+
+
 		public static IParser<SqlExpression> SqlFunctions(IParser<SqlExpression> factor)
 		{
 			return Parse.AnyCast<SqlExpression>(
 				FuncGetdate,
 				FuncDateadd(factor),
-				//FuncIsnull(factor),
+				FuncIsnull(factor),
 				FuncDatediff(factor),
 				factor);
 		}
 
-		////ISNULL(@SblimitExpiredDate, xxx)
-		//public IParser FuncIsnull(IParser factor)
-		//{
-		//	return Parse.Chain(
-		//		Match("ISNULL"),
-		//		LParen,
-		//		factor,
-		//		Comma,
-		//		factor,
-		//		RParen)
-		//		.MapResult(x => new SqlFunctionExpression()
-		//		{
-		//			Name = "ISNULL",
-		//			Parameters = new[] { (SqlExpression)x[2], (SqlExpression)x[4] }
-		//		});
-		//}
-
+		
 		//public IParser SetNocountExpr
 		//{
 		//	get
