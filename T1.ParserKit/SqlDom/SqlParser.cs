@@ -149,7 +149,7 @@ namespace T1.ParserKit.SqlDom
 				Comma,
 				factor,
 				RParen)
-				.MapResult(x => new SqlFunctionExpression()
+				.MapResults(x => new SqlFunctionExpression()
 				{
 					Name = "ISNULL",
 					Parameters = new[]
@@ -170,24 +170,17 @@ namespace T1.ParserKit.SqlDom
 				factor);
 		}
 
-		
-		//public IParser SetNocountExpr
-		//{
-		//	get
-		//	{
-		//		var onOFf = ContainsText("OFF", "ON");
-		//		return Parse.Chain(
-		//			Match("SET"),
-		//			Match("NOCOUNT"),
-		//			onOFf,
-		//			SemiColon.Optional()
-		//			).MapResult(x => new SetOptionExpression()
-		//			{
-		//				OptionName = x[1].GetText(),
-		//				IsToggle = string.Equals(x[2].GetText().ToUpper(), "ON", StringComparison.Ordinal)
-		//			});
-		//	}
-		//}
+		public static IParser<SetOptionExpression> SetNocountExpr =
+				Parse.Seq(
+					SqlToken.Word("SET"),
+					SqlToken.Word("NOCOUNT"),
+					SqlToken.ContainsWord("OFF", "ON"),
+					SemiColon.Optional()
+					).MapResults(x => new SetOptionExpression()
+					{
+						OptionName = x[1].Text,
+						IsToggle = string.Equals(x[2].Text.ToUpper(), "ON", StringComparison.Ordinal)
+					});
 
 		//public IParser DeclareVariableExpr
 		//{
@@ -273,7 +266,7 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<FieldExpression> TableFieldExpr2 =
 			Parse.Seq(Identifier, Dot, Identifier)
-				.MapResult(x => new FieldExpression()
+				.MapResults(x => new FieldExpression()
 				{
 					Name = x[2].Text,
 					From = x[0].Text
@@ -281,7 +274,7 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<FieldExpression> TableFieldExpr3 =
 			Parse.Seq(Identifier, Dot, Identifier, Dot, Identifier)
-				.MapResult(x => new FieldExpression()
+				.MapResults(x => new FieldExpression()
 				{
 					Name = x[4].Text,
 					From = $"{x[0].Text}.{x[2].Text}"
@@ -367,7 +360,7 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<NumberExpression> NegativeIntegerExpr =
 			ParseToken.Lexeme(Minus, Parse.Digits)
-				.MapResult(x => new NumberExpression()
+				.MapResults(x => new NumberExpression()
 				{
 					ValueTypeFullname = typeof(int).FullName,
 					Value = int.Parse($"{x[0].Text}{x[1].Text}")

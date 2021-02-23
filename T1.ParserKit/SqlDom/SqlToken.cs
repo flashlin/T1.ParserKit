@@ -82,7 +82,7 @@ namespace T1.ParserKit.SqlDom
 			return ParseToken.Lexeme(ParseToken.Match(text));
 		}
 
-		public static IParser<TextSpan> ContainsWord(string[] texts)
+		public static IParser<TextSpan> ContainsWord(params string[] texts)
 		{
 			var sortedTexts = texts
 				.OrderByDescending(x => x.Length)
