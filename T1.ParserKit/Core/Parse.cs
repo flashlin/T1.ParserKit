@@ -277,7 +277,7 @@ namespace T1.ParserKit.Core
 			return new SequenceParser<T>(parsers);
 		}
 
-		public static IParser<IEnumerable<T>> Sequence<T>(params IParser<T>[] parsers)
+		public static IParser<IEnumerable<T>> Seq<T>(params IParser<T>[] parsers)
 		{
 			return new SequenceParser<T>(parsers);
 		}
@@ -584,8 +584,8 @@ namespace T1.ParserKit.Core
 		{
 			var underscore = Equal("_");
 			var body = Any(underscore, Letters, Digits).Many();
-			var identifierCharacters1 = Sequence(underscore, body);
-			var identifierCharacters2 = Sequence(Letters, body);
+			var identifierCharacters1 = Seq(underscore, body);
+			var identifierCharacters2 = Seq(Letters, body);
 			return identifierCharacters1.Or(identifierCharacters2).Merge();
 		}
 

@@ -87,7 +87,7 @@ namespace T1.ParserKitTests
 		public void Sequence()
 		{
 			GiveText("ab");
-			WhenParse(Parse.Sequence(
+			WhenParse(Parse.Seq(
 				Parse.Match("a"),
 				Parse.Match("b")
 				).Merge()

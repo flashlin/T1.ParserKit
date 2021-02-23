@@ -136,5 +136,18 @@ namespace T1.ParserKitTests
 				Value = 32
 			});
 		}
+
+		[Fact]
+		public void Atom_Variable()
+		{
+			GiveText("@name");
+			WhenParse(SqlParser.Atom);
+			ThenResultShouldBe(new VariableExpression()
+			{
+				Name = "@name"
+			});
+		}
+
+
 	}
 }

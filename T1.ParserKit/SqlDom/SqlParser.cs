@@ -23,7 +23,7 @@ namespace T1.ParserKit.SqlDom
 			var start = Parse.Equal("[");
 			var body = Parse.NotEqual("]").Many1();
 			var end = Parse.Equal("]");
-			var identifier = Parse.Sequence(start, body, end).Merge();
+			var identifier = Parse.Seq(start, body, end).Merge();
 			return identifier.Or(Parse.CStyleIdentifier)
 					.Named("SqlIdentifier");
 		}
@@ -34,6 +34,7 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<TextSpan> Dot = ParseToken.Symbol(".");
 		public static IParser<TextSpan> Comma = ParseToken.Symbol(",");
 		public static IParser<TextSpan> Minus = ParseToken.Symbol("-");
+		public static IParser<TextSpan> At = ParseToken.Symbol("@");
 
 		public static IParser<TextSpan> SqlDataType =
 			ParseToken.Contains("DATETIME", "BIGINT");
@@ -239,21 +240,6 @@ namespace T1.ParserKit.SqlDom
 		//	}
 		//}
 
-		//public IParser Variable
-		//{
-		//	get
-		//	{
-		//		return Parse.Chain(
-		//			Symbol("@"),
-		//			Identifier()
-		//		).Merge()
-		//		.MapResult(x => new VariableExpression()
-		//		{
-		//			Name = x[0].GetText()
-		//		});
-		//	}
-		//}
-
 		//public IParser VariableAssignFieldExpr(IParser fieldExpr)
 		//{
 		//	var assignField = Parse.Chain(
@@ -288,6 +274,16 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<TextSpan> Identifier =
 			ParseToken.Lexeme(SqlIdentifierExcludeKeyword);
 
+		public static IParser<VariableExpression> Variable =
+			Parse.Seq(
+			At,
+				Identifier
+			).Merge()
+			.MapResult(x => new VariableExpression()
+			{
+				Name = x.Text
+			});
+
 		public static IParser<FieldExpression> TableFieldExpr1 =
 			Identifier.MapResult(x => new FieldExpression()
 			{
@@ -295,7 +291,7 @@ namespace T1.ParserKit.SqlDom
 			});
 
 		public static IParser<FieldExpression> TableFieldExpr2 =
-			Parse.Sequence(Identifier, Dot, Identifier)
+			Parse.Seq(Identifier, Dot, Identifier)
 				.MapResult(x => new FieldExpression()
 				{
 					Name = x[2].Text,
@@ -303,7 +299,7 @@ namespace T1.ParserKit.SqlDom
 				});
 
 		public static IParser<FieldExpression> TableFieldExpr3 =
-			Parse.Sequence(Identifier, Dot, Identifier, Dot, Identifier)
+			Parse.Seq(Identifier, Dot, Identifier, Dot, Identifier)
 				.MapResult(x => new FieldExpression()
 				{
 					Name = x[4].Text,
@@ -423,9 +419,8 @@ namespace T1.ParserKit.SqlDom
 			Parse.AnyCast<SqlExpression>(
 					FuncGetdate,
 					//		FieldExpr,
-					NumberExpr
-					//Variable
-					);
+					NumberExpr,
+					Variable);
 
 		//public IParser WhereExpr
 		//{
