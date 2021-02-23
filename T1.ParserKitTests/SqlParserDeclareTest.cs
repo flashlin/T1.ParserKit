@@ -12,21 +12,20 @@ namespace T1.ParserKitTests
 {
 	public class SqlParserDeclareTest : ParseTestBase
 	{
-		//[Fact]
-		//public void Variable_datetime()
-		//{
-		//	GiveText("declare @name datetime");
-		//	WhenParse();
-		//	ThenResultShouldBe(new DeclareExpression()
-		//	{
-		//		File = String.Empty,
-		//		Content = _code,
-		//		Position = 0,
-		//		Length = _code.Length,
-		//		Name = "@name",
-		//		DataType = "datetime"
-		//	});
-		//}
+		[Fact]
+		public void Declare_variable_datetime()
+		{
+			GiveText("declare @name datetime");
+			WhenParse(SqlParser.DeclareVariableExpr);
+			ThenResultShouldBe(new DeclareExpression()
+			{
+				Name = new VariableExpression()
+				{
+					Name = "@name"
+				},
+				DataType = "datetime"
+			});
+		}
 
 		[Fact]
 		public void Set_nocount_on()

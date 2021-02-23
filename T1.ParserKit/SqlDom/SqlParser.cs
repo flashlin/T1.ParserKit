@@ -53,7 +53,7 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<TextSpan> At = ParseToken.Symbol("@");
 
 		public static IParser<TextSpan> SqlDataType =
-			ParseToken.Contains("DATETIME", "BIGINT");
+			SqlToken.ContainsWord("DATETIME", "BIGINT");
 
 		//public static IParser<SqlFunctionExpression> FuncGetdate =
 		//	Parse.Sequence(ParseToken.Match("GETDATE"),
@@ -182,22 +182,6 @@ namespace T1.ParserKit.SqlDom
 						IsToggle = string.Equals(x[2].Text.ToUpper(), "ON", StringComparison.Ordinal)
 					});
 
-		//public IParser DeclareVariableExpr
-		//{
-		//	get
-		//	{
-		//		return Parse.Chain(
-		//			Match("DECLARE"),
-		//			Variable,
-		//			SqlDataType)
-		//			.MapResult(x => new DeclareExpression()
-		//			{
-		//				Name = x[1].GetText(),
-		//				DataType = x[2].GetText()
-		//			});
-		//	}
-		//}
-
 		//public IParser WithOptionExpr
 		//{
 		//	get
@@ -257,6 +241,16 @@ namespace T1.ParserKit.SqlDom
 			{
 				Name = x.Text
 			});
+
+		public static IParser<DeclareExpression> DeclareVariableExpr =
+			from declare1 in SqlToken.Word("DECLARE")
+			from variable1 in Variable
+			from sqlDataType1 in SqlDataType
+			select new DeclareExpression()
+			{
+				Name = variable1,
+				DataType = sqlDataType1.Text
+			};
 
 		public static IParser<FieldExpression> TableFieldExpr1 =
 			Identifier.MapResult(x => new FieldExpression()
