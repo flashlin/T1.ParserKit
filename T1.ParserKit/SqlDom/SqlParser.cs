@@ -403,18 +403,6 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<NumberExpression> NumberExpr =
 			Parse.Any(NegativeIntegerExpr, IntegerExpr);
 
-		//public static IParser<T> AnyCast<T>(params IParser<object>[] parsers)
-		//	where T: SqlExpression
-		//{
-		//	return parsers.Any();
-		//}
-
-		//public static IParser<SqlExpression> CastSqlParser<T>(this IParser<T> p)
-		//	where T : SqlExpression
-		//{
-		//	return p.CastParser<T, SqlExpression>();
-		//}
-
 		public static IParser<SqlExpression> Atom =
 			Parse.AnyCast<SqlExpression>(
 					FuncGetdate,
