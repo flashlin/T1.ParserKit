@@ -52,53 +52,45 @@ namespace T1.ParserKitTests
 			});
 		}
 
-
-
-		//[Fact]
-		//public void Datediff_dd_0_getdate()
-		//{
-		//	GiveText("DATEDIFF(dd, 0, GETDATE())");
-		//	WhenParse();
-		//	ThenResultShouldBe(new SqlFunctionExpression()
-		//	{
-		//		File = String.Empty,
-		//		Content = _code,
-		//		Position = 0,
-		//		Length = _code.Length,
-		//		Name = "DATEDIFF",
-		//		Parameters = new SqlExpression[]
-		//		{
-		//			new SqlOptionNameExpression
-		//			{
-		//				Value = "dd",
-		//				File = string.Empty,
-		//				Length = 2,
-		//				Position = 9,
-		//				Content = _code
-		//			},
-		//			new NumberExpression
-		//			{
-		//				Value = 0,
-		//				ValueTypeFullname = typeof(int).FullName,
-		//				File = "",
-		//				Length = 1,
-		//				Position = 13,
-		//				Content = _code
-		//			},
-		//			new SqlFunctionExpression
-		//			{
-		//				Name = "GETDATE",
-		//				Parameters = new SqlExpression[] { },
-		//				File = "",
-		//				Length = 9,
-		//				Position = 16,
-		//				Content = _code
-		//			}
-		//		}
-		//	});
-		//}
-
-
+		[Fact]
+		public void Datediff_dd_0_getdate()
+		{
+			GiveText("DATEDIFF(dd, 0, GETDATE())");
+			WhenParse(SqlParser.FuncDatediff(SqlParser.Atom));
+			ThenResultShouldBe(new SqlFunctionExpression()
+			{
+				Name = "DATEDIFF",
+				Parameters = new SqlExpression[]
+				{
+					new SqlOptionNameExpression
+					{
+						Value = "dd",
+					},
+					new NumberExpression
+					{
+						Value = 0,
+						ValueTypeFullname = typeof(int).FullName,
+					},
+					new SqlFunctionExpression
+					{
+						Name = "GETDATE",
+						Parameters = new SqlExpression[] { },
+						TextSpan = new TextSpan
+						{
+							File = string.Empty,
+							Text = "GETDATE()",
+							Position = 16,
+							Length = 9
+						}
+					}
+				},
+				TextSpan = new TextSpan
+				{
+					Position = 0,
+					Length = 0
+				}
+			});
+		}
 
 		//[Fact]
 		//public void Dateadd_d_1_datediff_getdate()

@@ -65,7 +65,7 @@ namespace T1.ParserKit.SqlDom
 				Parameters = new SqlExpression[0]
 			};
 
-		////DATEADD(DD,-1,DATEDIFF(dd, 0, GETDATE()))
+		//DATEADD(DD,-1,DATEDIFF(dd, 0, GETDATE()))
 		public static IParser<SqlFunctionExpression> FuncDateadd(IParser<SqlExpression> factor)
 		{
 			var datepart = SqlToken.ContainsWord(SqlToken.DateaddDetepart)
@@ -75,74 +75,53 @@ namespace T1.ParserKit.SqlDom
 				});
 
 			return from dateadd in SqlToken.Word("DATEADD")
-				from lparen in LParen
-				from tDatepart in datepart
-				from comma1 in Comma
-				from tFactor1 in factor
-				from comma2 in Comma
-				from tFactor2 in factor
-				from rparen in RParen
-				select new SqlFunctionExpression()
-				{
-					Name = "DATEADD",
-					Parameters = new SqlExpression[]
-					{
+					 from lparen in LParen
+					 from tDatepart in datepart
+					 from comma1 in Comma
+					 from tFactor1 in factor
+					 from comma2 in Comma
+					 from tFactor2 in factor
+					 from rparen in RParen
+					 select new SqlFunctionExpression()
+					 {
+						 Name = "DATEADD",
+						 Parameters = new SqlExpression[]
+						 {
 						tDatepart,
 						tFactor1,
 						tFactor2
-					}
-				};
+						 }
+					 };
 		}
 
-		//static readonly string[] DatediffDatepartStr = new[]
-		//{
-		//	"year", "quarter", "month", "dayofyear", "day",
-		//	"week", "hour", "minute", "second", "millisecond",
-		//	"microsecond", "nanosecond"
-		//};
+		//DATEDIFF(dd, 0, GETDATE())
+		public static IParser<SqlFunctionExpression> FuncDatediff(IParser<SqlExpression> factor)
+		{
+			var datepart = SqlToken.ContainsWord(SqlToken.DatediffDatepart)
+				.MapResult(x => new SqlOptionNameExpression()
+				{
+					Value = x.Text
+				});
 
-		//static readonly string[] DatediffAbbreviationDatepartStr = new[]
-		//{
-		//	"yy", "yyyy", "qq", "q", "mm", "m",
-		//	"dy", "y", "dd", "d", "wk", "ww",
-		//	"hh", "mi", "n", "ss", "s", "ms",
-		//	"mcs", "ns"
-		//};
-
-		//private static readonly string[] DatediffDatepart = DatediffDatepartStr
-		//	.Concat(DatediffAbbreviationDatepartStr)
-		//	.OrderByDescending(x => x.Length)
-		//	.ToArray();
-
-		////DATEDIFF(dd, 0, GETDATE())
-		//public IParser FuncDatediff(IParser factor)
-		//{
-		//	var datepart = ContainsText(DatediffDatepart)
-		//		.MapResult(x => new SqlOptionNameExpression()
-		//		{
-		//			Value = x[0].GetText()
-		//		});
-
-		//	return Parse.Chain(
-		//		Match("DATEDIFF"),
-		//		LParen,
-		//		datepart,
-		//		Comma,
-		//		NumberExpr,
-		//		Comma,
-		//		factor,
-		//		RParen
-		//		).MapResult(x => new SqlFunctionExpression()
-		//		{
-		//			Name = "DATEDIFF",
-		//			Parameters = new[]
-		//		{
-		//			(SqlExpression)x[2],
-		//			(SqlExpression)x[4],
-		//			(SqlExpression)x[6]
-		//		}
-		//		});
-		//}
+			return from datediff1 in SqlToken.Word("DATEDIFF")
+					 from lparen in LParen
+					 from datepart1 in datepart
+					 from comma1 in Comma
+					 from numberExpr1 in NumberExpr
+					 from comma2 in Comma
+					 from factor1 in factor
+					 from rparen in RParen
+					 select new SqlFunctionExpression()
+					 {
+						 Name = "DATEDIFF",
+						 Parameters = new SqlExpression[]
+						 {
+							datepart1,
+							numberExpr1,
+							factor1
+						}
+					 };
+		}
 
 		public static IParser<SqlExpression> SqlFunctions(IParser<SqlExpression> factor)
 		{
@@ -150,7 +129,7 @@ namespace T1.ParserKit.SqlDom
 				FuncGetdate,
 				FuncDateadd(factor),
 				//FuncIsnull(factor),
-				//FuncDatediff(factor),
+				FuncDatediff(factor),
 				factor);
 		}
 

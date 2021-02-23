@@ -56,7 +56,25 @@ namespace T1.ParserKit.SqlDom
 		};
 
 		public static readonly string[] DateaddDetepart = DateaddDatepartStr.Concat(DateaddAbbreviationDatepartStr)
-			.OrderByDescending(x => x.Length)
+			.ToArray();
+
+		static readonly string[] DatediffDatepartStr = new[]
+		{
+			"year", "quarter", "month", "dayofyear", "day",
+			"week", "hour", "minute", "second", "millisecond",
+			"microsecond", "nanosecond"
+		};
+
+		static readonly string[] DatediffAbbreviationDatepartStr = new[]
+		{
+			"yy", "yyyy", "qq", "q", "mm", "m",
+			"dy", "y", "dd", "d", "wk", "ww",
+			"hh", "mi", "n", "ss", "s", "ms",
+			"mcs", "ns"
+		};
+
+		public static readonly string[] DatediffDatepart = DatediffDatepartStr
+			.Concat(DatediffAbbreviationDatepartStr)
 			.ToArray();
 
 		public static IParser<TextSpan> Word(string text)
