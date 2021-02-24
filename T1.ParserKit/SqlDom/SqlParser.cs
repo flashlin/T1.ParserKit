@@ -433,43 +433,41 @@ namespace T1.ParserKit.SqlDom
 				DatabaseDboSchemaName2,
 				DatabaseDboSchemaName1);
 
-		//private IParser SetFieldEqualExpr(IParser factor)
-		//{
-		//	return Parse.Chain(
-		//		Match("SET"),
-		//		SchemaName,
-		//		Symbol("="),
-		//		factor)
-		//		.MapResult(x => new UpdateSetFieldExpression()
-		//		{
-		//			FieldName = x[1].GetText(),
-		//			AssignExpr = (SqlExpression)x[3]
-		//		});
-		//}
+		private static IParser<UpdateSetFieldExpression> SetFieldEqualExpr(IParser<SqlExpression> factor)
+		{
+			return from field1 in DatabaseDboSchemaName1
+					 from _ in Assign
+					 from expr1 in factor
+					 select new UpdateSetFieldExpression()
+					 {
+						 FieldName = field1.Name,
+						 AssignExpr = expr1
+					 };
+		}
 
-		//private IParser SetFieldEqualExprs(IParser factor)
-		//{
-		//	return SetFieldEqualExpr(factor).ManyDelimitedBy(Comma)
-		//		.MapResult(x => new ManySqlExpression()
-		//		{
-		//			Items = x.TakeEvery(1).ToArray()
-		//		});
-		//}
+		private static IParser<UpdateSetFieldExpression[]> SetFieldEqualExprs(IParser<SqlExpression> factor)
+		{
+			return SetFieldEqualExpr(factor)
+				.CastParser<SqlExpression>()
+				.ManyDelimitedBy(Comma)
+				.MapResult(x => x.TakeEvery(1).Cast<UpdateSetFieldExpression>().ToArray());
+		}
 
-		//public IParser UpdateExpr(IParser factor)
-		//{
-		//	var updateExpr = Parse.Chain(
-		//		Match("UPDATE"),
-		//		DatabaseSchemaObjectName,
-		//		SetFieldEqualExprs(factor),
-		//		WhereExpr.Optional()
-		//	).MapResult(x => new UpdateExpression()
-		//	{
-		//		SetFields = ((ManySqlExpression)x[2]).Items.Cast<UpdateSetFieldExpression>().ToArray(),
-		//		WhereExpr = x.FirstCast<WhereExpression>()
-		//	});
-		//	return Parse.Any(updateExpr, factor);
-		//}
+		public static IParser<SqlExpression> UpdateExpr(IParser<SqlExpression> factor)
+		{
+			var updateExpr =
+				from update1 in SqlToken.Word("UPDATE")
+				from table1 in DatabaseSchemaObjectName
+				from set1 in SqlToken.Word("SET")
+				from updateFields1 in SetFieldEqualExprs(factor)
+				from where1 in WhereExpr.Optional()
+				select new UpdateExpression()
+				{
+					SetFields = updateFields1,
+					WhereExpr = where1
+				};
+			return Parse.Any(updateExpr.MapSqlExpr(), factor);
+		}
 
 		public static IParser<T> Group<T>(IParser<T> p)
 		{
