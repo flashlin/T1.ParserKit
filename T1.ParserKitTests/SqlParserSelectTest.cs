@@ -50,6 +50,39 @@ namespace T1.ParserKitTests
 			});
 		}
 
+		[Fact]
+		public void Database_dbo_name()
+		{
+			GiveText("db1.dbo.customer");
+			WhenParse(SqlParser.DatabaseSchemaObjectName);
+			ThenResultShouldBe(new ObjectNameExpression()
+			{
+				Name = "db1.dbo.customer"
+			});
+		}
+
+		[Fact]
+		public void Dbo_name()
+		{
+			GiveText("dbo.customer");
+			WhenParse(SqlParser.DatabaseSchemaObjectName);
+			ThenResultShouldBe(new ObjectNameExpression()
+			{
+				Name = "dbo.customer"
+			});
+		}
+
+		[Fact]
+		public void Tablename()
+		{
+			GiveText("customer");
+			WhenParse(SqlParser.DatabaseSchemaObjectName);
+			ThenResultShouldBe(new ObjectNameExpression()
+			{
+				Name = "customer"
+			});
+		}
+
 		//[Fact]
 		//public void Select_field_from_table()
 		//{

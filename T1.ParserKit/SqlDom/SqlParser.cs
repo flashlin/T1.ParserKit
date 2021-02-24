@@ -374,10 +374,10 @@ namespace T1.ParserKit.SqlDom
 			};
 
 		//public IParser SelectExpr =>
-		//	Parse.Chain(
-		//		Match("SELECT"),
+		//	Parse.Seq(
+		//		SqlToken.Word("SELECT"),
 		//		FieldsExpr,
-		//		Match("FROM"),
+		//		SqlToken.Word("FROM"),
 		//		TableExpr,
 		//		WhereExpr.Optional()
 		//	).MapResult(x => new SelectExpression()
@@ -387,38 +387,39 @@ namespace T1.ParserKit.SqlDom
 		//		Where = x.FirstCast<WhereExpression>()
 		//	}).Named("SelectExpr");
 
-		//public IParser DatabaseDboSchemaName =>
-		//	Parse.Chain(Identifier(),
-		//		Symbol("."),
-		//		Identifier(),
-		//		Symbol("."),
-		//		Identifier()
-		//	).Merge()
-		//	.MapResult(x => new ObjectNameExpression()
-		//	{
-		//		Name = x[0].GetText()
-		//	});
+		private static readonly IParser<ObjectNameExpression> DatabaseDboSchemaName3 =
+			Parse.Seq(Identifier,
+				Dot,
+				Identifier,
+				Dot,
+				Identifier
+			).Merge()
+			.MapResult(x => new ObjectNameExpression()
+			{
+				Name = x.GetText()
+			});
 
-		//private IParser DboSchemaName =>
-		//	Parse.Chain(Identifier(),
-		//		Symbol("."),
-		//		Identifier()
-		//	).Merge()
-		//	.MapResult(x => new ObjectNameExpression()
-		//	{
-		//		Name = x[0].GetText()
-		//	});
+		private static readonly IParser<ObjectNameExpression> DatabaseDboSchemaName2 =
+			Parse.Seq(Identifier,
+				Dot,
+				Identifier
+			).Merge()
+			.MapResult(x => new ObjectNameExpression()
+			{
+				Name = x.GetText()
+			});
 
-		//private IParser SchemaName =>
-		//	Identifier()
-		//	.MapResult(x => new ObjectNameExpression()
-		//	{
-		//		Name = x[0].GetText()
-		//	});
+		private static readonly IParser<ObjectNameExpression> DatabaseDboSchemaName1 =
+			Identifier
+			.MapResult(x => new ObjectNameExpression()
+			{
+				Name = x.GetText()
+			});
 
-		//private IParser DatabaseSchemaObjectName =>
-		//	Parse.Any(DatabaseDboSchemaName, DboSchemaName, SchemaName);
-
+		public static readonly IParser<ObjectNameExpression> DatabaseSchemaObjectName =
+			Parse.Any(DatabaseDboSchemaName3, 
+				DatabaseDboSchemaName2, 
+				DatabaseDboSchemaName1);
 
 		//private IParser SetFieldEqualExpr(IParser factor)
 		//{
