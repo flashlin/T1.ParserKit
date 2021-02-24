@@ -293,55 +293,33 @@ namespace T1.ParserKitTests
 			});
 		}
 
-
-
-		//[Fact]
-		//public void Select_field_from_table_nolock()
-		//{
-		//	GiveText("select name from customer with(nolock)");
-		//	WhenParse();
-		//	ThenResultShouldBe(new SelectExpression()
-		//	{
-		//		File = "",
-		//		Length = _code.Length,
-		//		Position = 0,
-		//		Content = _code,
-		//		Fields = new FieldsExpression()
-		//		{
-		//			File = "",
-		//			Length = 4,
-		//			Position = 7,
-		//			Content = _code,
-		//			Items = new List<SqlExpression>()
-		//			{
-		//				new FieldExpression()
-		//				{
-		//					Name = "name",
-		//					File = "",
-		//					Length = 4,
-		//					Position = 7,
-		//					Content = _code
-		//				}
-		//			}
-		//		},
-		//		From = new TableExpression()
-		//		{
-		//			File = "",
-		//			Length = 21,
-		//			Position = 17,
-		//			Content = _code,
-		//			Name = "customer",
-		//			WithOption = new WithOptionExpression()
-		//			{
-		//				File = "",
-		//				Length = 12,
-		//				Position = 26,
-		//				Content = _code,
-		//				Nolock = true
-		//			}
-		//		}
-		//	});
-		//}
+		[Fact]
+		public void Select_field_from_table_nolock()
+		{
+			GiveText("select name from customer with(nolock)");
+			WhenParse(SqlParser.SelectExpr);
+			ThenResultShouldBe(new SelectExpression()
+			{
+				Fields = new FieldsExpression()
+				{
+					Items = new List<SqlExpression>()
+					{
+						new FieldExpression()
+						{
+							Name = "name",
+						}
+					}
+				},
+				From = new TableExpression()
+				{
+					Name = "customer",
+					WithOption = new WithOptionExpression()
+					{
+						Nolock = true
+					}
+				}
+			});
+		}
 
 		//[Fact]
 		//public void Select_tb_field_from_table_alias()
