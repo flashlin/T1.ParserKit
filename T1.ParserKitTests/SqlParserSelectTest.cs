@@ -83,6 +83,49 @@ namespace T1.ParserKitTests
 			});
 		}
 
+		[Fact]
+		public void Tablename_as_alias()
+		{
+			GiveText("customer as c1");
+			WhenParse(SqlParser.TableExpr);
+			ThenResultShouldBe(new TableExpression()
+			{
+				Name = "customer",
+				AliasName = "c1"
+			});
+		}
+
+		[Fact]
+		public void Tablename_nolock_as_alias()
+		{
+			GiveText("customer with(nolock) as c1");
+			WhenParse(SqlParser.TableExpr);
+			ThenResultShouldBe(new TableExpression()
+			{
+				Name = "customer",
+				AliasName = "c1",
+				WithOption = new WithOptionExpression()
+				{
+					Nolock = true
+				}
+			});
+		}
+
+		[Fact]
+		public void Tablename_nolock()
+		{
+			GiveText("customer with(nolock)");
+			WhenParse(SqlParser.TableExpr);
+			ThenResultShouldBe(new TableExpression()
+			{
+				Name = "customer",
+				WithOption = new WithOptionExpression()
+				{
+					Nolock = true
+				}
+			});
+		}
+
 		//[Fact]
 		//public void Select_field_from_table()
 		//{

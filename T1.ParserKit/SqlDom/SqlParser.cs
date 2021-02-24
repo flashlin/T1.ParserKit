@@ -494,45 +494,24 @@ namespace T1.ParserKit.SqlDom
 		//	return recSelectExpr.Or(factor);
 		//}
 
-		//public IParser TableExpr
-		//{
-		//	get
-		//	{
-		//		var withOption = WithOptionExpr.Many(0, 1);
+		private static readonly IParser<AliasExpression> AliasExpr =
+			from as1 in SqlToken.Word("AS").Optional()
+			from identifier in Identifier
+			select new AliasExpression()
+			{
+				Name = identifier.GetText()
+			};
 
-		//		var table1 =
-		//			Parse.Chain(Identifier(),
-		//					withOption)
-		//			.MapResult(x => new TableExpression()
-		//			{
-		//				Name = x[0].GetText(),
-		//				WithOption = x.FirstCast<WithOptionExpression>()
-		//			});
-
-		//		var table2 =
-		//			Parse.Chain(
-		//				Identifier(),
-		//				Identifier()
-		//			).MapResult(x => new TableExpression()
-		//			{
-		//				Name = x[0].GetText(),
-		//				AliasName = x[1].GetText()
-		//			});
-
-		//		var table3 =
-		//			Parse.Chain(
-		//				Identifier(),
-		//				Match("as"),
-		//				Identifier()
-		//			).MapResult(x => new TableExpression()
-		//			{
-		//				Name = x[0].GetText(),
-		//				AliasName = x[2].GetText()
-		//			});
-
-		//		return Parse.Any(table3, table2, table1);
-		//	}
-		//}
+		public static IParser<TableExpression> TableExpr =
+			from databaseTable1 in DatabaseSchemaObjectName
+			from withOption1 in WithOptionExpr.Optional()
+			from alias1 in AliasExpr.Optional()
+			select new TableExpression()
+			{
+				Name = databaseTable1.Name,
+				AliasName = alias1?.Name,
+				WithOption = withOption1
+			};
 
 		//public IParser IfExpr(IParser factor)
 		//{
