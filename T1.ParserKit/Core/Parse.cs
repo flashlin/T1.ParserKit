@@ -640,6 +640,18 @@ namespace T1.ParserKit.Core
 			return RecOperatorExpr(groupExpr, operators, mapBinaryExprResult);
 		}
 
+		public static IParser<T> Recursive<T>(IParser<T> factor, 
+			IEnumerable<Func<IParser<T>, IParser<T>>> parsers)
+		{
+			var curr = (IParser<T>)null;
+			foreach (var parser in parsers)
+			{
+				curr = parser(curr ?? factor);
+			}
+			return curr;
+		}
+
+
 		//private static IParser ChainLeft1(IParser p,
 		//	IParser @operator, IParser operand,
 		//	Func<ITextSpan, ITextSpan, ITextSpan> apply)

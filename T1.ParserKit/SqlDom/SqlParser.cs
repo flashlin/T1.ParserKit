@@ -469,7 +469,7 @@ namespace T1.ParserKit.SqlDom
 			return Parse.Any(updateExpr.MapSqlExpr(), factor);
 		}
 
-		public static IParser<T> Group<T>(IParser<T> p)
+		public static IParser<T> Group<T>(this IParser<T> p)
 		{
 			return from lparen1 in LParen
 					 from p1 in p
@@ -521,44 +521,35 @@ namespace T1.ParserKit.SqlDom
 				WithOption = withOption1
 			};
 
-		//public IParser IfExpr(IParser factor)
-		//{
-		//	var body = factor.AtLeastOnce()
-		//		.MapResult(x => new StatementsExpression()
-		//		{
-		//			Items = x.Cast<SqlExpression>().ToArray()
-		//		});
+		public static IParser<SqlExpression> IfExpr(IParser<SqlExpression> factor)
+		{
+			var body = factor.Many1()
+				.MapResult(x => new StatementsExpression()
+				{
+					Items = x.ToArray()
+				});
 
-		//	var groupFilterExpr =
-		//		Parse.Chain(LParen, FilterExpr(Atom), RParen)
-		//			.MapResult(x => x[1]);
+			var groupFilterExpr = FilterExpr(Atom).Group();
 
-		//	var conditionExpr = Parse.Any(groupFilterExpr, FilterExpr(Atom));
+			var conditionExpr = Parse.Any(groupFilterExpr, FilterExpr(Atom));
 
-		//	var ifExpr = Parse.Chain(
-		//		Match("IF"),
-		//		conditionExpr,
-		//		Match("BEGIN"),
-		//		body,
-		//		Match("END"))
-		//		.MapResult(x => new IfExpression()
-		//		{
-		//			Condition = (FilterExpression)x[1],
-		//			Body = (StatementsExpression)x[3]
-		//		});
+			var ifExpr = 
+				from if1 in SqlToken.Word("IF")
+				from conditionExpr1 in conditionExpr
+				from begin1 in SqlToken.Word("BEGIN")
+				from body1 in body
+				from end1 in SqlToken.Word("END")
+				select new IfExpression()
+				{
+					Condition = conditionExpr1,
+					Body = body1
+				};
 
-		//	return Parse.Any(ifExpr, factor);
-		//}
+			return Parse.Any(ifExpr.MapSqlExpr(), factor);
+		}
 
-		//public IParser Recursive(IParser factor, IEnumerable<Func<IParser, IParser>> parsers)
-		//{
-		//	var curr = (IParser)null;
-		//	foreach (var parser in parsers)
-		//	{
-		//		curr = parser(curr ?? factor);
-		//	}
-		//	return curr;
-		//}
+		//public static IParser<SqlExpression> StartExpr =
+		//	SelectExpr2;
 
 		//public IParser StartExpr()
 		//{
