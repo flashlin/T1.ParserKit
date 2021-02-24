@@ -51,6 +51,18 @@ namespace T1.ParserKitTests
 			});
 		}
 
+		[Fact]
+		public void With_nolock()
+		{
+			GiveText("with(nolock)");
+			WhenParse(SqlParser.WithOptionExpr);
+			ThenResultShouldBe(new WithOptionExpression()
+			{
+				Nolock = true
+			});
+		}
+
+
 		//[Fact]
 		//public void If_variable_eq_1_begin_select_field_from_table_end()
 		//{

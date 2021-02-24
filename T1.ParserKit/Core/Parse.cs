@@ -134,7 +134,7 @@ namespace T1.ParserKit.Core
 			return rc.Cast<ITextSpan>().Reduce(fn);
 		}
 
-		public static IParser<TResult> MapResults<T, TResult>(this IParser<IEnumerable<T>> p,
+		public static IParser<TResult> MapResultList<T, TResult>(this IParser<IEnumerable<T>> p,
 			Func<T[], TResult> map)
 		{
 			return new Parser<TResult>(p.Name, inp =>

@@ -165,7 +165,7 @@ namespace T1.ParserKit.SqlDom
 				Comma,
 				factor,
 				RParen)
-				.MapResults(x => new SqlFunctionExpression()
+				.MapResultList(x => new SqlFunctionExpression()
 				{
 					Name = "ISNULL",
 					Parameters = new[]
@@ -192,27 +192,22 @@ namespace T1.ParserKit.SqlDom
 					SqlToken.Word("NOCOUNT"),
 					SqlToken.ContainsWord("OFF", "ON"),
 					SemiColon.Optional()
-					).MapResults(x => new SetOptionExpression()
+					).MapResultList(x => new SetOptionExpression()
 					{
 						OptionName = x[1].TextSpan.Text,
 						IsToggle = string.Equals(x[2].TextSpan.Text.ToUpper(), "ON", StringComparison.Ordinal)
 					});
 
-		//public IParser WithOptionExpr
-		//{
-		//	get
-		//	{
-		//		return Parse.Chain(
-		//			Match("with"),
-		//			LParen,
-		//			Match("nolock"),
-		//			RParen
-		//		).MapResult(x => new WithOptionExpression()
-		//		{
-		//			Nolock = true
-		//		});
-		//	}
-		//}
+		public static IParser<WithOptionExpression> WithOptionExpr =
+			Parse.Seq(
+				SqlToken.Word("with"),
+				LParen,
+				SqlToken.Word("nolock"),
+				RParen
+			).MapResult(x => new WithOptionExpression()
+			{
+				Nolock = true
+			});
 
 		//public IParser VariableAssignFieldExpr(IParser fieldExpr)
 		//{
@@ -276,7 +271,7 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<FieldExpression> TableFieldExpr2 =
 			Parse.Seq(Identifier, Dot, Identifier)
-				.MapResults(x => new FieldExpression()
+				.MapResultList(x => new FieldExpression()
 				{
 					Name = x[2].GetText(),
 					From = x[0].GetText()
@@ -284,7 +279,7 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<FieldExpression> TableFieldExpr3 =
 			Parse.Seq(Identifier, Dot, Identifier, Dot, Identifier)
-				.MapResults(x => new FieldExpression()
+				.MapResultList(x => new FieldExpression()
 				{
 					Name = x[4].GetText(),
 					From = $"{x[0].GetText()}.{x[2].GetText()}"
@@ -370,7 +365,7 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<NumberExpression> NegativeIntegerExpr =
 			ParseToken.Lexeme(Minus, SqlToken.Digits)
-				.MapResults(x => new NumberExpression()
+				.MapResultList(x => new NumberExpression()
 				{
 					ValueTypeFullname = typeof(int).FullName,
 					Value = int.Parse($"{x[0].GetText()}{x[1].GetText()}")
