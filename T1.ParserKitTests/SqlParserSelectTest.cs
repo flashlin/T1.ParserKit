@@ -399,46 +399,30 @@ namespace T1.ParserKitTests
 			});
 		}
 
-		//[Fact]
-		//public void Select_Field_as_alias_from_table()
-		//{
-		//	GiveText("select name as n1 from customer");
-		//	WhenParse();
-		//	ThenResultShouldBe(new SelectExpression()
-		//	{
-		//		File = "",
-		//		Length = 31,
-		//		Position = 0,
-		//		Content = _code,
-		//		Fields = new FieldsExpression()
-		//		{
-		//			File = "",
-		//			Length = 10,
-		//			Position = 7,
-		//			Content = _code,
-		//			Items = new List<SqlExpression>()
-		//			{
-		//				new FieldExpression()
-		//				{
-		//					File = "",
-		//					Length = 10,
-		//					Position = 7,
-		//					Content = _code,
-		//					Name = "name",
-		//					AliasName = "n1"
-		//				}
-		//			}
-		//		},
-		//		From = new TableExpression()
-		//		{
-		//			File = "",
-		//			Length = 8,
-		//			Position = 23,
-		//			Content = _code,
-		//			Name = "customer"
-		//		}
-		//	});
-		//}
+		[Fact]
+		public void Select_Field_as_alias_from_table()
+		{
+			GiveText("select name as n1 from customer");
+			WhenParse(SqlParser.SelectExpr);
+			ThenResultShouldBe(new SelectExpression()
+			{
+				Fields = new FieldsExpression()
+				{
+					Items = new List<SqlExpression>()
+					{
+						new FieldExpression()
+						{
+							Name = "name",
+							AliasName = "n1"
+						}
+					}
+				},
+				From = new TableExpression()
+				{
+					Name = "customer"
+				}
+			});
+		}
 
 		//[Fact]
 		//public void Select_Field_as_alias_from_table_as_alias()
