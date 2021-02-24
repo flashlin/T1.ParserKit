@@ -32,6 +32,11 @@ namespace T1.ParserKit.SqlDom
 			});
 		}
 
+		public static IParser<SqlExpression> MapSqlExpr<T>(this IParser<T> p)
+		{
+			return p.CastParser<SqlExpression>();
+		}
+
 		public static IParser<SqlExpression> SqlIdentifier = _SqlIdentifier();
 
 		public static IParser<SqlExpression> _SqlIdentifier()
@@ -292,31 +297,6 @@ namespace T1.ParserKit.SqlDom
 			return VariableAssignFieldExpr(factor);
 		}
 
-		//public IParser FieldsExpr
-		//{
-		//	get
-		//	{
-		//		var fieldExpr = RecFieldExpr(ArithmeticOperatorExpr());
-
-		//		var fields = fieldExpr.ManyDelimitedBy(Comma)
-		//			.MapResult(x => new FieldsExpression()
-		//			{
-		//				Items = x.TakeEvery(1).Cast<SqlExpression>().ToList()
-		//			});
-
-		//		var fields1 = fieldExpr
-		//			.MapResult(x => new FieldsExpression()
-		//			{
-		//				Items = new List<SqlExpression>()
-		//				{
-		//					x[0] as SqlExpression
-		//				}
-		//			});
-
-		//		return fields.Or(fields1).Named("FieldsExpr");
-		//	}
-		//}
-
 		public static IParser<ArithmeticOperatorExpression> ArithmeticOperatorExpr(IParser<SqlExpression> atom)
 		{
 			return Parse.RecGroupOperatorExpr(LParen, atom, RParen, new[]
@@ -370,12 +350,20 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<SqlExpression> Atom =
 			Parse.AnyCast<SqlExpression>(
 					FuncGetdate,
-					//		FieldExpr,
+					TableFieldExpr,
 					NumberExpr,
 					Variable);
 
 		public static IParser<ArithmeticOperatorExpression> ArithmeticOperatorAtomExpr = 
 			ArithmeticOperatorExpr(Atom);
+
+		public static IParser<FieldsExpression> FieldsExpr =
+			RecFieldExpr(ArithmeticOperatorAtomExpr.MapSqlExpr())
+				.ManyDelimitedBy(Comma)
+				.MapResultList(x => new FieldsExpression()
+				{
+					Items = x.TakeEvery(1).ToList()
+				});
 
 		//public IParser WhereExpr
 		//{

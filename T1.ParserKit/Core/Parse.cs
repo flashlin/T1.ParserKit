@@ -95,7 +95,7 @@ namespace T1.ParserKit.Core
 		}
 
 		public static IParser<IEnumerable<T>> SeqCast<T>(
-			Func<IParser<TextSpan>, IParser<T>> map, 
+			Func<IParser<TextSpan>, IParser<T>> map,
 			params object[] parsers)
 		{
 			return parsers.MapParser<T>(map, x => Parse.Seq(x));
@@ -409,17 +409,20 @@ namespace T1.ParserKit.Core
 		//	return p.Many(accum => accum.GetTextSpan(), min, max);
 		//}
 
-		//public static IParser<T> ManyDelimitedBy<T>(this IParser<T> parser, IParser<T> delimited,
-		//	Func<IEnumerable<IParseResult<T>>, T> apply)
-		//{
-		//	var accum = new List<IParseResult<T>>();
-		//	var tail = delimited.Then(parser, (rc) =>
-		//	{
-		//		accum.AddRange(rc);
-		//		return rc.Select(x => x.Result).ToArray();
-		//	});
-		//	return Parse.Any(parser.Then(tail.Many1(apply)), parser);
-		//}
+		public static IParser<IEnumerable<T>> ManyDelimitedBy<T>(this IParser<T> parser, IParser<T> delimited)
+		{
+			var tail = delimited.Then(parser, (a, b) =>
+			{
+				return new T[] { a, b };
+			});
+			var expr2 = parser.Then(tail.Many(), (a, b) =>
+			{
+				var list = Enumerable.Repeat(a, 1).Concat(b.SelectMany(x => x));
+				return list;
+			});
+			var expr1 = parser.MapResult(x => Enumerable.Repeat(x, 1));
+			return Parse.Any(expr2, expr1);
+		}
 
 		//public static IParser MapResult(this IParser p, Func<IParseResult, IParseResult> f)
 		//{
@@ -456,8 +459,8 @@ namespace T1.ParserKit.Core
 		//	});
 		//}
 
-		public static IParser<T3> Then<T1, T2, T3>(this IParser<T1> p1, 
-			IParser<T2> p2, 
+		public static IParser<T3> Then<T1, T2, T3>(this IParser<T1> p1,
+			IParser<T2> p2,
 			Func<T1, T2, T3> combine)
 		{
 			var name = $"{p1.Name} {p2.Name}";
@@ -606,8 +609,8 @@ namespace T1.ParserKit.Core
 			return groupExpr.Or(atom);
 		}
 
-		public static IParser<T> RecOperatorExpr<T>(IParser<T> item, 
-			IParser<T>[] operators, 
+		public static IParser<T> RecOperatorExpr<T>(IParser<T> item,
+			IParser<T>[] operators,
 			Func<T[], T> mapResult)
 		{
 			var expr = item;
