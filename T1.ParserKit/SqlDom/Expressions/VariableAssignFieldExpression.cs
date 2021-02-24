@@ -2,9 +2,9 @@
 
 namespace T1.ParserKit.SqlDom.Expressions
 {
-	public class VariableAssignFieldExpression : FieldExpression
+	public class VariableAssignFieldExpression : SqlExpression
 	{
-		public string VariableName { get; set; }
-		public FieldExpression Field { get; set; }
+		public VariableExpression VariableName { get; set; }
+		public SqlExpression From { get; set; }
 	}
 }

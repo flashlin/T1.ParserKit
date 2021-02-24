@@ -599,37 +599,38 @@ namespace T1.ParserKit.Core
 			return identifierCharacters1.Or(identifierCharacters2).Merge();
 		}
 
-		//public static IParser GroupExpr(IParser lparen, IParser atom, IParser rparen)
-		//{
-		//	var groupExpr = Chain(lparen, atom, rparen)
-		//		.MapResult(x => x[1]);
-		//	return groupExpr.Or(atom);
-		//}
+		public static IParser<T> GroupExpr<T>(IParser<T> lparen, IParser<T> atom, IParser<T> rparen)
+		{
+			var groupExpr = Parse.Seq(lparen, atom, rparen)
+				.MapResultList(x => x[1]);
+			return groupExpr.Or(atom);
+		}
 
-		//public static IParser RecOperatorExpr(IParser item, IParser[] operators, 
-		//	Func<ITextSpan[], ITextSpan> mapResult)
-		//{
-		//	var expr = item;
-		//	foreach (var oper in operators)
-		//	{
-		//		IParser RecExpr(IParser atom)
-		//		{
-		//			var operandExpr = Chain(atom, oper, atom)
-		//				.MapResult(mapResult);
-		//			return operandExpr.Or(atom);
-		//		}
-		//		expr = RecExpr(expr);
-		//	}
-		//	return expr.Or(item);
-		//}
+		public static IParser<T> RecOperatorExpr<T>(IParser<T> item, 
+			IParser<T>[] operators, 
+			Func<T[], T> mapResult)
+		{
+			var expr = item;
+			foreach (var oper in operators)
+			{
+				IParser<T> RecExpr(IParser<T> atom)
+				{
+					var operandExpr = Seq(atom, oper, atom)
+						.MapResultList(mapResult);
+					return operandExpr.Or(atom);
+				}
+				expr = RecExpr(expr);
+			}
+			return expr.Or(item);
+		}
 
-		//public static IParser RecGroupOperatorExpr(IParser lparen, IParser atom, IParser rparen,
-		//	IParser[] operators, Func<ITextSpan[], ITextSpan> mapResult)
-		//{
-		//	var expr = RecOperatorExpr(atom, operators, mapResult);
-		//	var groupExpr = GroupExpr(lparen, expr, rparen);
-		//	return RecOperatorExpr(groupExpr, operators, mapResult);
-		//}
+		public static IParser<T> RecGroupOperatorExpr<T>(IParser<T> lparen, IParser<T> atom, IParser<T> rparen,
+			IParser<T>[] operators, Func<T[], T> mapBinaryExprResult)
+		{
+			var expr = RecOperatorExpr(atom, operators, mapBinaryExprResult);
+			var groupExpr = GroupExpr(lparen, expr, rparen);
+			return RecOperatorExpr(groupExpr, operators, mapBinaryExprResult);
+		}
 
 		//private static IParser ChainLeft1(IParser p,
 		//	IParser @operator, IParser operand,

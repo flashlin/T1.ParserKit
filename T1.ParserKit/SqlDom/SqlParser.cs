@@ -54,6 +54,7 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<SqlExpression> Comma = SqlToken.Symbol(",");
 		public static IParser<SqlExpression> Minus = SqlToken.Symbol("-");
 		public static IParser<SqlExpression> At = SqlToken.Symbol("@");
+		public static IParser<SqlExpression> Assign = SqlToken.Symbol("=");
 
 		public static IParser<SqlExpression> SqlDataType =
 			SqlToken.ContainsWord("DATETIME", "BIGINT");
@@ -209,22 +210,19 @@ namespace T1.ParserKit.SqlDom
 				Nolock = true
 			});
 
-		//public IParser VariableAssignFieldExpr(IParser fieldExpr)
-		//{
-		//	var assignField = Parse.Chain(
-		//		Variable,
-		//		Symbol("="),
-		//		fieldExpr)
-		//		.MapAssign<VariableAssignFieldExpression>((x, expr) =>
-		//		{
-		//			var f = (FieldExpression)x[2];
-		//			expr.VariableName = x[0].GetText();
-		//			expr.Name = f.Name;
-		//			expr.From = f.From;
-		//			expr.AliasName = f.AliasName;
-		//		});
-		//	return Parse.Any(assignField, fieldExpr);
-		//}
+		public static IParser<SqlExpression> VariableAssignFieldExpr(IParser<SqlExpression> fieldExpr)
+		{
+			var assignExpr =
+				from variable1 in Variable
+				from assign1 in Assign
+				from expr1 in fieldExpr
+				select new VariableAssignFieldExpression()
+				{
+					VariableName = variable1,
+					From = expr1,
+				};
+			return Parse.AnyCast<SqlExpression>(assignExpr, fieldExpr);
+		}
 
 		private static readonly HashSet<string> Keywords = new HashSet<string>(
 			SqlToken.Keywords.Concat(SqlToken.Keywords.Select(x => x.ToLower())));
@@ -289,10 +287,10 @@ namespace T1.ParserKit.SqlDom
 			Parse.Any(TableFieldExpr3, TableFieldExpr2, TableFieldExpr1)
 				.Named(nameof(TableFieldExpr));
 
-		//public IParser RecFieldExpr(IParser factor)
-		//{
-		//	return VariableAssignFieldExpr(factor);
-		//}
+		public static IParser<SqlExpression> RecFieldExpr(IParser<SqlExpression> factor)
+		{
+			return VariableAssignFieldExpr(factor);
+		}
 
 		//public IParser FieldsExpr
 		//{
@@ -319,26 +317,21 @@ namespace T1.ParserKit.SqlDom
 		//	}
 		//}
 
-		//public IParser ArithmeticOperatorExpr(IParser atom)
-		//{
-		//	return Parse.RecGroupOperatorExpr(LParen, atom, RParen, new[]
-		//	{
-		//		Symbol("*"),
-		//		Symbol("/"),
-		//		Symbol("+"),
-		//		Symbol("-")
-		//	}, x => new ArithmeticOperatorExpression
-		//	{
-		//		Left = (SqlExpression)x[0],
-		//		Oper = x[1].GetText(),
-		//		Right = (SqlExpression)x[2]
-		//	});
-		//}
-
-		//public IParser ArithmeticOperatorExpr()
-		//{
-		//	return ArithmeticOperatorExpr(Atom);
-		//}
+		public static IParser<ArithmeticOperatorExpression> ArithmeticOperatorExpr(IParser<SqlExpression> atom)
+		{
+			return Parse.RecGroupOperatorExpr(LParen, atom, RParen, new[]
+			{
+				SqlToken.Symbol("*"),
+				SqlToken.Symbol("/"),
+				SqlToken.Symbol("+"),
+				SqlToken.Symbol("-")
+			}, x => new ArithmeticOperatorExpression
+			{
+				Left = x[0],
+				Oper = x[1].GetText(),
+				Right = x[2]
+			}).MapResult(x => (ArithmeticOperatorExpression)x);
+		}
 
 		//public IParser FilterExpr(IParser atom)
 		//{
@@ -380,6 +373,9 @@ namespace T1.ParserKit.SqlDom
 					//		FieldExpr,
 					NumberExpr,
 					Variable);
+
+		public static IParser<ArithmeticOperatorExpression> ArithmeticOperatorAtomExpr = 
+			ArithmeticOperatorExpr(Atom);
 
 		//public IParser WhereExpr
 		//{
