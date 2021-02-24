@@ -223,76 +223,44 @@ namespace T1.ParserKitTests
 			});
 		}
 
-		//[Fact]
-		//public void Select_field_from_table_where_field_eq_variable()
-		//{
-		//	GiveText("select name from customer where name = @name");
-		//	WhenParse();
-		//	ThenResultShouldBe(new SelectExpression()
-		//	{
-		//		File = "",
-		//		Length = _code.Length,
-		//		Position = 0,
-		//		Content = _code,
-		//		Fields = new FieldsExpression()
-		//		{
-		//			File = "",
-		//			Length = 4,
-		//			Position = 7,
-		//			Content = _code,
-		//			Items = new List<SqlExpression>()
-		//			{
-		//				new FieldExpression()
-		//				{
-		//					Name = "name",
-		//					File = "",
-		//					Length = 4,
-		//					Position = 7,
-		//					Content = _code
-		//				}
-		//			}
-		//		},
-		//		From = new TableExpression()
-		//		{
-		//			File = "",
-		//			Length = 8,
-		//			Position = 17,
-		//			Content = _code,
-		//			Name = "customer"
-		//		},
-		//		Where = new WhereExpression()
-		//		{
-		//			File = string.Empty,
-		//			Length = 18,
-		//			Position = 26,
-		//			Content = _code,
-		//			Filter = new FilterExpression()
-		//			{
-		//				File = string.Empty,
-		//				Length = 12,
-		//				Position = 32,
-		//				Content = _code,
-		//				Left = new FieldExpression()
-		//				{
-		//					File = string.Empty,
-		//					Length = 4,
-		//					Position = 32,
-		//					Content = _code,
-		//					Name = "name"
-		//				},
-		//				Oper = "=",
-		//				Right = new VariableExpression()
-		//				{
-		//					File = string.Empty,
-		//					Length = 5,
-		//					Position = 39,
-		//					Content = _code,
-		//					Name = "@name"
-		//				}
-		//			}
-		//		}
-		//	});
-		//}
+		[Fact]
+		public void Select_field_from_table_where_field_eq_variable()
+		{
+			GiveText("select name from customer where name = @name");
+			WhenParse(SqlParser.SelectExpr);
+			ThenResultShouldBe(new SelectExpression()
+			{
+				Fields = new FieldsExpression()
+				{
+					Items = new List<SqlExpression>()
+					{
+						new FieldExpression()
+						{
+							Name = "name",
+						}
+					}
+				},
+				From = new TableExpression()
+				{
+					Name = "customer"
+				},
+				Where = new WhereExpression()
+				{
+					Filter = new FilterExpression()
+					{
+						Left = new FieldExpression()
+						{
+							Name = "name"
+						},
+						Oper = "=",
+						Right = new VariableExpression()
+						{
+							Name = "@name"
+						}
+					}
+				}
+			});
+		}
 
 		//[Fact]
 		//public void Select_variable_assign_field_from_table()
