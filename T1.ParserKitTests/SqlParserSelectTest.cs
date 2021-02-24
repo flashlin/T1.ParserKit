@@ -10,7 +10,7 @@ using Xunit;
 
 namespace T1.ParserKitTests
 {
-	public class SqlParserTest : ParseTestBase
+	public class SqlParserSelectTest : ParseTestBase
 	{
 		[Fact]
 		public void Where_field_eq_1()
