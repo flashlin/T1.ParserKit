@@ -1,5 +1,6 @@
 using ExpectedObjects;
 using T1.ParserKit.Core;
+using T1.ParserKit.SqlDom.Expressions;
 using Xunit;
 
 namespace T1.ParserKitTests
@@ -16,9 +17,16 @@ namespace T1.ParserKitTests
 				throw new ParseException(_parsed.Error);
 			}
 
-			var actualResult = (TextSpan)_parsed.Result;
+			if (_parsed.Result is TextSpan textSpan)
+			{
+				expected.ToExpectedObject()
+					.ShouldMatch(textSpan.Text);
+				return;
+			}
+
+			var actualResult = (SqlExpression)_parsed.Result;
 			expected.ToExpectedObject()
-				.ShouldMatch(actualResult.Text);
+				.ShouldMatch(actualResult.TextSpan.Text);
 		}
 
 		protected void ThenResultShouldFail()
@@ -28,7 +36,7 @@ namespace T1.ParserKitTests
 
 		protected void ThenResultShouldBe<T>(T expected)
 		{
-			if (!_parsed.IsSuccess() )
+			if (!_parsed.IsSuccess())
 			{
 				throw new ParseException(_parsed.Error);
 			}

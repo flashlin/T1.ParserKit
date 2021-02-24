@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using T1.ParserKit.Core;
+using T1.ParserKit.SqlDom.Expressions;
 
 namespace T1.ParserKit.SqlDom
 {
@@ -77,17 +78,40 @@ namespace T1.ParserKit.SqlDom
 			.Concat(DatediffAbbreviationDatepartStr)
 			.ToArray();
 
-		public static IParser<TextSpan> Word(string text)
+		public static IParser<SqlExpression> Digits =
+			Parse.Digits.MapResult(x => new SqlExpression()
+			{
+				TextSpan = x
+			});
+
+		public static IParser<SqlExpression> Word(string text)
 		{
-			return ParseToken.Lexeme(ParseToken.Match(text));
+			return ParseToken.Lexeme(ParseToken.Match(text))
+				.MapResult(x => new SqlExpression()
+				{
+					TextSpan = x
+				});
 		}
 
-		public static IParser<TextSpan> ContainsWord(params string[] texts)
+		public static IParser<SqlExpression> Symbol(string text)
+		{
+			return ParseToken.Symbol(text)
+				.MapResult(x => new SqlExpression()
+				{
+					TextSpan = x
+				});
+		}
+
+		public static IParser<SqlExpression> ContainsWord(params string[] texts)
 		{
 			var sortedTexts = texts
 				.OrderByDescending(x => x.Length)
 				.ToArray();
-			return ParseToken.Lexeme(ParseToken.Matchs(sortedTexts));
+			return ParseToken.Lexeme(ParseToken.Matchs(sortedTexts))
+				.MapResult(x => new SqlExpression()
+				{
+					TextSpan = x
+				});
 		}
 	}
 }

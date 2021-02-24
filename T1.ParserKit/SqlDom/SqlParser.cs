@@ -32,27 +32,30 @@ namespace T1.ParserKit.SqlDom
 			});
 		}
 
-		public static IParser<TextSpan> SqlIdentifier = _SqlIdentifier();
+		public static IParser<SqlExpression> SqlIdentifier = _SqlIdentifier();
 
-		public static IParser<TextSpan> _SqlIdentifier()
+		public static IParser<SqlExpression> _SqlIdentifier()
 		{
 			var start = Parse.Equal("[");
 			var body = Parse.NotEqual("]").Many1();
 			var end = Parse.Equal("]");
 			var identifier = Parse.Seq(start, body, end).Merge();
-			return identifier.Or(Parse.CStyleIdentifier)
-					.Named("SqlIdentifier");
+			return identifier.Or(Parse.CStyleIdentifier).Named("SqlIdentifier")
+				.MapResult(x => new SqlExpression()
+				{
+					TextSpan = x
+				});
 		}
 
-		public static IParser<TextSpan> LParen = ParseToken.Symbol("(");
-		public static IParser<TextSpan> RParen = ParseToken.Symbol(")");
-		public static IParser<TextSpan> SemiColon = ParseToken.Symbol(";");
-		public static IParser<TextSpan> Dot = ParseToken.Symbol(".");
-		public static IParser<TextSpan> Comma = ParseToken.Symbol(",");
-		public static IParser<TextSpan> Minus = ParseToken.Symbol("-");
-		public static IParser<TextSpan> At = ParseToken.Symbol("@");
+		public static IParser<SqlExpression> LParen = SqlToken.Symbol("(");
+		public static IParser<SqlExpression> RParen = SqlToken.Symbol(")");
+		public static IParser<SqlExpression> SemiColon = SqlToken.Symbol(";");
+		public static IParser<SqlExpression> Dot = SqlToken.Symbol(".");
+		public static IParser<SqlExpression> Comma = SqlToken.Symbol(",");
+		public static IParser<SqlExpression> Minus = SqlToken.Symbol("-");
+		public static IParser<SqlExpression> At = SqlToken.Symbol("@");
 
-		public static IParser<TextSpan> SqlDataType =
+		public static IParser<SqlExpression> SqlDataType =
 			SqlToken.ContainsWord("DATETIME", "BIGINT");
 
 		//public static IParser<SqlFunctionExpression> FuncGetdate =
@@ -70,8 +73,21 @@ namespace T1.ParserKit.SqlDom
 		//			};
 		//		});
 
+		public static TextSpan GetTextSpan(this IEnumerable<SqlExpression> exprs)
+		{
+			return exprs.Select(x => x.TextSpan).GetTextSpan();
+		}
+
+		public static IParser<SqlExpression> Merge(this IParser<IEnumerable<SqlExpression>> parsers)
+		{
+			return parsers.Select(x => new SqlExpression()
+			{
+				TextSpan = x.Result.GetTextSpan()
+			});
+		}
+
 		public static IParser<SqlFunctionExpression> FuncGetdate =
-			from getdate in ParseToken.Match("GETDATE")
+			from getdate in SqlToken.Word("GETDATE")
 			from lparen in LParen
 			from rparen in RParen
 			select new SqlFunctionExpression
@@ -87,7 +103,7 @@ namespace T1.ParserKit.SqlDom
 			var datepart = SqlToken.ContainsWord(SqlToken.DateaddDetepart)
 				.MapResult(x => new SqlOptionNameExpression()
 				{
-					Value = x.Text
+					Value = x.TextSpan.Text
 				});
 
 			return from dateadd in SqlToken.Word("DATEADD")
@@ -116,7 +132,7 @@ namespace T1.ParserKit.SqlDom
 			var datepart = SqlToken.ContainsWord(SqlToken.DatediffDatepart)
 				.MapResult(x => new SqlOptionNameExpression()
 				{
-					Value = x.Text
+					Value = x.TextSpan.Text
 				});
 
 			return from datediff1 in SqlToken.Word("DATEDIFF")
@@ -142,7 +158,7 @@ namespace T1.ParserKit.SqlDom
 		//ISNULL(@SblimitExpiredDate, xxx)
 		public static IParser<SqlFunctionExpression> FuncIsnull(IParser<SqlExpression> factor)
 		{
-			return Parse.SeqCast<SqlExpression>(MapSqlExpr,
+			return Parse.Seq(
 				SqlToken.Word("ISNULL"),
 				LParen,
 				factor,
@@ -178,8 +194,8 @@ namespace T1.ParserKit.SqlDom
 					SemiColon.Optional()
 					).MapResults(x => new SetOptionExpression()
 					{
-						OptionName = x[1].Text,
-						IsToggle = string.Equals(x[2].Text.ToUpper(), "ON", StringComparison.Ordinal)
+						OptionName = x[1].TextSpan.Text,
+						IsToggle = string.Equals(x[2].TextSpan.Text.ToUpper(), "ON", StringComparison.Ordinal)
 					});
 
 		//public IParser WithOptionExpr
@@ -218,10 +234,10 @@ namespace T1.ParserKit.SqlDom
 		private static readonly HashSet<string> Keywords = new HashSet<string>(
 			SqlToken.Keywords.Concat(SqlToken.Keywords.Select(x => x.ToLower())));
 
-		public static IParser<TextSpan> SqlIdentifierExcludeKeyword =
+		public static IParser<SqlExpression> SqlIdentifierExcludeKeyword =
 			SqlIdentifier.TransferToNext(rc =>
 			{
-				var ch = rc.Text;
+				var ch = rc.TextSpan.Text;
 				if (Keywords.Contains($"{ch}"))
 				{
 					return $"Expect not keyword, but got '{ch}'";
@@ -229,7 +245,7 @@ namespace T1.ParserKit.SqlDom
 				return "";
 			});
 
-		public static IParser<TextSpan> Identifier =
+		public static IParser<SqlExpression> Identifier =
 			ParseToken.Lexeme(SqlIdentifierExcludeKeyword);
 
 		public static IParser<VariableExpression> Variable =
@@ -239,7 +255,7 @@ namespace T1.ParserKit.SqlDom
 			).Merge()
 			.MapResult(x => new VariableExpression()
 			{
-				Name = x.Text
+				Name = x.TextSpan.Text
 			});
 
 		public static IParser<DeclareExpression> DeclareVariableExpr =
@@ -249,29 +265,29 @@ namespace T1.ParserKit.SqlDom
 			select new DeclareExpression()
 			{
 				Name = variable1,
-				DataType = sqlDataType1.Text
+				DataType = sqlDataType1.GetText()
 			};
 
 		public static IParser<FieldExpression> TableFieldExpr1 =
 			Identifier.MapResult(x => new FieldExpression()
 			{
-				Name = x.Text
+				Name = x.GetText()
 			});
 
 		public static IParser<FieldExpression> TableFieldExpr2 =
 			Parse.Seq(Identifier, Dot, Identifier)
 				.MapResults(x => new FieldExpression()
 				{
-					Name = x[2].Text,
-					From = x[0].Text
+					Name = x[2].GetText(),
+					From = x[0].GetText()
 				});
 
 		public static IParser<FieldExpression> TableFieldExpr3 =
 			Parse.Seq(Identifier, Dot, Identifier, Dot, Identifier)
 				.MapResults(x => new FieldExpression()
 				{
-					Name = x[4].Text,
-					From = $"{x[0].Text}.{x[2].Text}"
+					Name = x[4].GetText(),
+					From = $"{x[0].GetText()}.{x[2].GetText()}"
 				});
 
 		public static IParser<FieldExpression> TableFieldExpr =
@@ -353,11 +369,11 @@ namespace T1.ParserKit.SqlDom
 				});
 
 		public static IParser<NumberExpression> NegativeIntegerExpr =
-			ParseToken.Lexeme(Minus, Parse.Digits)
+			ParseToken.Lexeme(Minus, SqlToken.Digits)
 				.MapResults(x => new NumberExpression()
 				{
 					ValueTypeFullname = typeof(int).FullName,
-					Value = int.Parse($"{x[0].Text}{x[1].Text}")
+					Value = int.Parse($"{x[0].GetText()}{x[1].GetText()}")
 				});
 
 		public static IParser<NumberExpression> NumberExpr =
