@@ -22,7 +22,7 @@ namespace T1.ParserKitTests
 		public void Tablename1()
 		{
 			GiveText("name");
-			WhenParse(SqlParser.TableFieldExpr1);
+			WhenParse(SqlParser.TableFieldExpr);
 			ThenResultShouldBe(new FieldExpression()
 			{
 				Name = "name",
@@ -45,7 +45,7 @@ namespace T1.ParserKitTests
 		public void Table_name2()
 		{
 			GiveText("customer.name");
-			WhenParse(SqlParser.TableFieldExpr2);
+			WhenParse(SqlParser.TableFieldExpr);
 			ThenResultShouldBe(new FieldExpression()
 			{
 				Name = "name",
@@ -69,7 +69,7 @@ namespace T1.ParserKitTests
 		public void Database_table_name3()
 		{
 			GiveText("db1.customer.name");
-			WhenParse(SqlParser.TableFieldExpr3);
+			WhenParse(SqlParser.TableFieldExpr);
 			ThenResultShouldBe(new FieldExpression()
 			{
 				Name = "name",

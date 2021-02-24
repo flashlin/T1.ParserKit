@@ -266,13 +266,13 @@ namespace T1.ParserKit.SqlDom
 				DataType = sqlDataType1.GetText()
 			};
 
-		public static IParser<FieldExpression> TableFieldExpr1 =
+		private static readonly IParser<FieldExpression> TableFieldExpr1 =
 			Identifier.MapResult(x => new FieldExpression()
 			{
 				Name = x.GetText()
 			});
 
-		public static IParser<FieldExpression> TableFieldExpr2 =
+		private static readonly IParser<FieldExpression> TableFieldExpr2 =
 			Parse.Seq(Identifier, Dot, Identifier)
 				.MapResultList(x => new FieldExpression()
 				{
@@ -280,7 +280,7 @@ namespace T1.ParserKit.SqlDom
 					From = x[0].GetText()
 				});
 
-		public static IParser<FieldExpression> TableFieldExpr3 =
+		private static readonly IParser<FieldExpression> TableFieldExpr3 =
 			Parse.Seq(Identifier, Dot, Identifier, Dot, Identifier)
 				.MapResultList(x => new FieldExpression()
 				{
@@ -291,6 +291,16 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<FieldExpression> TableFieldExpr =
 			Parse.Any(TableFieldExpr3, TableFieldExpr2, TableFieldExpr1)
 				.Named(nameof(TableFieldExpr));
+
+
+		public static readonly IParser<FieldExpression> TableFieldAliasExpr =
+			from tableField1 in TableFieldExpr
+			from alias1 in AliasExpr.Optional()
+			select tableField1.Assign(x =>
+			{
+				x.AliasName = alias1?.Name;
+			});
+
 
 		public static IParser<SqlExpression> RecFieldExpr(IParser<SqlExpression> factor)
 		{
@@ -335,7 +345,7 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<SqlExpression> Atom =
 			Parse.AnyCast<SqlExpression>(
 					FuncGetdate,
-					TableFieldExpr,
+					TableFieldAliasExpr,
 					NumberExpr,
 					Variable);
 

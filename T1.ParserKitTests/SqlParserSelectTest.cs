@@ -347,48 +347,32 @@ namespace T1.ParserKitTests
 			});
 		}
 
-		//[Fact]
-		//public void Select_tb_field_alias_from_table_alias()
-		//{
-		//	GiveText("select c.name username from customer c");
-		//	WhenParse();
-		//	ThenResultShouldBe(new SelectExpression()
-		//	{
-		//		File = "",
-		//		Length = _code.Length,
-		//		Position = 0,
-		//		Content = _code,
-		//		Fields = new FieldsExpression()
-		//		{
-		//			File = "",
-		//			Length = 15,
-		//			Position = 7,
-		//			Content = _code,
-		//			Items = new List<SqlExpression>()
-		//			{
-		//				new FieldExpression()
-		//				{
-		//					File = "",
-		//					Length = 15,
-		//					Position = 7,
-		//					Content = _code,
-		//					Name = "name",
-		//					From = "c",
-		//					AliasName = "username"
-		//				}
-		//			}
-		//		},
-		//		From = new TableExpression()
-		//		{
-		//			File = "",
-		//			Length = 10,
-		//			Position = 28,
-		//			Content = _code,
-		//			Name = "customer",
-		//			AliasName = "c"
-		//		}
-		//	});
-		//}
+		[Fact]
+		public void Select_tb_field_alias_from_table_alias()
+		{
+			GiveText("select c.name username from customer c");
+			WhenParse(SqlParser.SelectExpr);
+			ThenResultShouldBe(new SelectExpression()
+			{
+				Fields = new FieldsExpression()
+				{
+					Items = new List<SqlExpression>()
+					{
+						new FieldExpression()
+						{
+							Name = "name",
+							From = "c",
+							AliasName = "username"
+						}
+					}
+				},
+				From = new TableExpression()
+				{
+					Name = "customer",
+					AliasName = "c"
+				}
+			});
+		}
 
 		//[Fact]
 		//public void Select_Field_alias_from_table()

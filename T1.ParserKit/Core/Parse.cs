@@ -417,6 +417,11 @@ namespace T1.ParserKit.Core
 			});
 			var expr2 = parser.Then(tail.Many(), (a, b) =>
 			{
+				if (b == null)
+				{
+					return Enumerable.Repeat(a, 1);
+				}
+
 				var list = Enumerable.Repeat(a, 1).Concat(b.SelectMany(x => x));
 				return list;
 			});
@@ -695,6 +700,12 @@ namespace T1.ParserKit.Core
 		public static IEnumerable<TResult> GetAccumResults<TResult>(this IEnumerable<IParseResult<TResult>> accum)
 		{
 			return accum.Select(x => x.Result);
+		}
+
+		public static T Assign<T>(this T result, Action<T> fn)
+		{
+			fn(result);
+			return result;
 		}
 	}
 }
