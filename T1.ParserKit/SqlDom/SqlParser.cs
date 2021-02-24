@@ -577,40 +577,5 @@ namespace T1.ParserKit.SqlDom
 		//{
 		//	return StartExpr().ParseText(code).Cast<SqlExpression>().ToArray();
 		//}
-
-		//public IParser<TextSpan> Identifier =
-		//	ParseToken.Lexeme(SqlIdentifier);
-		//{
-		//	return SkipBlanks(SqlIdentifier.Next(NotKeyword));
-		//}
-
-		//protected static IParser Symbol(string text)
-		//{
-		//	return SkipBlanks(
-		//		Parse.Equal(text)
-		//	);
-		//}
-
-		//protected IParser ContainsText(params string[] texts)
-		//{
-		//	return SkipBlanks(
-		//		Parse.Contains(texts, true).Assertion(true)
-		//	);
-		//}
-
-		//protected IParser ContainsSymbol(params string[] symbols)
-		//{
-		//	return SkipBlanks(
-		//		Parse.Contains(symbols)
-		//	);
-		//}
-
-		//protected IParser SkipBlanks(IParser p)
-		//{
-		//	return new[] {
-		//		Parse.Blanks().Many().Skip(),
-		//		p
-		//	}.Chain(TODO).Named($">>{p.Name}");
-		//}
 	}
 }
