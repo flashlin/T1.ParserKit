@@ -373,6 +373,20 @@ namespace T1.ParserKit.SqlDom
 				Filter = filter1
 			};
 
+		//public IParser SelectExpr =>
+		//	Parse.Chain(
+		//		Match("SELECT"),
+		//		FieldsExpr,
+		//		Match("FROM"),
+		//		TableExpr,
+		//		WhereExpr.Optional()
+		//	).MapResult(x => new SelectExpression()
+		//	{
+		//		Fields = x[1] as FieldsExpression,
+		//		From = x[3] as TableExpression,
+		//		Where = x.FirstCast<WhereExpression>()
+		//	}).Named("SelectExpr");
+
 		//public IParser DatabaseDboSchemaName =>
 		//	Parse.Chain(Identifier(),
 		//		Symbol("."),
@@ -443,20 +457,6 @@ namespace T1.ParserKit.SqlDom
 		//	});
 		//	return Parse.Any(updateExpr, factor);
 		//}
-
-		//public IParser SelectExpr =>
-		//	Parse.Chain(
-		//		Match("SELECT"),
-		//		FieldsExpr,
-		//		Match("FROM"),
-		//		TableExpr,
-		//		WhereExpr.Optional()
-		//	).MapResult(x => new SelectExpression()
-		//	{
-		//		Fields = x[1] as FieldsExpression,
-		//		From = x[3] as TableExpression,
-		//		Where = x.FirstCast<WhereExpression>()
-		//	}).Named("SelectExpr");
 
 		//public IParser Group(IParser p)
 		//{
