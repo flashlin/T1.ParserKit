@@ -78,5 +78,11 @@ namespace T1.ParserKit.Core
 			var sorted = texts.OrderByDescending(x => x.Length);
 			return Parse.Contains(texts, true).ThenLeft(Assertion());
 		}
+
+		public static IParser<TextSpan> Symbols(params string[] texts)
+		{
+			var sorted = texts.OrderByDescending(x => x.Length);
+			return Parse.Contains(texts);
+		}
 	}
 }

@@ -313,21 +313,6 @@ namespace T1.ParserKit.SqlDom
 			}).MapResult(x => (ArithmeticOperatorExpression)x);
 		}
 
-		//public IParser FilterExpr(IParser atom)
-		//{
-		//	var oper = ContainsSymbol(">=", "<=", "!=", ">", "<", "=");
-		//	return Parse.Chain(
-		//		atom,
-		//		oper,
-		//		atom
-		//		).MapResult(x => new FilterExpression()
-		//		{
-		//			Left = (SqlExpression)x[0],
-		//			Oper = x[1].GetText(),
-		//			Right = (SqlExpression)x[2],
-		//		});
-		//}
-
 		public static IParser<NumberExpression> IntegerExpr =
 			ParseToken.Lexeme(Parse.Digits)
 				.MapResult(x => new NumberExpression()
@@ -354,7 +339,7 @@ namespace T1.ParserKit.SqlDom
 					NumberExpr,
 					Variable);
 
-		public static IParser<ArithmeticOperatorExpression> ArithmeticOperatorAtomExpr = 
+		public static IParser<ArithmeticOperatorExpression> ArithmeticOperatorAtomExpr =
 			ArithmeticOperatorExpr(Atom);
 
 		public static IParser<FieldsExpression> FieldsExpr =
@@ -365,21 +350,28 @@ namespace T1.ParserKit.SqlDom
 					Items = x.TakeEvery(1).ToList()
 				});
 
-		//public IParser WhereExpr
-		//{
-		//	get
-		//	{
-		//		return Parse.Chain(
-		//			Match("WHERE"),
-		//			FilterExpr(Atom)
-		//		)
-		//		.Named("WhereExpr")
-		//		.MapResult(x => new WhereExpression()
-		//		{
-		//			Filter = (FilterExpression)x[1]
-		//		});
-		//	}
-		//}
+		public static IParser<FilterExpression> FilterExpr(IParser<SqlExpression> atom)
+		{
+			var oper = SqlToken.Symbols(">=", "<=", "!=", ">", "<", "=");
+			return Parse.Seq(
+				atom,
+				oper,
+				atom
+				).MapResultList(x => new FilterExpression()
+				{
+					Left = x[0],
+					Oper = x[1].GetText(),
+					Right = x[2],
+				});
+		}
+
+		public static IParser<WhereExpression> WhereExpr =
+			from _ in SqlToken.Word("WHERE")
+			from filter1 in FilterExpr(Atom)
+			select new WhereExpression()
+			{
+				Filter = filter1
+			};
 
 		//public IParser DatabaseDboSchemaName =>
 		//	Parse.Chain(Identifier(),

@@ -104,10 +104,16 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<SqlExpression> ContainsWord(params string[] texts)
 		{
-			var sortedTexts = texts
-				.OrderByDescending(x => x.Length)
-				.ToArray();
-			return ParseToken.Lexeme(ParseToken.Matchs(sortedTexts))
+			return ParseToken.Lexeme(ParseToken.Matchs(texts))
+				.MapResult(x => new SqlExpression()
+				{
+					TextSpan = x
+				});
+		}
+
+		public static IParser<SqlExpression> Symbols(params string[] texts)
+		{
+			return ParseToken.Lexeme(ParseToken.Symbols(texts))
 				.MapResult(x => new SqlExpression()
 				{
 					TextSpan = x
