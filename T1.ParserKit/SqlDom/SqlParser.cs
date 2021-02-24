@@ -396,6 +396,9 @@ namespace T1.ParserKit.SqlDom
 				Where = where1
 			};
 
+		public static IParser<SelectExpression> SelectExpr2 =
+			RecSelectExpr(SelectExpr);
+
 		private static readonly IParser<ObjectNameExpression> DatabaseDboSchemaName3 =
 			Parse.Seq(Identifier,
 				Dot,
@@ -426,8 +429,8 @@ namespace T1.ParserKit.SqlDom
 			});
 
 		public static readonly IParser<ObjectNameExpression> DatabaseSchemaObjectName =
-			Parse.Any(DatabaseDboSchemaName3, 
-				DatabaseDboSchemaName2, 
+			Parse.Any(DatabaseDboSchemaName3,
+				DatabaseDboSchemaName2,
 				DatabaseDboSchemaName1);
 
 		//private IParser SetFieldEqualExpr(IParser factor)
@@ -468,40 +471,38 @@ namespace T1.ParserKit.SqlDom
 		//	return Parse.Any(updateExpr, factor);
 		//}
 
-		//public IParser Group(IParser p)
-		//{
-		//	return Parse.Chain(
-		//		Symbol("("),
-		//		p,
-		//		Symbol(")"));
-		//}
+		public static IParser<T> Group<T>(IParser<T> p)
+		{
+			return from lparen1 in LParen
+					 from p1 in p
+					 from rparen1 in RParen
+					 select p1;
+		}
 
-		//public IParser RecSelectExpr(IParser factor)
-		//{
-		//	var subTableExpr =
-		//		Parse.Chain(
-		//			Group(factor),
-		//			Identifier())
-		//			.MapResult(x => new SourceExpression()
-		//			{
-		//				Item = x[1] as SqlExpression,
-		//				AliasName = x[3].GetText()
-		//			}).Named("SubTableExpr");
+		public static IParser<SelectExpression> RecSelectExpr(IParser<SelectExpression> factor)
+		{
+			var subTableExpr =
+				from subExpr1 in Group(factor)
+				from alias1 in AliasExpr
+				select new SourceExpression()
+				{
+					Item = subExpr1,
+					AliasName = alias1.Name
+				};
 
-		//	var recSelectExpr = Parse.Chain(
-		//		Match("SELECT"),
-		//		FieldsExpr,
-		//		Match("FROM"),
-		//		subTableExpr
-		//	)
-		//	.MapResult(x => new SelectExpression()
-		//	{
-		//		Fields = x[1] as FieldsExpression,
-		//		From = x[3] as SqlExpression
-		//	});
+			var recSelectExpr =
+					from select1 in SqlToken.Word("SELECT")
+					from fields1 in FieldsExpr
+					from from1 in SqlToken.Word("FROM")
+					from subTableExpr1 in subTableExpr
+					select new SelectExpression()
+					{
+						Fields = fields1,
+						From = subTableExpr1
+					};
 
-		//	return recSelectExpr.Or(factor);
-		//}
+			return recSelectExpr.Or(factor);
+		}
 
 		private static readonly IParser<AliasExpression> AliasExpr =
 			from as1 in SqlToken.Word("AS").Optional()

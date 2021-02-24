@@ -450,78 +450,46 @@ namespace T1.ParserKitTests
 			});
 		}
 
-		//[Fact]
-		//public void Select_Field_as_alias_from_lparen_select_name_from_table_rparen_alias()
-		//{
-		//	GiveText("select name as n1 from (select name1 from customer) c");
-		//	WhenParse();
-		//	ThenResultShouldBe(new SelectExpression()
-		//	{
-		//		File = "",
-		//		Length = 53,
-		//		Position = 0,
-		//		Content = _code,
-		//		Fields = new FieldsExpression()
-		//		{
-		//			File = "",
-		//			Length = 10,
-		//			Position = 7,
-		//			Content = _code,
-		//			Items = new List<SqlExpression>()
-		//			{
-		//				new FieldExpression()
-		//				{
-		//					File = "",
-		//					Length = 10,
-		//					Position = 7,
-		//					Content = _code,
-		//					Name = "name",
-		//					AliasName = "n1"
-		//				}
-		//			}
-		//		},
-		//		From = new SourceExpression()
-		//		{
-		//			File = "",
-		//			Length = 30,
-		//			Position = 23,
-		//			Content = _code,
-		//			Item = new SelectExpression()
-		//			{
-		//				File = "",
-		//				Length = 26,
-		//				Position = 24,
-		//				Content = _code,
-		//				Fields = new FieldsExpression()
-		//				{
-		//					File = "",
-		//					Length = 5,
-		//					Position = 31,
-		//					Content = _code,
-		//					Items = new List<SqlExpression>()
-		//					{
-		//						new FieldExpression()
-		//						{
-		//							File = "",
-		//							Length = 5,
-		//							Position = 31,
-		//							Content = _code,
-		//							Name = "name1"
-		//						}
-		//					}
-		//				},
-		//				From = new TableExpression()
-		//				{
-		//					File = "",
-		//					Length = 8,
-		//					Position = 42,
-		//					Content = _code,
-		//					Name = "customer"
-		//				}
-		//			},
-		//			AliasName = "c"
-		//		}
-		//	});
-		//}
+		[Fact]
+		public void Select_Field_as_alias_from_lparen_select_name_from_table_rparen_alias()
+		{
+			GiveText("select name as n1 from (select name1 from customer) c");
+			WhenParse(SqlParser.SelectExpr2);
+			ThenResultShouldBe(new SelectExpression()
+			{
+				Fields = new FieldsExpression()
+				{
+					Items = new List<SqlExpression>()
+					{
+						new FieldExpression()
+						{
+							Name = "name",
+							AliasName = "n1"
+						}
+					}
+				},
+				From = new SourceExpression()
+				{
+					Item = new SelectExpression()
+					{
+						Fields = new FieldsExpression()
+						{
+							Items = new List<SqlExpression>()
+							{
+								new FieldExpression()
+								{
+									Name = "name1"
+								}
+							}
+						},
+						From = new TableExpression()
+						{
+							Name = "customer"
+						}
+					},
+					AliasName = "c"
+				}
+			});
+		}
 	}
 }
