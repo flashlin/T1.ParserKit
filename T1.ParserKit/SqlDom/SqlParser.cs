@@ -297,7 +297,7 @@ namespace T1.ParserKit.SqlDom
 			return VariableAssignFieldExpr(factor);
 		}
 
-		public static IParser<ArithmeticOperatorExpression> ArithmeticOperatorExpr(IParser<SqlExpression> atom)
+		public static IParser<SqlExpression> ArithmeticOperatorExpr(IParser<SqlExpression> atom)
 		{
 			return Parse.RecGroupOperatorExpr(LParen, atom, RParen, new[]
 			{
@@ -310,7 +310,7 @@ namespace T1.ParserKit.SqlDom
 				Left = x[0],
 				Oper = x[1].GetText(),
 				Right = x[2]
-			}).MapResult(x => (ArithmeticOperatorExpression)x);
+			});
 		}
 
 		public static IParser<NumberExpression> IntegerExpr =
@@ -339,7 +339,7 @@ namespace T1.ParserKit.SqlDom
 					NumberExpr,
 					Variable);
 
-		public static IParser<ArithmeticOperatorExpression> ArithmeticOperatorAtomExpr =
+		public static IParser<SqlExpression> ArithmeticOperatorAtomExpr =
 			ArithmeticOperatorExpr(Atom);
 
 		public static IParser<FieldsExpression> FieldsExpr =
@@ -373,19 +373,18 @@ namespace T1.ParserKit.SqlDom
 				Filter = filter1
 			};
 
-		//public IParser SelectExpr =>
-		//	Parse.Seq(
-		//		SqlToken.Word("SELECT"),
-		//		FieldsExpr,
-		//		SqlToken.Word("FROM"),
-		//		TableExpr,
-		//		WhereExpr.Optional()
-		//	).MapResult(x => new SelectExpression()
-		//	{
-		//		Fields = x[1] as FieldsExpression,
-		//		From = x[3] as TableExpression,
-		//		Where = x.FirstCast<WhereExpression>()
-		//	}).Named("SelectExpr");
+		public static IParser<SelectExpression> SelectExpr =
+			from select1 in SqlToken.Word("SELECT")
+			from fields1 in FieldsExpr
+			from from1 in SqlToken.Word("FROM")
+			from table1 in TableExpr
+			from where1 in WhereExpr.Optional()
+			select new SelectExpression()
+			{
+				Fields = fields1,
+				From = table1,
+				Where = where1
+			};
 
 		private static readonly IParser<ObjectNameExpression> DatabaseDboSchemaName3 =
 			Parse.Seq(Identifier,
