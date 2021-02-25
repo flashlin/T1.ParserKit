@@ -477,31 +477,6 @@ namespace T1.ParserKit.SqlDom
 					 select p1;
 		}
 
-		public static IParser<SelectExpression> RecSelectExpr(IParser<SelectExpression> factor)
-		{
-			var subTableExpr =
-				from subExpr1 in Group(factor)
-				from alias1 in AliasExpr
-				select new SourceExpression()
-				{
-					Item = subExpr1,
-					AliasName = alias1.Name
-				};
-
-			var recSelectExpr =
-					from select1 in SqlToken.Word("SELECT")
-					from fields1 in FieldsExpr
-					from from1 in SqlToken.Word("FROM")
-					from subTableExpr1 in subTableExpr
-					select new SelectExpression()
-					{
-						Fields = fields1,
-						From = subTableExpr1
-					};
-
-			return recSelectExpr.Or(factor);
-		}
-
 		private static readonly IParser<AliasExpression> AliasExpr =
 			from as1 in SqlToken.Word("AS").Optional()
 			from identifier in Identifier
