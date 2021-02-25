@@ -71,21 +71,6 @@ namespace T1.ParserKit.SqlDom
 				"binary", "varbinary", "image"
 			);
 
-		//public static IParser<SqlFunctionExpression> FuncGetdate =
-		//	Parse.Sequence(ParseToken.Match("GETDATE"),
-		//			LParen,
-		//			RParen)
-		//		.MapResult(x =>
-		//		{
-		//			var xs = x.CastArray();
-		//			return new SqlFunctionExpression()
-		//			{
-		//				TextSpan = xs.GetTextSpan(),
-		//				Name = "GETDATE",
-		//				Parameters = new SqlExpression[0]
-		//			};
-		//		});
-
 		public static TextSpan GetTextSpan(this IEnumerable<SqlExpression> exprs)
 		{
 			return exprs.Select(x => x.TextSpan).GetTextSpan();
