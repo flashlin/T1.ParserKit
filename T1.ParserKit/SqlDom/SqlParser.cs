@@ -383,11 +383,19 @@ namespace T1.ParserKit.SqlDom
 				Filter = filter1
 			};
 
+		public static IParser<TableExpression> ToTableExpr(this IParser<SelectExpression> subSelect)
+		{
+			return subSelect.MapResult(x => (TableExpression)new TableSourceExpression()
+			{
+				From = x
+			});
+		}
+
 		public static IParser<SelectExpression> SelectExpr =
 			from select1 in SqlToken.Word("SELECT")
 			from fields1 in FieldsExpr
 			from from1 in SqlToken.Word("FROM")
-			from table1 in TableExpr
+			from table1 in Parse.Any(TableExpr, SelectExpr.ToTableExpr())
 			from where1 in WhereExpr.Optional()
 			select new SelectExpression()
 			{
@@ -548,8 +556,9 @@ namespace T1.ParserKit.SqlDom
 			return Parse.Any(ifExpr.MapSqlExpr(), factor);
 		}
 
-		//public static IParser<SqlExpression> StartExpr =
-		//	SelectExpr2;
+		public static IParser<SqlExpression> StartExpr =
+			SelectExpr.MapSqlExpr()
+				.LeftRecursive(IfExpr);
 
 		//public IParser StartExpr()
 		//{

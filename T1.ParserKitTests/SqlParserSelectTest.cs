@@ -13,6 +13,26 @@ namespace T1.ParserKitTests
 	public class SqlParserSelectTest : ParseTestBase
 	{
 		[Fact]
+		public void FilterExpr_variable_eq_1()
+		{
+			GiveText("@name = 1");
+			WhenParse(SqlParser.FilterExpr(SqlParser.Atom));
+			ThenResultShouldBe(new FilterExpression()
+			{
+				Left = new VariableExpression
+				{
+					Name = "@name",
+				},
+				Oper = "=",
+				Right = new NumberExpression()
+				{
+					Value = 1,
+					ValueTypeFullname = typeof(int).FullName,
+				}
+			});
+		}
+
+		[Fact]
 		public void Where_field_eq_1()
 		{
 			GiveText("where name = 1");

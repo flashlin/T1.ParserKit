@@ -37,10 +37,10 @@ namespace T1.ParserKit.Core.Parsers
 				acc = _accFunc(acc, parsed.Result);
 			} while (true);
 
-			if (startPosition == inp.GetPosition())
-			{
-				return Parse.Success<TResult>();
-			}
+			//if (startPosition == inp.GetPosition())
+			//{
+			//	return Parse.Success<TResult>();
+			//}
 
 			return Parse.Success(_resultSelector(acc));
 		}

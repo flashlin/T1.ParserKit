@@ -326,17 +326,6 @@ namespace T1.ParserKit.Core
 			});
 		}
 
-		public static IParser<T> LeftRecursive<T>(this IParser<T> factor,
-			params Func<IParser<T>, IParser<T>>[] exprs)
-		{
-			var f = factor;
-			foreach (var expr in exprs)
-			{
-				f = expr(f);
-			}
-			return f;
-		}
-
 		//private static IParseResult<T2> MapAccumSuccess<T1, T2>(IEnumerable<T1> accum, Func<T1[], T2> map)
 		//{
 		//	var accumArr = accum.CastArray();
@@ -640,8 +629,20 @@ namespace T1.ParserKit.Core
 			return RecOperatorExpr(groupExpr, operators, mapBinaryExprResult);
 		}
 
-		public static IParser<T> Recursive<T>(IParser<T> factor, 
-			IEnumerable<Func<IParser<T>, IParser<T>>> parsers)
+
+		//public static IParser<T> LeftRecursive<T>(this IParser<T> factor,
+		//	params Func<IParser<T>, IParser<T>>[] exprs)
+		//{
+		//	var f = factor;
+		//	foreach (var expr in exprs)
+		//	{
+		//		f = expr(f);
+		//	}
+		//	return f;
+		//}
+
+		public static IParser<T> LeftRecursive<T>(this IParser<T> factor, 
+			params Func<IParser<T>, IParser<T>>[] parsers)
 		{
 			var curr = (IParser<T>)null;
 			foreach (var parser in parsers)
@@ -650,7 +651,6 @@ namespace T1.ParserKit.Core
 			}
 			return curr;
 		}
-
 
 		//private static IParser ChainLeft1(IParser p,
 		//	IParser @operator, IParser operand,
