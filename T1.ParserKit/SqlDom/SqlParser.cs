@@ -525,8 +525,11 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<SqlExpression> StartExpr =
 			Parse.AnyCast<SqlExpression>(
-			SelectExpr.MapSqlExpr().LeftRecursive(IfExpr),
-				DeclareVariableExpr
+			SelectExpr.MapSqlExpr().LeftRecursive(
+				IfExpr,
+				SqlFunctions),
+				DeclareVariableExpr,
+				SetNocountExpr
 			);
 
 		//public IParser StartExpr()
