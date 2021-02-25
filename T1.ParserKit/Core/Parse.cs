@@ -101,34 +101,6 @@ namespace T1.ParserKit.Core
 			return parsers.MapParser<T>(map, x => Parse.Seq(x));
 		}
 
-		//public static IParser<T> SymbolAssertion<T>()
-		//{
-		//	return new Parser<T>("symbolAssertion", inp =>
-		//	{
-		//		if (inp.Eof())
-		//		{
-		//			return Parse.Success<T>(inp);
-		//		}
-
-		//		var blank = Blank.TryParse(inp);
-		//		if (blank.IsSuccess())
-		//		{
-		//			return Parse.Success<T>(inp);
-		//		}
-
-		//		var ch = inp.Substr(1);
-		//		var error = Parse.Error<T>($"Expect assertion, but got '{ch}' at {inp}.", inp);
-
-		//		var letter = Letter.TryParse(inp);
-
-		//		if (letter.IsSuccess())
-		//		{
-		//			return Parse.Success<T>(inp);
-		//		}
-		//		return error;
-		//	});
-		//}
-
 		public static TResult Reduce<TResult>(this IEnumerable<TextSpan> rc, Func<ITextSpan, TResult> fn)
 		{
 			return rc.Cast<ITextSpan>().Reduce(fn);
