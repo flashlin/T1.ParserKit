@@ -606,62 +606,46 @@ namespace T1.ParserKit.Core
 			return curr;
 		}
 
-		//private static IParser ChainLeft1(IParser p,
-		//	IParser @operator, IParser operand,
-		//	Func<ITextSpan, ITextSpan, ITextSpan> apply)
-		//{
-		//	return new Parser("ChainLeft1", inp =>
-		//	{
-		//		var parsed = p.TryParse(inp);
-		//		if (!parsed.IsSuccess())
-		//		{
-		//			return parsed;
-		//		}
+		private static IParser<T> ChainLeft1<T>(IParser<T> p,
+			IParser<T> @operator, IParser<T> operand,
+			Func<T, T, T> apply)
+		{
+			return new Parser<T>("ChainLeft1", inp =>
+			{
+				var parsed = p.TryParse(inp);
+				if (!parsed.IsSuccess())
+				{
+					return parsed;
+				}
 
-		//		var result = parsed;
-		//		var remainder = parsed.Rest;
+				var startPos = inp.GetPosition();
+				var result = parsed.Result;
 
-		//		var operatorResult = @operator.TryParse(remainder);
-		//		while (operatorResult.IsSuccess())
-		//		{
-		//			remainder = operatorResult.Rest;
+				var operatorResult = @operator.TryParse(inp);
+				while (operatorResult.IsSuccess())
+				{
+					var operandResult = operand.TryParse(inp);
+					if (!operandResult.IsSuccess())
+					{
+						inp.Seek(startPos);
+						return operandResult;
+					}
 
-		//			var operandResult = operand.TryParse(remainder);
-		//			if (!operandResult.IsSuccess())
-		//			{
-		//				return operandResult;
-		//			}
+					result = apply(result, operandResult.Result);
 
-		//			var newResult = apply(result.Result, operandResult.Result);
+					startPos = inp.GetPosition();
+					operatorResult = @operator.TryParse(inp);
+				}
 
-		//			result = Parse.Success(newResult, operatorResult.Rest);
+				return Parse.Success(result);
+			});
+		}
 
-		//			remainder = operandResult.Rest;
-		//			operatorResult = @operator.TryParse(remainder);
-		//		}
-
-		//		return result;
-		//	});
-		//}
-
-		//public static IParser ChainLeft(IParser @operator, IParser operand,
-		//	Func<ITextSpan, ITextSpan, ITextSpan> apply)
-		//{
-		//	return ChainLeft1(operand, @operator, operand, apply);
-		//}
-
-		//public static IParser Ref(IParser reference)
-		//{
-		//	IParser parser = null;
-
-		//	return new Parser("Ref", inp =>
-		//	{
-		//		if (parser == null)
-		//			parser = reference();
-
-		//		return parser.TryParse(inp);
-		//	});
-		//}
+		public static IParser<T> ChainLeft<T>(IParser<T> @operator, IParser<T> operand,
+			Func<T, T, T> apply)
+		{
+			return ChainLeft1<T>(operand, @operator, operand, apply);
+		}
 
 		public static IEnumerable<TResult> GetAccumResults<TResult>(this IEnumerable<IParseResult<TResult>> accum)
 		{
