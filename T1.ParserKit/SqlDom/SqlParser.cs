@@ -383,19 +383,22 @@ namespace T1.ParserKit.SqlDom
 				Filter = filter1
 			};
 
-		public static IParser<TableExpression> ToTableExpr(this IParser<SelectExpression> subSelect)
+		public static IParser<SourceExpression> ToTableExpr(this IParser<SelectExpression> subSelect)
 		{
-			return subSelect.MapResult(x => (TableExpression)new TableSourceExpression()
-			{
-				From = x
-			});
+			return from subQuery1 in subSelect.Group()
+					 from alias1 in AliasExpr.Optional()
+					 select new SourceExpression()
+					 {
+						 Item = subQuery1,
+						 AliasName = alias1?.Name
+					 };
 		}
 
 		public static IParser<SelectExpression> SelectExpr =
 			from select1 in SqlToken.Word("SELECT")
 			from fields1 in FieldsExpr
 			from from1 in SqlToken.Word("FROM")
-			from table1 in Parse.Any(TableExpr, SelectExpr.ToTableExpr())
+			from table1 in Parse.AnyCast<SqlExpression>(TableExpr, SelectExpr.ToTableExpr())
 			from where1 in WhereExpr.Optional()
 			select new SelectExpression()
 			{
@@ -403,9 +406,6 @@ namespace T1.ParserKit.SqlDom
 				From = table1,
 				Where = where1
 			};
-
-		public static IParser<SelectExpression> SelectExpr2 =
-			RecSelectExpr(SelectExpr);
 
 		private static readonly IParser<ObjectNameExpression> DatabaseDboSchemaName3 =
 			Parse.Seq(Identifier,
@@ -541,7 +541,7 @@ namespace T1.ParserKit.SqlDom
 
 			var conditionExpr = Parse.Any(groupFilterExpr, FilterExpr(Atom));
 
-			var ifExpr = 
+			var ifExpr =
 				from if1 in SqlToken.Word("IF")
 				from conditionExpr1 in conditionExpr
 				from begin1 in SqlToken.Word("BEGIN")

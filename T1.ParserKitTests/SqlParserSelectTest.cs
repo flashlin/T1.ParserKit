@@ -474,7 +474,7 @@ namespace T1.ParserKitTests
 		public void Select_Field_as_alias_from_lparen_select_name_from_table_rparen_alias()
 		{
 			GiveText("select name as n1 from (select name1 from customer) c");
-			WhenParse(SqlParser.SelectExpr2);
+			WhenParse(SqlParser.SelectExpr);
 			ThenResultShouldBe(new SelectExpression()
 			{
 				Fields = new FieldsExpression()
