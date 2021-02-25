@@ -1,4 +1,4 @@
-﻿namespace T1.ParserKit.Core
+﻿namespace T1.ParserKit.Core.Parsers
 {
 	public class OrParser<T> : IParser<T>
 	{

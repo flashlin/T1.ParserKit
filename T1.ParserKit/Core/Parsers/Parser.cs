@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace T1.ParserKit.Core
+namespace T1.ParserKit.Core.Parsers
 {
 	public class Parser<T> : IParser<T>
 	{
