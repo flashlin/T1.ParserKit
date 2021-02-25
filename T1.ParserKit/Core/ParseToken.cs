@@ -76,7 +76,7 @@ namespace T1.ParserKit.Core
 		public static IParser<TextSpan> Matchs(params string[] texts)
 		{
 			var sorted = texts.OrderByDescending(x => x.Length);
-			return Parse.Contains(texts, true).ThenLeft(Assertion());
+			return Parse.Contains(sorted, true).ThenLeft(Assertion());
 		}
 
 		public static IParser<TextSpan> Symbols(params string[] texts)

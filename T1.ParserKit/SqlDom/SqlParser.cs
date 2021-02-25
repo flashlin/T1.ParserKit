@@ -62,7 +62,14 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<SqlExpression> Assign = SqlToken.Symbol("=");
 
 		public static IParser<SqlExpression> SqlDataType =
-			SqlToken.ContainsWord("DATETIME", "BIGINT");
+			SqlToken.ContainsWord(
+				"bigint", "numeric", "bit", "smallint", "decimal", "smallmoney", "int", "tinyint", "money",
+				"float", "real",
+				"date", "datetimeoffset", "datetime2", "smalldatetime", "datetime", "time",
+				"char", "varchar", "text",
+				"nchar", "nvarchar", "ntext", 
+				"binary", "varbinary", "image"
+			);
 
 		//public static IParser<SqlFunctionExpression> FuncGetdate =
 		//	Parse.Sequence(ParseToken.Match("GETDATE"),
@@ -557,8 +564,10 @@ namespace T1.ParserKit.SqlDom
 		}
 
 		public static IParser<SqlExpression> StartExpr =
-			SelectExpr.MapSqlExpr()
-				.LeftRecursive(IfExpr);
+			Parse.AnyCast<SqlExpression>(
+			SelectExpr.MapSqlExpr().LeftRecursive(IfExpr),
+				DeclareVariableExpr
+			);
 
 		//public IParser StartExpr()
 		//{
