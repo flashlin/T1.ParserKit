@@ -211,12 +211,6 @@ namespace T1.ParserKit.Core
 			});
 		}
 
-		//public static IParser<T> Many1<T>(this IParser<T> parser,
-		//	Func<IEnumerable<IParseResult<T>>, T> apply)
-		//{
-		//	return parser.Many(apply, 1);
-		//}
-
 		//public static IParser<T> Chain<T>(this IEnumerable<IParser<T>> parsers,
 		//	Func<IEnumerable<IParseResult<T>>, IParseResult<T>> apply)
 		//{
