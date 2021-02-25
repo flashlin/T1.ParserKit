@@ -595,18 +595,6 @@ namespace T1.ParserKit.Core
 			return RecOperatorExpr(groupExpr, operators, mapBinaryExprResult);
 		}
 
-
-		//public static IParser<T> LeftRecursive<T>(this IParser<T> factor,
-		//	params Func<IParser<T>, IParser<T>>[] exprs)
-		//{
-		//	var f = factor;
-		//	foreach (var expr in exprs)
-		//	{
-		//		f = expr(f);
-		//	}
-		//	return f;
-		//}
-
 		public static IParser<T> LeftRecursive<T>(this IParser<T> factor, 
 			params Func<IParser<T>, IParser<T>>[] parsers)
 		{
