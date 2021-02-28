@@ -582,25 +582,27 @@ namespace T1.ParserKit.SqlDom
 			select new SqlParameterExpression()
 			{
 				Name = variableName1,
-				DataTypeExpr = dataType1
+				DataType = dataType1
 			};
 
 		public static IParser<IEnumerable<SqlParameterExpression>> SqlParameterListExpr =
 			SqlParameterExpr.SeparatedBy(Comma);
 
 		//CREATE PROCEDURE [dbo].[AccountAPI_AddSportsCashUsed_19.05]
-		public static IParser<CreateStoredProcedureExpression> CreateStoredProcedureExpr =
+		public static IParser<SqlCreateStoredProcedureExpression> CreateStoredProcedureExpr =
 			from create1 in SqlToken.Word("CREATE")
 			from proc1 in SqlToken.Word("PROCEDURE")
 			from procName1 in Parse.Any(DatabaseDboSchemaName2, DatabaseDboSchemaName1)
 			from procParams1 in SqlParameterListExpr
 			from as1 in SqlToken.Word("AS")
 			from begin1 in SqlToken.Word("BEGIN")
+			from body1 in StartExpr
 			from end1 in SqlToken.Word("END")
-			select new CreateStoredProcedureExpression()
+			select new SqlCreateStoredProcedureExpression()
 			{
 				Name = procName1,
-				Parameters = procParams1.ToArray()
+				Parameters = procParams1.ToArray(),
+				Body = body1
 			};
 
 		public static IParser<SqlExpression> StartExpr =

@@ -3,6 +3,6 @@
 	public class SqlParameterExpression : SqlExpression
 	{
 		public VariableExpression Name { get; set; }
-		public SqlDataTypeExpression DataTypeExpr { get; set; }
+		public SqlDataTypeExpression DataType { get; set; }
 	}
 }
