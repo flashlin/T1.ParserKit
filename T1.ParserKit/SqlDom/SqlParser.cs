@@ -61,15 +61,33 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<SqlExpression> At = SqlToken.Symbol("@");
 		public static IParser<SqlExpression> Assign = SqlToken.Symbol("=");
 
-		public static IParser<SqlExpression> SqlDataType =
+		public static IParser<SqlExpression> SqlDataType0 =
 			SqlToken.ContainsWord(
-				"bigint", "numeric", "bit", "smallint", "decimal", "smallmoney", "int", "tinyint", "money",
-				"float", "real",
-				"date", "datetimeoffset", "datetime2", "smalldatetime", "datetime", "time",
-				"char", "varchar", "text",
-				"nchar", "nvarchar", "ntext", 
-				"binary", "varbinary", "image"
+				"bit", "smallint", "smallmoney", "int", "tinyint",
+				"money", "real", "date", "smalldatetime", "datetime",
+				"image", "text", "ntext"
 			);
+
+		public static IParser<SqlExpression> SqlDataType1 =
+			SqlToken.ContainsWord(
+				"bigint", "bit", "float", "datetime2", "time",
+				"char", "varchar", "binary", "varbinary", "nchar",
+				"nvarchar", "datetimeoffset"
+			);
+
+		public static IParser<SqlExpression> SqlDataType2 =
+			SqlToken.ContainsWord("decimal");
+
+		public static IParser<SqlExpression> SqlDataType =
+			Parse.Any(SqlDataType0, SqlDataType1, SqlDataType2);
+		//SqlToken.ContainsWord(
+		//	"bigint", "numeric", "bit", "smallint", "decimal",
+		//	"smallmoney", "int", "tinyint", "money", "float",
+		//	"real", "date", "datetimeoffset", "datetime2", "smalldatetime",
+		//	"datetime", "time", "char", "varchar", "text",
+		//	"nchar", "nvarchar", "ntext", "binary", "varbinary",
+		//	"image"
+		//);
 
 		public static TextSpan GetTextSpan(this IEnumerable<SqlExpression> exprs)
 		{
@@ -522,6 +540,68 @@ namespace T1.ParserKit.SqlDom
 
 			return Parse.Any(ifExpr.MapSqlExpr(), factor);
 		}
+
+		public static IParser<SqlDataTypeExpression> SqlDataType0Expr =
+			Parse.Any(SqlDataType0, SqlDataType1)
+				.MapResult(x => new SqlDataTypeExpression()
+				{
+					DataType = x.GetText(),
+				});
+
+		public static IParser<SqlDataTypeExpression> SqlDataType1Expr =
+			from dataType1 in Parse.Any(SqlDataType2, SqlDataType1)
+			from lparen1 in LParen
+			from size1 in IntegerExpr
+			from rparen1 in RParen
+			select new SqlDataTypeExpression()
+			{
+				DataType = dataType1.GetText(),
+				Size = (int)size1.Value
+			};
+
+		public static IParser<SqlDataTypeExpression> SqlDataType2Expr =
+			from dataType1 in SqlDataType2
+			from lparen1 in LParen
+			from size1 in IntegerExpr
+			from comma1 in Comma
+			from scale1 in IntegerExpr
+			from rparen1 in RParen
+			select new SqlDataTypeExpression()
+			{
+				DataType = dataType1.GetText(),
+				Size = (int)size1.Value,
+				Scale = (int)scale1.Value
+			};
+
+		public static IParser<SqlDataTypeExpression> SqlDataTypeExpr =
+			Parse.Any(SqlDataType2Expr, SqlDataType1Expr, SqlDataType0Expr);
+
+		public static IParser<SqlParameterExpression> SqlParameterExpr =
+			from variableName1 in Variable
+			from dataType1 in SqlDataTypeExpr
+			select new SqlParameterExpression()
+			{
+				Name = variableName1,
+				DataTypeExpr = dataType1
+			};
+
+		public static IParser<IEnumerable<SqlParameterExpression>> SqlParameterListExpr =
+			SqlParameterExpr.SeparatedBy(Comma);
+
+		//CREATE PROCEDURE [dbo].[AccountAPI_AddSportsCashUsed_19.05]
+		public static IParser<CreateStoredProcedureExpression> CreateStoredProcedureExpr =
+			from create1 in SqlToken.Word("CREATE")
+			from proc1 in SqlToken.Word("PROCEDURE")
+			from procName1 in Parse.Any(DatabaseDboSchemaName2, DatabaseDboSchemaName1)
+			from procParams1 in SqlParameterListExpr
+			from as1 in SqlToken.Word("AS")
+			from begin1 in SqlToken.Word("BEGIN")
+			from end1 in SqlToken.Word("END")
+			select new CreateStoredProcedureExpression()
+			{
+				Name = procName1,
+				Parameters = procParams1.ToArray()
+			};
 
 		public static IParser<SqlExpression> StartExpr =
 			Parse.AnyCast<SqlExpression>(

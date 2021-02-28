@@ -384,6 +384,13 @@ namespace T1.ParserKit.Core
 			return Parse.Any(expr2, expr1);
 		}
 
+		public static IParser<IEnumerable<T1>> SeparatedBy<T1, T2>(this IParser<T1> p, IParser<T2> delimited)
+			where T1 : T2
+		{
+			return p.CastParser<T2>().ManyDelimitedBy(delimited)
+				.MapResultList(x => x.TakeEvery(1).Cast<T1>());
+		}
+
 		//public static IParser MapResult(this IParser p, Func<IParseResult, IParseResult> f)
 		//{
 		//	return new Parser(p.Name, inp =>
@@ -595,7 +602,7 @@ namespace T1.ParserKit.Core
 			return RecOperatorExpr(groupExpr, operators, mapBinaryExprResult);
 		}
 
-		public static IParser<T> LeftRecursive<T>(this IParser<T> factor, 
+		public static IParser<T> LeftRecursive<T>(this IParser<T> factor,
 			params Func<IParser<T>, IParser<T>>[] parsers)
 		{
 			var curr = (IParser<T>)null;
