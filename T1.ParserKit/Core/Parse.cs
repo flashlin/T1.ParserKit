@@ -608,6 +608,12 @@ namespace T1.ParserKit.Core
 
 		public static IParser<TextSpan> CStyleIdentifier = CStyleIdentifierF().Named(nameof(CStyleIdentifier));
 
+		public static IParser<TextSpan> CStyleString =
+			from start1 in Parse.Equal("\"")
+			from body1 in Parse.Any(Parse.Equal("\\\""), Parse.Equal("\"").Not().ThenRight(Parse.AnyChars(1))).Many()
+			from end1 in Parse.Equal("\"")
+			select new[] {start1, body1, end1}.GetTextSpan();
+
 		public static IParser<TextSpan> NewLine =
 			Parse.Any(
 				Parse.Equal("\r\n"),

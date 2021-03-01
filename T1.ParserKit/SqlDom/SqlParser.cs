@@ -633,6 +633,14 @@ namespace T1.ParserKit.SqlDom
 				Body = body1.ToArray()
 			};
 
+		//:setvar DatabaseName "AccountDB"
+		//TODO:
+		//public static IParser<SqlSetVarExpression> SetVarExpr =
+		//	from setVar1 in SqlToken.Word(":setVar")
+		//	from name1 in SqlToken.Lexeme(Parse.CStyleIdentifier)
+		//	from value1 in SqlToken.Lexeme(Parse.CStyleString)
+
+
 		public static IParser<SqlExpression> StartExpr =
 			Parse.AnyCast<SqlExpression>(
 				DeclareVariableExpr,

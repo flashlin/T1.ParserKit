@@ -122,5 +122,23 @@ namespace T1.ParserKitTests
 			WhenParse(Parse.Equal("b").Not().ThenRight(Parse.AnyChars(1)));
 			ThenResultShouldBe("a");
 		}
+
+		[Fact]
+		public void CStyleString()
+		{
+			GiveText("\"123\"");
+			WhenParse(Parse.CStyleString);
+			ThenResultShouldBe("\"123\"");
+		}
+
+		[Fact]
+		public void CStyleString_with_escape_char()
+		{
+			GiveText("\"12\\\"3\"");
+			WhenParse(Parse.CStyleString);
+			ThenResultShouldBe("\"12\\\"3\"");
+		}
+
+		
 	}
 }
