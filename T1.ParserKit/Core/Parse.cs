@@ -35,7 +35,7 @@ namespace T1.ParserKit.Core
 		{
 			return new ParseResult<T>()
 			{
-				Result = (T)result,
+				Result = (T) result,
 				Error = ParseError.Empty,
 			};
 		}
@@ -191,6 +191,7 @@ namespace T1.ParserKit.Core
 					var textSpan = inp.Consume(count);
 					return Parse.Success<TextSpan>(textSpan);
 				}
+
 				return Parse.Error<TextSpan>($"Expect anyChar {count}, but got '{ch}' at {inp}.", inp.GetPosition());
 			});
 		}
@@ -205,6 +206,7 @@ namespace T1.ParserKit.Core
 					var textSpan = inp.Consume(text.Length);
 					return Parse.Success<TextSpan>(textSpan);
 				}
+
 				return Parse.Error<TextSpan>($"Expect {text}, but got '{ch}' at {inp}.", inp.GetPosition());
 			});
 		}
@@ -219,6 +221,7 @@ namespace T1.ParserKit.Core
 					var textSpan = inp.Consume(text.Length);
 					return Parse.Success<TextSpan>(textSpan);
 				}
+
 				return Parse.Error<TextSpan>($"Expect {text}, but got '{ch}' at {inp}.", inp.GetPosition());
 			});
 		}
@@ -235,6 +238,7 @@ namespace T1.ParserKit.Core
 					var textSpan = inp.Consume(text.Length);
 					return Parse.Success<TextSpan>(textSpan);
 				}
+
 				return Parse.Error<TextSpan>($"Expect {text}, but got '{ch}' at {inp}.", inp.GetPosition());
 			});
 		}
@@ -251,6 +255,7 @@ namespace T1.ParserKit.Core
 					var textSpan = inp.Consume(text.Length);
 					return Parse.Success<TextSpan>(textSpan);
 				}
+
 				return Parse.Error<TextSpan>($"Expect {text}, but got '{ch}' at {inp}.", inp.GetPosition());
 			});
 		}
@@ -410,10 +415,7 @@ namespace T1.ParserKit.Core
 
 		public static IParser<IEnumerable<T>> ManyDelimitedBy<T>(this IParser<T> parser, IParser<T> delimited)
 		{
-			var tail = delimited.Then(parser, (a, b) =>
-			{
-				return new T[] { a, b };
-			});
+			var tail = delimited.Then(parser, (a, b) => { return new T[] {a, b}; });
 			var expr2 = parser.Then(tail.Many(), (a, b) =>
 			{
 				if (b == null)
@@ -525,6 +527,7 @@ namespace T1.ParserKit.Core
 			{
 				strTexts = $"'{strTexts}'";
 			}
+
 			var name = $"[{strTexts}]";
 
 			return new Parser<TextSpan>(name, (inp) =>
@@ -568,7 +571,7 @@ namespace T1.ParserKit.Core
 		}
 
 		public static IParser<TextSpan> Blank =
-			Contains(new[] { " ", "\t", "\r", "\n" }).Named("blank");
+			Contains(new[] {" ", "\t", "\r", "\n"}).Named("blank");
 
 		public static IParser<TextSpan> Blanks =
 			Blank.Many1().Named("blanks");
@@ -593,6 +596,7 @@ namespace T1.ParserKit.Core
 				{
 					return Parse.Success<TextSpan>(inp.Consume(1));
 				}
+
 				return Parse.Error<TextSpan>($"Expect letter, but got '{ch}' at {inp}.", inp.GetPosition());
 			});
 
@@ -633,8 +637,10 @@ namespace T1.ParserKit.Core
 						.MapResultList(mapResult);
 					return operandExpr.Or(atom);
 				}
+
 				expr = RecExpr(expr);
 			}
+
 			return expr.Or(item);
 		}
 
@@ -649,11 +655,12 @@ namespace T1.ParserKit.Core
 		public static IParser<T> LeftRecursive<T>(this IParser<T> factor,
 			params Func<IParser<T>, IParser<T>>[] parsers)
 		{
-			var curr = (IParser<T>)null;
+			var curr = (IParser<T>) null;
 			foreach (var parser in parsers)
 			{
 				curr = parser(curr ?? factor);
 			}
+
 			return curr;
 		}
 
@@ -709,14 +716,10 @@ namespace T1.ParserKit.Core
 			return result;
 		}
 
-		public static IParser<SqlCommentExpression> CStyleComment2 =
-			from start1 in SqlToken.Symbol("/*")
-			from body1 in SqlToken.Symbol("*/").Not().ThenRight(Parse.AnyChars(1)).Many()
-			from end1 in SqlToken.Symbol("*/")
-			select new SqlCommentExpression()
-			{
-				IsMultipleLines = true,	
-				Content = body1.Text
-			};
+		public static IParser<TextSpan> CStyleComment2 =
+			from start1 in Parse.Equal("/*")
+			from body1 in Parse.Equal("*/").Not().ThenRight(Parse.AnyChars(1)).Many()
+			from end1 in Parse.Equal("*/")
+			select body1;
 	}
 }

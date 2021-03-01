@@ -11,7 +11,7 @@ namespace T1.ParserKit.Core
 		{
 			File = string.Empty,
 			Text = string.Empty,
-			Position = -1,
+			Position = 0,
 			Length = 0
 		};
 
@@ -27,12 +27,12 @@ namespace T1.ParserKit.Core
 				return "{EOS}";
 			}
 
-			var text = "";
-			if (Length > 0)
-			{
-				text = Text.Substring(Position, Length);
-			}
-			return $"Pos:{Position} '{text}'";
+			//var text = "";
+			//if (Length > 0)
+			//{
+			//	text = Text.Substring(Position, Length);
+			//}
+			return $"Pos:{Position} '{Text}'";
 		}
 
 		public static TextSpan From(IEnumerable<ITextSpan> from)

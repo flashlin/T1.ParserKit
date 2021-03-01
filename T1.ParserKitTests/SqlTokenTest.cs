@@ -47,10 +47,12 @@ namespace T1.ParserKitTests
 		{
 			GiveText(text);
 			WhenParse(Parse.CStyleComment2);
-			ThenResultShouldBe(new SqlCommentExpression()
+			ThenResultShouldBe(new TextSpan()
 			{
-				IsMultipleLines = true,
-				Content = text.Substring(2, text.Length-4)
+				File = string.Empty,
+				Text = text.Substring(2, text.Length - 4),
+				Position = (text.Length - 4) > 0 ? 2 : 0,
+				Length = text.Length - 4
 			});
 		}
 
