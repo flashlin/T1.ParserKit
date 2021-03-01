@@ -596,13 +596,13 @@ namespace T1.ParserKit.SqlDom
 			from procParams1 in SqlParameterListExpr
 			from as1 in SqlToken.Word("AS")
 			from begin1 in SqlToken.Word("BEGIN")
-			from body1 in StartExpr
+			from body1 in StartExpr.Many()
 			from end1 in SqlToken.Word("END")
 			select new SqlCreateStoredProcedureExpression()
 			{
 				Name = procName1,
 				Parameters = procParams1.ToArray(),
-				Body = body1
+				Body = body1.ToArray()
 			};
 
 		public static IParser<SqlExpression> StartExpr =

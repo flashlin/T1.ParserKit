@@ -65,10 +65,13 @@ END
 						}
 					},
 				},
-				Body = new SetOptionExpression()
+				Body = new SqlExpression[]
 				{
-					OptionName = "NOCOUNT",
-					IsToggle = true
+					new SetOptionExpression()
+					{
+						OptionName = "NOCOUNT",
+						IsToggle = true
+					}
 				}
 			});
 		}
