@@ -109,10 +109,10 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<T> Lexeme<T>(IParser<T> parser)
 		{
-			return from comment1 in Comment.Many()
+			return (from comment1 in Comment.Many()
 					 from blanks1 in Parse.Blanks.Optional()
 					 from p1 in parser
-					 select p1;
+					 select p1).Named($"\\s*{parser.Name}");
 		}
 
 		public static IParser<SqlExpression> Word(string text)
