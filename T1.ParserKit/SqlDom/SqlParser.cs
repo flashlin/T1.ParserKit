@@ -202,16 +202,38 @@ namespace T1.ParserKit.SqlDom
 				factor);
 		}
 
+		public static IParser<SqlExpression> OptionName =
+			SqlToken.ContainsWord("NOCOUNT",
+				"ANSI_NULLS", "ANSI_PADDING", "ANSI_WARNINGS", "ARITHABORT", "CONCAT_NULL_YIELDS_NULL", 
+				"QUOTED_IDENTIFIER",
+				"NUMERIC_ROUNDABORT"
+			);
+
+		public static IParser<bool> OnOffExpr =
+			from onOff1 in SqlToken.ContainsWord("OFF", "ON")
+			select string.Equals(onOff1.GetText().ToUpper(), "ON", StringComparison.Ordinal);
+
 		public static IParser<SetOptionExpression> SetOptionOnOffExpr =
 			from set1 in SqlToken.Word("SET")
-			from optionName1 in SqlToken.Word("NOCOUNT")
-			from onOff1 in SqlToken.ContainsWord("OFF", "ON")
+			from optionName1 in OptionName
+			from onOff1 in OnOffExpr
 			from semiColon1 in SemiColon.Optional()
 			select new SetOptionExpression()
 			{
 				OptionName = optionName1.GetText(),
-				IsToggle = string.Equals(onOff1.GetText().ToUpper(), "ON", StringComparison.Ordinal)
+				IsToggle = onOff1
 			};
+
+		public static IParser<IEnumerable<SetOptionExpression>> SetManyOptionOnOffExpr =
+			from set1 in SqlToken.Word("SET")
+			from optionNames1 in OptionName.Many1()
+			from onOff1 in OnOffExpr
+			from semiColon1 in SemiColon.Optional()
+			select optionNames1.Select(x => new SetOptionExpression()
+			{
+				OptionName = x.GetText(),
+				IsToggle = onOff1
+			});
 
 		public static IParser<WithOptionExpression> WithOptionExpr =
 			Parse.Seq(

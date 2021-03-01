@@ -12,6 +12,21 @@ namespace T1.ParserKit.Core
 			return new SelectParser<T, TResult>(parser, mapFunc);
 		}
 
+		public static IParser<TResult> Select<T, TResult>(
+			this IParser<T> parser,
+			Func<T, TResult> mapFunc)
+		{
+			return new Parser<TResult>(parser.Name, inp =>
+			{
+				var parsed = parser.TryParse(inp);
+				if (!parsed.IsSuccess())
+				{
+					return Parse.Error<TResult>(parsed.Error);
+				}
+				return Parse.Success<TResult>(mapFunc(parsed.Result));
+			});
+		}
+
 		public static IParser<TResult> SelectMany<T, TIntermediate, TResult>(
 			this IParser<T> parser,
 			Func<T, IParser<TIntermediate>> bindParser,
