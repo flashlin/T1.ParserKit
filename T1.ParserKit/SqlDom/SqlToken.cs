@@ -106,9 +106,17 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<SqlCommentExpression> Comment =
 			Parse.Any(Comment2, Comment1);
 
+		public static IParser<T> Lexeme<T>(IParser<T> parser)
+		{
+			return from comment1 in Comment.Many()
+					 from blanks1 in Parse.Blanks.Optional()
+					 from p1 in parser
+					 select p1;
+		}
+
 		public static IParser<SqlExpression> Word(string text)
 		{
-			return ParseToken.Lexeme(ParseToken.Match(text))
+			return Lexeme(ParseToken.Match(text))
 				.MapResult(x => new SqlExpression()
 				{
 					TextSpan = x
@@ -126,7 +134,7 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<SqlExpression> ContainsWord(params string[] texts)
 		{
-			return ParseToken.Lexeme(ParseToken.Matchs(texts))
+			return Lexeme(ParseToken.Matchs(texts))
 				.MapResult(x => new SqlExpression()
 				{
 					TextSpan = x
@@ -135,7 +143,7 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<SqlExpression> Symbols(params string[] texts)
 		{
-			return ParseToken.Lexeme(ParseToken.Symbols(texts))
+			return Lexeme(ParseToken.Symbols(texts))
 				.MapResult(x => new SqlExpression()
 				{
 					TextSpan = x

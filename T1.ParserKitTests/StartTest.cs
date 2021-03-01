@@ -25,8 +25,8 @@ namespace T1.ParserKitTests
 			});
 		}
 
-		//[Fact]
-		[Fact(Skip = "Test Samples")]
+		[Fact]
+		//[Fact(Skip = "Test Samples")]
 		public void Test()
 		{
 			var folder = @"D:\VDisk\MyGitHub\SQL";
