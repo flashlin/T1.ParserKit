@@ -202,17 +202,16 @@ namespace T1.ParserKit.SqlDom
 				factor);
 		}
 
-		public static IParser<SetOptionExpression> SetNocountExpr =
-				Parse.Seq(
-					SqlToken.Word("SET"),
-					SqlToken.Word("NOCOUNT"),
-					SqlToken.ContainsWord("OFF", "ON"),
-					SemiColon.Optional()
-					).MapResultList(x => new SetOptionExpression()
-					{
-						OptionName = x[1].TextSpan.Text,
-						IsToggle = string.Equals(x[2].TextSpan.Text.ToUpper(), "ON", StringComparison.Ordinal)
-					});
+		public static IParser<SetOptionExpression> SetOptionOnOffExpr =
+			from set1 in SqlToken.Word("SET")
+			from optionName1 in SqlToken.Word("NOCOUNT")
+			from onOff1 in SqlToken.ContainsWord("OFF", "ON")
+			from semiColon1 in SemiColon.Optional()
+			select new SetOptionExpression()
+			{
+				OptionName = optionName1.GetText(),
+				IsToggle = string.Equals(onOff1.GetText().ToUpper(), "ON", StringComparison.Ordinal)
+			};
 
 		public static IParser<WithOptionExpression> WithOptionExpr =
 			Parse.Seq(
@@ -611,7 +610,7 @@ namespace T1.ParserKit.SqlDom
 				IfExpr,
 				SqlFunctions),
 				DeclareVariableExpr,
-				SetNocountExpr
+				SetOptionOnOffExpr
 			);
 
 		//public IParser StartExpr()

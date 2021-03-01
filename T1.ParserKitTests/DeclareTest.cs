@@ -32,7 +32,7 @@ namespace T1.ParserKitTests
 		public void Set_nocount_on()
 		{
 			GiveText("SET NOCOUNT ON;");
-			WhenParse(SqlParser.SetNocountExpr);
+			WhenParse(SqlParser.SetOptionOnOffExpr);
 			ThenResultShouldBe(new SetOptionExpression()
 			{
 				OptionName = "NOCOUNT",
@@ -44,7 +44,7 @@ namespace T1.ParserKitTests
 		public void Set_nocount_on2()
 		{
 			GiveText("SET NOCOUNT ON");
-			WhenParse(SqlParser.SetNocountExpr);
+			WhenParse(SqlParser.SetOptionOnOffExpr);
 			ThenResultShouldBe(new SetOptionExpression()
 			{
 				OptionName = "NOCOUNT",
