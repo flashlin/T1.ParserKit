@@ -41,6 +41,30 @@ namespace T1.ParserKitTests
 		}
 
 		[Fact]
+		public void Test()
+		{
+			GiveText("SET ANSI_NULLS, ANSI_PADDING ON;");
+			WhenParse(SqlParser.SetManyOptionOnOffExpr);
+			ThenResultShouldBe(new SetManyOptionExpression()
+			{
+				Items = new []
+				{
+					new SetOptionExpression()
+					{
+						OptionName = "ANSI_NULLS",
+						IsToggle = true
+					},
+					new SetOptionExpression()
+					{
+						OptionName = "ANSI_PADDING",
+						IsToggle = true
+					}
+				}
+			});
+		}
+
+
+		[Fact]
 		public void Set_nocount_on2()
 		{
 			GiveText("SET NOCOUNT ON");

@@ -86,13 +86,6 @@ namespace T1.ParserKit.Core.Parsers
 		public static IParser<T> AnyCastParser<T>(this IEnumerable<object> parsers)
 		{
 			return parsers.MapParser<T>(x => x.Any());
-			var parsersArr = parsers.CastArray();
-			var parsersTArr = new IParser<T>[parsersArr.Length];
-			foreach (var p in parsersArr.SelectWithIndex())
-			{
-				parsersTArr[p.index] = p.value.CastParser<T>();
-			}
-			return parsersTArr.Any<T>();
 		}
 
 		public static IParser<TextSpan> Many(this IParser<TextSpan> parser)
@@ -166,10 +159,6 @@ namespace T1.ParserKit.Core.Parsers
 				return Parse.Error<T>($"Expect {name}, but got '{ch}' at {inp}",
 					acc, inp.GetPosition());
 			});
-
-
-			return parsers.Aggregate(Empty<T>("Empty choose sequence"),
-				(acc, p) => acc.Or(p));
 		}
 
 		private static IParser<T> Empty<T>(string errorMessage)

@@ -559,7 +559,7 @@ namespace T1.ParserKit.Core
 		{
 			return parser.Select(x =>
 			{
-				var resultArr = x.Result.CastArray();
+				var resultArr = x.CastArray();
 				return new TextSpan()
 				{
 					File = resultArr[0].File,

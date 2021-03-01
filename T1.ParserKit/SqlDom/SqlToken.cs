@@ -104,7 +104,8 @@ namespace T1.ParserKit.SqlDom
 				});
 
 		public static IParser<SqlCommentExpression> Comment =
-			Parse.Any(Comment2, Comment1);
+			Parse.Any(Comment2, Comment1)
+				.Named("Comment");
 
 		public static IParser<T> Lexeme<T>(IParser<T> parser)
 		{

@@ -5,12 +5,12 @@ namespace T1.ParserKit.Core
 {
 	public static class LinqToParser
 	{
-		public static IParser<TResult> Select<T, TResult>(
-			this IParser<T> parser, 
-			Func<IParseResult<T>, TResult> mapFunc)
-		{
-			return new SelectParser<T, TResult>(parser, mapFunc);
-		}
+		//public static IParser<TResult> Select<T, TResult>(
+		//	this IParser<T> parser, 
+		//	Func<IParseResult<T>, TResult> mapFunc)
+		//{
+		//	return new SelectParser<T, TResult>(parser, mapFunc);
+		//}
 
 		public static IParser<TResult> Select<T, TResult>(
 			this IParser<T> parser,

@@ -98,7 +98,7 @@ namespace T1.ParserKit.SqlDom
 		{
 			return parsers.Select(x => new SqlExpression()
 			{
-				TextSpan = x.Result.GetTextSpan()
+				TextSpan = x.Select(item => item.TextSpan).GetTextSpan()
 			});
 		}
 
@@ -224,16 +224,23 @@ namespace T1.ParserKit.SqlDom
 				IsToggle = onOff1
 			};
 
-		public static IParser<IEnumerable<SetOptionExpression>> SetManyOptionOnOffExpr =
+		public static IParser<SetManyOptionExpression> SetManyOptionOnOffExpr =
 			from set1 in SqlToken.Word("SET")
-			from optionNames1 in OptionName.Many1()
+			from optionNames1 in OptionName.SeparatedBy(Comma)
 			from onOff1 in OnOffExpr
 			from semiColon1 in SemiColon.Optional()
-			select optionNames1.Select(x => new SetOptionExpression()
-			{
-				OptionName = x.GetText(),
-				IsToggle = onOff1
-			});
+			select new SetManyOptionExpression()
+			{ 
+				Items = optionNames1.Select(x => new SetOptionExpression()
+				{
+					OptionName = x.GetText(),
+					IsToggle = onOff1
+				}).ToArray()
+			};
+
+		public static IParser<SqlExpression> GoExpr =
+			from go1 in SqlToken.Word("GO")
+			select go1;
 
 		public static IParser<WithOptionExpression> WithOptionExpr =
 			Parse.Seq(
@@ -632,7 +639,9 @@ namespace T1.ParserKit.SqlDom
 				IfExpr,
 				SqlFunctions),
 				DeclareVariableExpr,
-				SetOptionOnOffExpr
+				SetOptionOnOffExpr,
+				SetManyOptionOnOffExpr,
+				GoExpr
 			);
 
 		//public IParser StartExpr()
