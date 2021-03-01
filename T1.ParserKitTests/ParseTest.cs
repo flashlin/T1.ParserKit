@@ -83,6 +83,25 @@ namespace T1.ParserKitTests
 			ThenResultShouldBe("name");
 		}
 
+		[Theory]
+		[InlineData("/**/")]
+		[InlineData("/*1*/")]
+		[InlineData("/*12*/")]
+		[InlineData("/*123*/")]
+		[InlineData("/*12**/")]
+		public void Comment2(string text)
+		{
+			GiveText(text);
+			WhenParse(Parse.CStyleComment2);
+			ThenResultShouldBe(new TextSpan()
+			{
+				File = string.Empty,
+				Text = text.Substring(2, text.Length - 4),
+				Position = (text.Length - 4) > 0 ? 2 : 0,
+				Length = text.Length - 4
+			});
+		}
+
 		[Fact]
 		public void Sequence()
 		{
