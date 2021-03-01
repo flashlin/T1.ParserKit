@@ -7,7 +7,7 @@ using Xunit;
 
 namespace T1.ParserKitTests
 {
-	public class SqlParserStartTest : ParseTestBase
+	public class StartTest : ParseTestBase
 	{
 		[Fact]
 		public void Start_declare_name_int()

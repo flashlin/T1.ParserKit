@@ -9,7 +9,7 @@ using Xunit;
 
 namespace T1.ParserKitTests
 {
-	public class SqlParserFunctionTest
+	public class FunctionTest
 	{
 		private string _code;
 		private IParseResult<object> _result;
