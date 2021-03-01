@@ -1,4 +1,5 @@
 using T1.ParserKit.Core;
+using T1.ParserKitTests.Helpers;
 using Xunit;
 
 namespace T1.ParserKitTests

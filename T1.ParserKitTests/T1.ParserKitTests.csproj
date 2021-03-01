@@ -18,8 +18,4 @@
     <ProjectReference Include="..\T1.ParserKit\T1.ParserKit.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Helpers\" />
-  </ItemGroup>
-
 </Project>

@@ -5,7 +5,7 @@ using T1.ParserKit.Core;
 using T1.ParserKit.SqlDom.Expressions;
 using Xunit;
 
-namespace T1.ParserKitTests
+namespace T1.ParserKitTests.Helpers
 {
 	public abstract class ParseTestBase
 	{
