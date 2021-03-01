@@ -24,6 +24,7 @@ namespace T1.ParserKitTests
 			});
 		}
 
+		//[Fact]
 		[Fact(Skip = "Test Samples")]
 		public void Test()
 		{

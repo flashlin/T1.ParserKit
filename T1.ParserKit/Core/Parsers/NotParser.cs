@@ -14,10 +14,13 @@ namespace T1.ParserKit.Core.Parsers
 
 		public IParseResult<Unit> TryParse(IInputReader inp)
 		{
+			var pos = inp.GetPosition();
 			var result = _parser.TryParse(inp);
 			if (result.IsSuccess())
+			{
+				inp.Seek(pos);
 				return Parse.Error<Unit>($"Expect {_parser.Name}, but got '{result.Result}' at {inp}.", inp.GetPosition());
-
+			}
 			return Parse.Success(Unit.Instance);
 		}
 	}

@@ -151,6 +151,48 @@ namespace T1.ParserKit.Core
 			return new NotParser<T>(parser);
 		}
 
+		private static string GetManyText(int min, int max)
+		{
+			var text = $"({min},{max})";
+
+			if (max == int.MaxValue)
+			{
+				text = $"({min})";
+			}
+
+			if (min == 0 && max == 1)
+			{
+				text = $"?";
+			}
+
+			if (min == 0 && max == int.MaxValue)
+			{
+				text = $"*";
+			}
+
+			if (min == 1 && max == int.MaxValue)
+			{
+				text = $"+";
+			}
+
+			return text;
+		}
+
+		public static IParser<TextSpan> AnyChars(int count)
+		{
+			var name = GetManyText(count, count);
+			return new Parser<TextSpan>($".{name}", inp =>
+			{
+				var ch = inp.Substr(count);
+				if (ch.Length == count)
+				{
+					var textSpan = inp.Consume(count);
+					return Parse.Success<TextSpan>(textSpan);
+				}
+				return Parse.Error<TextSpan>($"Expect anyChar {count}, but got '{ch}' at {inp}.", inp.GetPosition());
+			});
+		}
+
 		public static IParser<TextSpan> Equal(string text)
 		{
 			return new Parser<TextSpan>($"\"{text}\"", (inp) =>
