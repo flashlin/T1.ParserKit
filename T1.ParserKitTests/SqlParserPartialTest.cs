@@ -20,12 +20,6 @@
 //			_parser = new SqlParser();
 //		}
 
-//		[Fact]
-//		public void NotSqlIdentifier()
-//		{
-//			GiveText("from");
-//			Assert.Throws<ParseException>(() => _parser.Identifier().ParseText(_text));
-//		}
 
 //		[Fact]
 //		public void SqlIdentifier()
@@ -65,49 +59,6 @@
 //				File = "",
 //				Content = _text,
 //				Length = 4
-//			});
-//		}
-
-//		[Fact]
-//		public void Field_aliasName()
-//		{
-//			GiveText("name n1");
-//			WhenTryParse(_parser.FieldExpr);
-//			ThenResultShouldBe(new FieldExpression()
-//			{
-//				Name = "name",
-//				AliasName = "n1",
-//				File = "",
-//				Content = _text,
-//				Length = 7
-//			});
-//		}
-
-//		[Fact]
-//		public void WithNolock()
-//		{
-//			GiveText("with(nolock)");
-//			WhenTryParse(_parser.WithOptionExpr);
-//			ThenResultShouldBe(new WithOptionExpression()
-//			{
-//				File = "",
-//				Content = _text,
-//				Length = _text.Length,
-//				Nolock = true
-//			});
-//		}
-
-//		[Fact]
-//		public void Table_where()
-//		{
-//			GiveText("customer where");
-//			WhenTryParse(_parser.TableExpr);
-//			ThenResultShouldBe(new TableExpression()
-//			{
-//				File = "",
-//				Content = _text,
-//				Length = 8,
-//				Name = "customer"
 //			});
 //		}
 
@@ -152,105 +103,6 @@
 //			});
 //		}
 
-//		[Fact]
-//		public void Arithmetic_1_add_2_mul_3()
-//		{
-//			GiveText("1 + 2 * 3");
-//			WhenTryParse(_parser.ArithmeticOperatorExpr());
-//			ThenResultShouldBe(new ArithmeticOperatorExpression()
-//			{
-//				File = "",
-//				Content = _text,
-//				Length = _text.Length,
-//				Position = 0,
-//				Left = new NumberExpression()
-//				{
-//					Value = 1,
-//					ValueTypeFullname = typeof(int).FullName,
-//					File = "",
-//					Length = 1,
-//					Position = 0,
-//					Content = _text
-//				},
-//				Oper = "+",
-//				Right = new ArithmeticOperatorExpression
-//				{
-//					Left = new NumberExpression
-//					{
-//						Value = 2,
-//						ValueTypeFullname = typeof(int).FullName,
-//						File = "",
-//						Length = 1,
-//						Position = 4,
-//						Content = _text
-//					},
-//					Oper = "*",
-//					Right = new NumberExpression
-//					{
-//						Value = 3,
-//						ValueTypeFullname = typeof(int).FullName,
-//						File = "",
-//						Length = 1,
-//						Position = 8,
-//						Content = _text
-//					},
-//					File = "",
-//					Length = 5,
-//					Position = 4,
-//					Content = _text
-//				}
-//			});
-//		}
-
-//		[Fact]
-//		public void Arithmetic_1_mul_2_add_3()
-//		{
-//			GiveText("1 * 2 + 3");
-//			WhenTryParse(_parser.ArithmeticOperatorExpr());
-//			ThenResultShouldBe(new ArithmeticOperatorExpression()
-//			{
-//				File = "",
-//				Content = _text,
-//				Length = _text.Length,
-//				Position = 0,
-//				Left = new ArithmeticOperatorExpression
-//				{
-//					File = "",
-//					Length = 5,
-//					Position = 0,
-//					Content = _text,
-//					Left = new NumberExpression
-//					{
-//						Value = 1,
-//						ValueTypeFullname = typeof(int).FullName,
-//						File = "",
-//						Length = 1,
-//						Position = 0,
-//						Content = _text
-//					},
-//					Oper = "*",
-//					Right = new NumberExpression
-//					{
-//						Value = 2,
-//						ValueTypeFullname = typeof(int).FullName,
-//						File = "",
-//						Length = 1,
-//						Position = 4,
-//						Content = _text
-//					},
-//				},
-//				Oper = "+",
-//				Right = new NumberExpression()
-//				{
-//					Value = 3,
-//					ValueTypeFullname = typeof(int).FullName,
-//					File = "",
-//					Length = 1,
-//					Position = 8,
-//					Content = _text
-//				},
-//			});
-//		}
 
 //		[Fact]
 //		public void Arithmetic_1_add_2_mul_3_add_4()
@@ -369,58 +221,4 @@
 //			});
 //		}
 
-//		[Fact]
-//		public void Declare_variable_datatype()
-//		{
-//			GiveText("DECLARE @start datetime");
-//			WhenTryParse(_parser.DeclareVariableExpr);
-//			ThenResultShouldBe(new DeclareExpression()
-//			{
-//				File = "",
-//				Content = _text,
-//				Length = _text.Length,
-//				Position = 0,
-//				Name = "@start",
-//				DataType = "datetime"
-//			});
-//		}
 
-
-//		private void ThenResultShouldBe(SqlExpression expression)
-//		{
-//			if (!_parsed.IsSuccess())
-//			{
-//				throw new ParseException(_parsed.Error);
-//			}
-
-//			expression.ToExpectedObject()
-//				.ShouldMatch(_parsed.Result);
-//		}
-
-//		private void ThenResultShouldSuccess()
-//		{
-//			Assert.True(_parsed.IsSuccess());
-//		}
-
-//		private void ThenResultShouldFail()
-//		{
-//			Assert.False(_parsed.IsSuccess());
-//		}
-
-//		private void ThenResultShouldBe(string expectedText, int consumed)
-//		{
-//			Assert.Equal(expectedText, _parsed.Result.GetText());
-//			//Assert.Equal(consumed, _parsed.Rest.Position);
-//		}
-
-//		private void WhenTryParse(IParser parser)
-//		{
-//			_parsed = parser.TryParseText(_text);
-//		}
-
-//		private void GiveText(string code)
-//		{
-//			_text = code;
-//		}
-//	}
-//}
