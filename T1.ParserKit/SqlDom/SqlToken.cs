@@ -85,6 +85,27 @@ namespace T1.ParserKit.SqlDom
 				TextSpan = x
 			});
 
+		public static IParser<SqlCommentExpression> Comment1 =
+			from start1 in Parse.Equal("--")
+			from body in Parse.NewLine.Not().ThenRight(Parse.AnyChars(1)).Many()
+			from end1 in Parse.Any(Parse.NewLine, Parse.Eos<TextSpan>())
+			select new SqlCommentExpression()
+			{
+				IsMultipleLines = false,
+				Content = body.Text
+			};
+
+		public static IParser<SqlCommentExpression> Comment2 =
+			Parse.CStyleComment2
+				.MapResult(x => new SqlCommentExpression()
+				{
+					IsMultipleLines = true,
+					Content = x.Text
+				});
+
+		public static IParser<SqlCommentExpression> Comment =
+			Parse.Any(Comment2, Comment1);
+
 		public static IParser<SqlExpression> Word(string text)
 		{
 			return ParseToken.Lexeme(ParseToken.Match(text))

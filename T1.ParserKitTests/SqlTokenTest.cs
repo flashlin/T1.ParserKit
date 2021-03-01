@@ -36,5 +36,41 @@ namespace T1.ParserKitTests
 			WhenParse(SqlParser.Identifier);
 			ThenResultShouldFail();
 		}
+
+		[Fact]
+		public void Comment1()
+		{
+			GiveText("--123");
+			WhenParse(SqlToken.Comment);
+			ThenResultShouldBe(new SqlCommentExpression()
+			{
+				IsMultipleLines = false,
+				Content = "123"
+			});
+		}
+
+		[Fact]
+		public void Comment1_crlf()
+		{
+			GiveText("--123\r\n");
+			WhenParse(SqlToken.Comment);
+			ThenResultShouldBe(new SqlCommentExpression()
+			{
+				IsMultipleLines = false,
+				Content = "123"
+			});
+		}
+
+		[Fact]
+		public void Comment2_crlf()
+		{
+			GiveText("/*123\r\n456*/");
+			WhenParse(SqlToken.Comment);
+			ThenResultShouldBe(new SqlCommentExpression()
+			{
+				IsMultipleLines = true,
+				Content = "123\r\n456"
+			});
+		}
 	}
 }

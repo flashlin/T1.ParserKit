@@ -608,6 +608,12 @@ namespace T1.ParserKit.Core
 
 		public static IParser<TextSpan> CStyleIdentifier = CStyleIdentifierF().Named(nameof(CStyleIdentifier));
 
+		public static IParser<TextSpan> NewLine =
+			Parse.Any(
+				Parse.Equal("\r\n"),
+				Parse.Equal("\n")
+			);
+
 		private static IParser<TextSpan> CStyleIdentifierF()
 		{
 			var underscore = Equal("_");
