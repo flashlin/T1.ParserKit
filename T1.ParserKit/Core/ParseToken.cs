@@ -13,7 +13,7 @@ namespace T1.ParserKit.Core
 
 		public static IParser<T> Lexeme<T>(IParser<T> parser)
 		{
-			return Parse.Blanks.Optional().Then(parser, (a, b) => b)
+			return Parse.Blanks.Optional().ThenRight(parser)
 				.Named($"\\s*{parser.Name}");
 		}
 
