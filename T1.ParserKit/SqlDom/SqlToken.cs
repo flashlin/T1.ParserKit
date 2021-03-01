@@ -85,16 +85,6 @@ namespace T1.ParserKit.SqlDom
 				TextSpan = x
 			});
 
-		public static IParser<SqlCommentExpression> Comment2 =
-			from start1 in Symbol("/*")
-			from body1 in Symbol("*/").Not().ThenRight(Parse.AnyChars(1)).Many()
-			from end1 in Symbol("*/")
-			select new SqlCommentExpression()
-			{
-				IsMultipleLines = true,	
-				Content = body1.Text
-			};
-
 		public static IParser<SqlExpression> Word(string text)
 		{
 			return ParseToken.Lexeme(ParseToken.Match(text))

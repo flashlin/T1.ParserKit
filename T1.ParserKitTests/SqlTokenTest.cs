@@ -46,7 +46,7 @@ namespace T1.ParserKitTests
 		public void Comment2(string text)
 		{
 			GiveText(text);
-			WhenParse(SqlToken.Comment2);
+			WhenParse(Parse.CStyleComment2);
 			ThenResultShouldBe(new SqlCommentExpression()
 			{
 				IsMultipleLines = true,

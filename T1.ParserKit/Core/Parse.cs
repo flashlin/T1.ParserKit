@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using T1.ParserKit.Core.Parsers;
 using T1.ParserKit.Helpers;
+using T1.ParserKit.SqlDom;
+using T1.ParserKit.SqlDom.Expressions;
 using T1.Standard.Common;
 using T1.Standard.Extensions;
 
@@ -81,7 +83,7 @@ namespace T1.ParserKit.Core
 			ParseError innerError,
 			int position)
 		{
-			return Error<T>(message, new[] { innerError }, position);
+			return Error<T>(message, new[] {innerError}, position);
 		}
 
 		public static IParser<T> AnyCast<T>(params object[] parsers)
@@ -693,7 +695,7 @@ namespace T1.ParserKit.Core
 		public static IParser<T> ChainLeft<T>(IParser<T> @operator, IParser<T> operand,
 			Func<T, T, T> apply)
 		{
-			return ChainLeft1<T>(operand, @operator, operand, apply);
+			return ChainLeft1(operand, @operator, operand, apply);
 		}
 
 		public static IEnumerable<TResult> GetAccumResults<TResult>(this IEnumerable<IParseResult<TResult>> accum)
@@ -706,5 +708,15 @@ namespace T1.ParserKit.Core
 			fn(result);
 			return result;
 		}
+
+		public static IParser<SqlCommentExpression> CStyleComment2 =
+			from start1 in SqlToken.Symbol("/*")
+			from body1 in SqlToken.Symbol("*/").Not().ThenRight(Parse.AnyChars(1)).Many()
+			from end1 in SqlToken.Symbol("*/")
+			select new SqlCommentExpression()
+			{
+				IsMultipleLines = true,	
+				Content = body1.Text
+			};
 	}
 }
