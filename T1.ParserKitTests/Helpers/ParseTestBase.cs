@@ -9,8 +9,8 @@ namespace T1.ParserKitTests.Helpers
 {
 	public abstract class ParseTestBase
 	{
-		private string _text;
-		private IParseResult<object> _parsed;
+		protected string _text;
+		protected IParseResult<object> _parsed;
 		private string _file;
 
 		protected void ThenResultShouldBe(string expected)

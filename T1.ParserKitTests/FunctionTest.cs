@@ -5,15 +5,13 @@ using ExpectedObjects;
 using T1.ParserKit.Core;
 using T1.ParserKit.SqlDom;
 using T1.ParserKit.SqlDom.Expressions;
+using T1.ParserKitTests.Helpers;
 using Xunit;
 
 namespace T1.ParserKitTests
 {
-	public class FunctionTest
+	public class FunctionTest : ParseTestBase
 	{
-		private string _code;
-		private IParseResult<object> _result;
-
 		[Fact]
 		public void FuncGetdate()
 		{
@@ -24,9 +22,9 @@ namespace T1.ParserKitTests
 				TextSpan = new TextSpan()
 				{
 					File = String.Empty,
-					Text = _code,
+					Text = _text,
 					Position = 0,
-					Length = _code.Length,
+					Length = _text.Length,
 				},
 				Name = "GETDATE",
 				Parameters = new SqlExpression[0]
@@ -43,9 +41,9 @@ namespace T1.ParserKitTests
 				TextSpan = new TextSpan()
 				{
 					File = String.Empty,
-					Text = _code,
+					Text = _text,
 					Position = 0,
-					Length = _code.Length,
+					Length = _text.Length,
 				},
 				Name = "GETDATE",
 				Parameters = new SqlExpression[0]
@@ -196,21 +194,5 @@ namespace T1.ParserKitTests
 		//		}
 		//	});
 		//}
-
-		private void WhenParse<T>(IParser<T> parser)
-		{
-			_result = parser.ParseText(_code).CastToParseResult();
-		}
-
-		private void GiveText(string code)
-		{
-			_code = code;
-		}
-
-		private void ThenResultShouldBe(SqlExpression expression)
-		{
-			expression.ToExpectedObject()
-				.ShouldMatch(_result.Result);
-		}
 	}
 }
