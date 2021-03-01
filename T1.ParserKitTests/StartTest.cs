@@ -34,7 +34,7 @@ namespace T1.ParserKitTests
 			foreach (var sample in samples)
 			{
 				GiveTextFile(sample);
-				WhenParse(SqlParser.StartExpr);
+				WhenParseAll(SqlParser.StartExpr);
 				ThenResultShouldSuccess();
 			}
 		}

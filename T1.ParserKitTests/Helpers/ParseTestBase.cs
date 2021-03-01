@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using ExpectedObjects;
 using T1.ParserKit.Core;
 using T1.ParserKit.SqlDom.Expressions;
@@ -10,8 +12,9 @@ namespace T1.ParserKitTests.Helpers
 	public abstract class ParseTestBase
 	{
 		protected string _text;
-		protected IParseResult<object> _parsed;
 		private string _file;
+		private IParseResult<object>[] _parsedList;
+		protected IParseResult<object> _parsed => _parsedList.Last();
 
 		protected void ThenResultShouldBe(string expected)
 		{
@@ -52,7 +55,18 @@ namespace T1.ParserKitTests.Helpers
 		protected void WhenParse<T>(IParser<T> parser)
 		{
 			var inp = new StringInputReader(_text);
-			_parsed = parser.TryParse(inp).CastToParseResult();
+			_parsedList = new[]
+			{
+				parser.TryParse(inp).CastToParseResult()
+			};
+		}
+
+		protected void WhenParseAll<T>(IParser<T> parser)
+		{
+			var inp = new StringInputReader(_text);
+			_parsedList = parser.TryParseAllText(_text)
+				.Select(x => x.CastToParseResult())
+				.ToArray();
 		}
 
 		protected void ThenResultShouldSuccess()
