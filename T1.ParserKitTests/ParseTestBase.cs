@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using ExpectedObjects;
 using T1.ParserKit.Core;
 using T1.ParserKit.SqlDom.Expressions;
@@ -9,6 +11,7 @@ namespace T1.ParserKitTests
 	{
 		private string _text;
 		private IParseResult<object> _parsed;
+		private string _file;
 
 		protected void ThenResultShouldBe(string expected)
 		{
@@ -52,9 +55,25 @@ namespace T1.ParserKitTests
 			_parsed = parser.TryParse(inp).CastToParseResult();
 		}
 
+		protected void ThenResultShouldSuccess()
+		{
+			if (!_parsed.IsSuccess())
+			{
+				var parseEx = new ParseException(_parsed.Error);
+				throw new Exception(_file, parseEx);
+			}
+		}
+
 		protected void GiveText(string text)
 		{
+			_file = String.Empty;
 			_text = text;
+		}
+
+		protected void GiveTextFile(string file)
+		{
+			_file = file;
+			_text = File.ReadAllText(file);
 		}
 	}
 }
