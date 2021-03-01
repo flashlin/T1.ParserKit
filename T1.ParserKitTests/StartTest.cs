@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using T1.ParserKit.Core;
 using T1.ParserKit.SqlDom;
 using T1.ParserKit.SqlDom.Expressions;
 using T1.ParserKitTests.Helpers;
@@ -22,6 +23,64 @@ namespace T1.ParserKitTests
 					Name = "@name"
 				},
 				DataType = "int"
+			});
+		}
+
+		[Fact]
+		public void Start_set_ANSI_NULLS_on()
+		{
+			GiveText("SET ANSI_NULLS ON;");
+			WhenParse(SqlParser.StartExpr);
+			ThenResultShouldBe(new SetOptionExpression()
+			{
+				OptionName = "ANSI_NULLS",
+				IsToggle = true
+			});
+		}
+
+		[Fact]
+		public void Start_set_ANSI_NULLS_ANSI_PADDING_on()
+		{
+			GiveText("SET ANSI_NULLS, ANSI_PADDING ON;");
+			WhenParse(SqlParser.StartExpr);
+			ThenResultShouldBe(new SetManyOptionExpression()
+			{
+				Items = new []
+				{
+					new SetOptionExpression()
+					{
+						OptionName = "ANSI_NULLS",
+						IsToggle = true
+					},
+					new SetOptionExpression()
+					{
+						OptionName = "ANSI_PADDING",
+						IsToggle = true
+					}
+				}
+			});
+		}
+
+		[Fact]
+		public void Start_set_ANSI_NULLS__ANSI_PADDING_on()
+		{
+			GiveText("SET ANSI_NULLS , ANSI_PADDING ON;");
+			WhenParse(SqlParser.StartExpr);
+			ThenResultShouldBe(new SetManyOptionExpression()
+			{
+				Items = new []
+				{
+					new SetOptionExpression()
+					{
+						OptionName = "ANSI_NULLS",
+						IsToggle = true
+					},
+					new SetOptionExpression()
+					{
+						OptionName = "ANSI_PADDING",
+						IsToggle = true
+					}
+				}
 			});
 		}
 

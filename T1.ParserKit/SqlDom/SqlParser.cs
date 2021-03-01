@@ -204,7 +204,7 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<SqlExpression> OptionName =
 			SqlToken.ContainsWord("NOCOUNT",
-				"ANSI_NULLS", "ANSI_PADDING", "ANSI_WARNINGS", "ARITHABORT", "CONCAT_NULL_YIELDS_NULL", 
+				"ANSI_NULLS", "ANSI_PADDING", "ANSI_WARNINGS", "ARITHABORT", "CONCAT_NULL_YIELDS_NULL",
 				"QUOTED_IDENTIFIER",
 				"NUMERIC_ROUNDABORT"
 			);
@@ -214,29 +214,29 @@ namespace T1.ParserKit.SqlDom
 			select string.Equals(onOff1.GetText().ToUpper(), "ON", StringComparison.Ordinal);
 
 		public static IParser<SetOptionExpression> SetOptionOnOffExpr =
-			from set1 in SqlToken.Word("SET")
-			from optionName1 in OptionName
-			from onOff1 in OnOffExpr
-			from semiColon1 in SemiColon.Optional()
-			select new SetOptionExpression()
-			{
-				OptionName = optionName1.GetText(),
-				IsToggle = onOff1
-			};
+			(from set1 in SqlToken.Word("SET")
+			 from optionName1 in OptionName
+			 from onOff1 in OnOffExpr
+			 from semiColon1 in SemiColon.Optional()
+			 select new SetOptionExpression()
+			 {
+				 OptionName = optionName1.GetText(),
+				 IsToggle = onOff1
+			 }).Named(nameof(SetOptionOnOffExpr));
 
 		public static IParser<SetManyOptionExpression> SetManyOptionOnOffExpr =
-			from set1 in SqlToken.Word("SET")
-			from optionNames1 in OptionName.SeparatedBy(Comma)
-			from onOff1 in OnOffExpr
-			from semiColon1 in SemiColon.Optional()
-			select new SetManyOptionExpression()
-			{ 
-				Items = optionNames1.Select(x => new SetOptionExpression()
-				{
-					OptionName = x.GetText(),
-					IsToggle = onOff1
-				}).ToArray()
-			};
+			(from set1 in SqlToken.Word("SET")
+			 from optionNames1 in OptionName.SeparatedBy(Comma)
+			 from onOff1 in OnOffExpr
+			 from semiColon1 in SemiColon.Optional()
+			 select new SetManyOptionExpression()
+			 {
+				 Items = optionNames1.Select(x => new SetOptionExpression()
+				 {
+					 OptionName = x.GetText(),
+					 IsToggle = onOff1
+				 }).ToArray()
+			 }).Named(nameof(SetManyOptionOnOffExpr));
 
 		public static IParser<SqlExpression> GoExpr =
 			from go1 in SqlToken.Word("GO")
@@ -635,13 +635,13 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<SqlExpression> StartExpr =
 			Parse.AnyCast<SqlExpression>(
-			SelectExpr.MapSqlExpr().LeftRecursive(
-				IfExpr,
-				SqlFunctions),
 				DeclareVariableExpr,
 				SetOptionOnOffExpr,
 				SetManyOptionOnOffExpr,
-				GoExpr
+				GoExpr,
+				SelectExpr.MapSqlExpr().LeftRecursive(
+				IfExpr,
+				SqlFunctions)
 			);
 
 		//public IParser StartExpr()

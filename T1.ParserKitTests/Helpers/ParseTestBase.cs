@@ -48,6 +48,14 @@ namespace T1.ParserKitTests.Helpers
 			}
 
 			var actualResult = _parsed.Result;
+
+			var actualName = actualResult.GetType().FullName;
+			var expectedName = typeof(T).FullName;
+			if (actualName != expectedName)
+			{
+				throw new Exception($"Expect {expectedName} result, but got {actualName} result.");
+			}
+
 			expected.ToExpectedObject()
 				.ShouldMatch(actualResult);
 		}

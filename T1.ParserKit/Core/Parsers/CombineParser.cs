@@ -148,11 +148,13 @@ namespace T1.ParserKit.Core.Parsers
 				var acc = new List<ParseError>();
 				foreach (var parser in parserArr)
 				{
+					var pos = inp.GetPosition();
 					var parsed = parser.TryParse(inp);
 					if (parsed.IsSuccess())
 					{
 						return parsed;
 					}
+					inp.Seek(pos);
 					acc.Add(parsed.Error);
 				}
 				var ch = inp.Substr(20);

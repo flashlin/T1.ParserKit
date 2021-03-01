@@ -73,5 +73,23 @@ namespace T1.ParserKitTests
 				Content = "123\r\n456"
 			});
 		}
+
+		[Fact]
+		public void Comma()
+		{
+			GiveText(",");
+			WhenParse(SqlParser.Comma);
+			ThenResultShouldBe(new SqlExpression()
+			{
+				TextSpan = new TextSpan()
+				{
+					File = string.Empty,
+					Text = ",",
+					Length = 1
+				}
+			});
+		}
+
+
 	}
 }

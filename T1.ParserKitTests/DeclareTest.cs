@@ -41,7 +41,7 @@ namespace T1.ParserKitTests
 		}
 
 		[Fact]
-		public void Test()
+		public void Set_ansinulls_ansipadding_on()
 		{
 			GiveText("SET ANSI_NULLS, ANSI_PADDING ON;");
 			WhenParse(SqlParser.SetManyOptionOnOffExpr);
