@@ -9,7 +9,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Symbol()
 		{
-			GiveText(">=");
+			GivenText(">=");
 			WhenParse(ParseToken.Symbol(">="));
 			ThenResultShouldBe(">=");
 		}

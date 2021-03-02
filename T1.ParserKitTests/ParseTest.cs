@@ -14,7 +14,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Letters()
 		{
-			GiveText("abc");
+			GivenText("abc");
 			WhenParse(Parse.Letters);
 			ThenResultShouldBe("abc");
 		}
@@ -22,7 +22,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Digits()
 		{
-			GiveText("123");
+			GivenText("123");
 			WhenParse(Parse.Digits);
 			ThenResultShouldBe("123");
 		}
@@ -30,7 +30,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void NotDigit_Letter()
 		{
-			GiveText("a");
+			GivenText("a");
 			WhenParse(Parse.Digit.Not().ThenRight(Parse.Letter));
 			ThenResultShouldBe("a");
 		}
@@ -38,7 +38,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void NotDigit()
 		{
-			GiveText("a");
+			GivenText("a");
 			WhenParse(Parse.Digit.Not());
 			ThenResultShouldBe(Unit.Instance);
 		}
@@ -46,7 +46,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Any()
 		{
-			GiveText("b");
+			GivenText("b");
 			WhenParse(Parse.Any(Parse.Equal("a"), Parse.Equal("b")));
 			ThenResultShouldBe("b");
 		}
@@ -54,7 +54,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Equal()
 		{
-			GiveText("a");
+			GivenText("a");
 			WhenParse(Parse.Equal("a"));
 			ThenResultShouldBe("a");
 		}
@@ -62,7 +62,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Many()
 		{
-			GiveText("bb");
+			GivenText("bb");
 			WhenParse(Parse.Equal("b").Many());
 			ThenResultShouldBe("bb");
 		}
@@ -71,7 +71,7 @@ namespace T1.ParserKitTests
 
 		public void Many_empty()
 		{
-			GiveText("a");
+			GivenText("a");
 			WhenParse(Parse.Equal("b").Many());
 			ThenResultShouldBe("");
 		}
@@ -79,7 +79,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void CStyleIdentifier()
 		{
-			GiveText("name");
+			GivenText("name");
 			WhenParse(Parse.CStyleIdentifier);
 			ThenResultShouldBe("name");
 		}
@@ -92,7 +92,7 @@ namespace T1.ParserKitTests
 		[InlineData("/*12**/")]
 		public void Comment2(string text)
 		{
-			GiveText(text);
+			GivenText(text);
 			WhenParse(Parse.CStyleComment2);
 			ThenResultShouldBe(new TextSpan()
 			{
@@ -106,7 +106,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Sequence()
 		{
-			GiveText("ab");
+			GivenText("ab");
 			WhenParse(Parse.Seq(
 				Parse.Match("a"),
 				Parse.Match("b")
@@ -118,7 +118,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Not_then_anyChar1()
 		{
-			GiveText("a");
+			GivenText("a");
 			WhenParse(Parse.Equal("b").Not().ThenRight(Parse.AnyChars(1)));
 			ThenResultShouldBe("a");
 		}
@@ -126,7 +126,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void CStyleString()
 		{
-			GiveText("\"123\"");
+			GivenText("\"123\"");
 			WhenParse(Parse.CStyleString);
 			ThenResultShouldBe("\"123\"");
 		}
@@ -134,7 +134,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void CStyleString_with_escape_char()
 		{
-			GiveText("\"12\\\"3\"");
+			GivenText("\"12\\\"3\"");
 			WhenParse(Parse.CStyleString);
 			ThenResultShouldBe("\"12\\\"3\"");
 		}

@@ -10,7 +10,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Arithmetic_1_add_2()
 		{
-			GiveText("1 + 2");	
+			GivenText("1 + 2");	
 			WhenParse(SqlParser.ArithmeticOperatorAtomExpr);
 			ThenResultShouldBe(new ArithmeticOperatorExpression()
 			{
@@ -31,7 +31,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Arithmetic_1_add_2_mul_3()
 		{
-			GiveText("1 + 2 * 3");	
+			GivenText("1 + 2 * 3");	
 			WhenParse(SqlParser.ArithmeticOperatorAtomExpr);
 			ThenResultShouldBe(new ArithmeticOperatorExpression()
 			{
@@ -61,7 +61,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Arithmetic_1_add_2_mul_3_add_4()
 		{
-			GiveText("1 + 2 * 3 + 4");
+			GivenText("1 + 2 * 3 + 4");
 			WhenParse(SqlParser.ArithmeticOperatorAtomExpr);
 			ThenResultShouldBe(new ArithmeticOperatorExpression()
 			{
@@ -100,7 +100,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Arithmetic_Group_LParen_1_add_2_RParen_mul_3()
 		{
-			GiveText("(1 + 2) * 3");
+			GivenText("(1 + 2) * 3");
 			WhenParse(SqlParser.ArithmeticOperatorAtomExpr);
 			ThenResultShouldBe(new ArithmeticOperatorExpression()
 			{

@@ -15,7 +15,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void FuncGetdate()
 		{
-			GiveText("GETDATE()");
+			GivenText("GETDATE()");
 			WhenParse(SqlParser.FuncGetdate);
 			ThenResultShouldBe(new SqlFunctionExpression()
 			{
@@ -34,7 +34,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void SqlFunctions_Getdate()
 		{
-			GiveText("GETDATE()");
+			GivenText("GETDATE()");
 			WhenParse(SqlParser.SqlFunctions(SqlParser.Atom));
 			ThenResultShouldBe(new SqlFunctionExpression()
 			{
@@ -53,7 +53,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Datediff_dd_0_getdate()
 		{
-			GiveText("DATEDIFF(dd, 0, GETDATE())");
+			GivenText("DATEDIFF(dd, 0, GETDATE())");
 			WhenParse(SqlParser.FuncDatediff(SqlParser.Atom));
 			ThenResultShouldBe(new SqlFunctionExpression()
 			{
@@ -93,7 +93,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void SqlFunctions_isnull()
 		{
-			GiveText("isnull(@name, 50)");
+			GivenText("isnull(@name, 50)");
 			WhenParse(SqlParser.SqlFunctions(SqlParser.Atom));
 			ThenResultShouldBe(new SqlFunctionExpression()
 			{

@@ -14,7 +14,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Update_table_set_field1_eq_1()
 		{
-			GiveText("UPDATE customer set id=1 where custId=@customerId");
+			GivenText("UPDATE customer set id=1 where custId=@customerId");
 			WhenParse(SqlParser.UpdateExpr(SqlParser.Atom));
 			ThenResultShouldBe(new UpdateExpression()
 			{

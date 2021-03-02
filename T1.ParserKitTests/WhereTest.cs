@@ -10,7 +10,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Where_name_eq_1()
 		{
-			GiveText("where name = 1");
+			GivenText("where name = 1");
 			WhenParse(SqlParser.WhereExpr);
 			ThenResultShouldBe(new WhereExpression()
 			{

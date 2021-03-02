@@ -10,7 +10,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Create_proc_name()
 		{
-			GiveText(@"
+			GivenText(@"
 CREATE PROCEDURE [dbo].[AddCustomer]
 	@customerId int,
 	@name nvarchar(10),

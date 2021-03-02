@@ -16,7 +16,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Declare_variable_datetime()
 		{
-			GiveText("declare @name datetime");
+			GivenText("declare @name datetime");
 			WhenParse(SqlParser.DeclareVariableExpr);
 			ThenResultShouldBe(new DeclareExpression()
 			{
@@ -31,7 +31,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Set_nocount_on()
 		{
-			GiveText("SET NOCOUNT ON;");
+			GivenText("SET NOCOUNT ON;");
 			WhenParse(SqlParser.SetOptionOnOffExpr);
 			ThenResultShouldBe(new SetOptionExpression()
 			{
@@ -43,7 +43,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Set_ansinulls_ansipadding_on()
 		{
-			GiveText("SET ANSI_NULLS, ANSI_PADDING ON;");
+			GivenText("SET ANSI_NULLS, ANSI_PADDING ON;");
 			WhenParse(SqlParser.SetManyOptionOnOffExpr);
 			ThenResultShouldBe(new SetManyOptionExpression()
 			{
@@ -67,7 +67,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Set_nocount_on2()
 		{
-			GiveText("SET NOCOUNT ON");
+			GivenText("SET NOCOUNT ON");
 			WhenParse(SqlParser.SetOptionOnOffExpr);
 			ThenResultShouldBe(new SetOptionExpression()
 			{
@@ -79,7 +79,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void With_nolock()
 		{
-			GiveText("with(nolock)");
+			GivenText("with(nolock)");
 			WhenParse(SqlParser.WithOptionExpr);
 			ThenResultShouldBe(new WithOptionExpression()
 			{
@@ -90,7 +90,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void If_variable_eq_1_begin_select_field_from_table_end()
 		{
-			GiveText("if @name=1 BEGIN select name from customer END");
+			GivenText("if @name=1 BEGIN select name from customer END");
 			WhenParse(SqlParser.StartExpr);
 			ThenResultShouldBe(new IfExpression()
 			{
@@ -136,7 +136,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Test()
 		{
-			GiveText(":setvar DatabaseName \"CustomerDB\"");
+			GivenText(":setvar DatabaseName \"CustomerDB\"");
 			WhenParse(SqlParser.StartExpr);
 			ThenResultShouldBe(new SqlSetVarExpression()
 			{

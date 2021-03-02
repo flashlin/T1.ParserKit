@@ -14,7 +14,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Start_declare_name_int()
 		{
-			GiveText("declare @name int");
+			GivenText("declare @name int");
 			WhenParse(SqlParser.StartExpr);
 			ThenResultShouldBe(new DeclareExpression()
 			{
@@ -29,7 +29,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Start_set_ANSI_NULLS_on()
 		{
-			GiveText("SET ANSI_NULLS ON;");
+			GivenText("SET ANSI_NULLS ON;");
 			WhenParse(SqlParser.StartExpr);
 			ThenResultShouldBe(new SetOptionExpression()
 			{
@@ -41,7 +41,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Start_set_ANSI_NULLS_ANSI_PADDING_on()
 		{
-			GiveText("SET ANSI_NULLS, ANSI_PADDING ON;");
+			GivenText("SET ANSI_NULLS, ANSI_PADDING ON;");
 			WhenParse(SqlParser.StartExpr);
 			ThenResultShouldBe(new SetManyOptionExpression()
 			{
@@ -64,7 +64,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Start_set_ANSI_NULLS__ANSI_PADDING_on()
 		{
-			GiveText("SET ANSI_NULLS , ANSI_PADDING ON;");
+			GivenText("SET ANSI_NULLS , ANSI_PADDING ON;");
 			WhenParse(SqlParser.StartExpr);
 			ThenResultShouldBe(new SetManyOptionExpression()
 			{
@@ -92,7 +92,7 @@ namespace T1.ParserKitTests
 			var samples = GetSqlFiles(folder);
 			foreach (var sample in samples)
 			{
-				GiveTextFile(sample);
+				GivenTextFile(sample);
 				WhenParseAll(SqlParser.StartExpr);
 				ThenResultShouldSuccess();
 			}

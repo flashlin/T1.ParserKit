@@ -15,7 +15,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void NonIdentifier()
 		{
-			GiveText("from");
+			GivenText("from");
 			WhenParse(SqlParser.Identifier);
 			ThenResultShouldFail();
 		}
@@ -23,7 +23,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Identifier()
 		{
-			GiveText("name");
+			GivenText("name");
 			WhenParse(SqlParser.Identifier);
 			ThenResultShouldBe("name");
 		}
@@ -33,7 +33,7 @@ namespace T1.ParserKitTests
 		[InlineData("select")]
 		public void MoreNonIdentifier(string keyword)
 		{
-			GiveText(keyword);
+			GivenText(keyword);
 			WhenParse(SqlParser.Identifier);
 			ThenResultShouldFail();
 		}
@@ -41,7 +41,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Comment1()
 		{
-			GiveText("--123");
+			GivenText("--123");
 			WhenParse(SqlToken.Comment);
 			ThenResultShouldBe(new SqlCommentExpression()
 			{
@@ -53,7 +53,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Comment1_crlf()
 		{
-			GiveText("--123\r\n");
+			GivenText("--123\r\n");
 			WhenParse(SqlToken.Comment);
 			ThenResultShouldBe(new SqlCommentExpression()
 			{
@@ -65,7 +65,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Comment2_crlf()
 		{
-			GiveText("/*123\r\n456*/");
+			GivenText("/*123\r\n456*/");
 			WhenParse(SqlToken.Comment);
 			ThenResultShouldBe(new SqlCommentExpression()
 			{
@@ -77,7 +77,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Comma()
 		{
-			GiveText(",");
+			GivenText(",");
 			WhenParse(SqlParser.Comma);
 			ThenResultShouldBe(new SqlExpression()
 			{

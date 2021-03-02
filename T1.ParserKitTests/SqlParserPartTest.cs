@@ -11,7 +11,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Tablename()
 		{
-			GiveText("name");
+			GivenText("name");
 			WhenParse(SqlParser.TableFieldExpr);
 			ThenResultShouldBe(new FieldExpression()
 			{
@@ -22,7 +22,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Tablename1()
 		{
-			GiveText("name");
+			GivenText("name");
 			WhenParse(SqlParser.TableFieldExpr);
 			ThenResultShouldBe(new FieldExpression()
 			{
@@ -33,7 +33,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Table_name()
 		{
-			GiveText("customer.name");
+			GivenText("customer.name");
 			WhenParse(SqlParser.TableFieldExpr);
 			ThenResultShouldBe(new FieldExpression()
 			{
@@ -45,7 +45,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Table_name2()
 		{
-			GiveText("customer.name");
+			GivenText("customer.name");
 			WhenParse(SqlParser.TableFieldExpr);
 			ThenResultShouldBe(new FieldExpression()
 			{
@@ -57,7 +57,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Database_table_name()
 		{
-			GiveText("db1.customer.name");
+			GivenText("db1.customer.name");
 			WhenParse(SqlParser.TableFieldExpr);
 			ThenResultShouldBe(new FieldExpression()
 			{
@@ -69,7 +69,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Database_table_name3()
 		{
-			GiveText("db1.customer.name");
+			GivenText("db1.customer.name");
 			WhenParse(SqlParser.TableFieldExpr);
 			ThenResultShouldBe(new FieldExpression()
 			{
@@ -81,7 +81,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Integer()
 		{
-			GiveText("123");
+			GivenText("123");
 			WhenParse(SqlParser.IntegerExpr);
 			ThenResultShouldBe(new NumberExpression()
 			{
@@ -93,7 +93,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void NagativeInteger()
 		{
-			GiveText("-32");
+			GivenText("-32");
 			WhenParse(SqlParser.NegativeIntegerExpr);
 			ThenResultShouldBe(new NumberExpression()
 			{
@@ -105,7 +105,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void NumberExpr_NagativeInteger()
 		{
-			GiveText("-32");
+			GivenText("-32");
 			WhenParse(SqlParser.NumberExpr);
 			ThenResultShouldBe(new NumberExpression()
 			{
@@ -117,7 +117,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void NumberExpr_Integer()
 		{
-			GiveText("32");
+			GivenText("32");
 			WhenParse(SqlParser.NumberExpr);
 			ThenResultShouldBe(new NumberExpression()
 			{
@@ -129,7 +129,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Atom_Integer()
 		{
-			GiveText("32");
+			GivenText("32");
 			WhenParse(SqlParser.Atom);
 			ThenResultShouldBe(new NumberExpression()
 			{
@@ -141,7 +141,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Atom_Variable()
 		{
-			GiveText("@name");
+			GivenText("@name");
 			WhenParse(SqlParser.Atom);
 			ThenResultShouldBe(new VariableExpression()
 			{

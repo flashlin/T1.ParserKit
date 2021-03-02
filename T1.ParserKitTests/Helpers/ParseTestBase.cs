@@ -86,13 +86,13 @@ namespace T1.ParserKitTests.Helpers
 			}
 		}
 
-		protected void GiveText(string text)
+		protected void GivenText(string text)
 		{
 			_file = String.Empty;
 			_text = text;
 		}
 
-		protected void GiveTextFile(string file)
+		protected void GivenTextFile(string file)
 		{
 			_file = file;
 			_text = File.ReadAllText(file);
