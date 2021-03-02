@@ -646,7 +646,7 @@ namespace T1.ParserKit.SqlDom
 
 		//:on error exit
 		public static IParser<SqlOnErrorExitExpression> OnErrorExitExpr =
-			from on1 in SqlToken.Word("ON")
+			from on1 in SqlToken.Word(":ON")
 			from error1 in SqlToken.Word("ERROR")
 			from exit1 in SqlToken.Word("EXIT")
 			select new SqlOnErrorExitExpression();
