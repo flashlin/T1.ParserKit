@@ -62,21 +62,21 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<SqlExpression> Assign = SqlToken.Symbol("=");
 
 		public static IParser<SqlExpression> SqlDataType0 =
-			SqlToken.ContainsWord(
+			SqlToken.Contains(
 				"bit", "smallint", "smallmoney", "int", "tinyint",
 				"money", "real", "date", "smalldatetime", "datetime",
 				"image", "text", "ntext"
 			);
 
 		public static IParser<SqlExpression> SqlDataType1 =
-			SqlToken.ContainsWord(
+			SqlToken.Contains(
 				"bigint", "bit", "float", "datetime2", "time",
 				"char", "varchar", "binary", "varbinary", "nchar",
 				"nvarchar", "datetimeoffset"
 			);
 
 		public static IParser<SqlExpression> SqlDataType2 =
-			SqlToken.ContainsWord("decimal");
+			SqlToken.Contains("decimal");
 
 		public static IParser<SqlExpression> SqlDataType =
 			Parse.Any(SqlDataType0, SqlDataType1, SqlDataType2);
@@ -116,7 +116,7 @@ namespace T1.ParserKit.SqlDom
 		//DATEADD(DD,-1,DATEDIFF(dd, 0, GETDATE()))
 		public static IParser<SqlFunctionExpression> FuncDateadd(IParser<SqlExpression> factor)
 		{
-			var datepart = SqlToken.ContainsWord(SqlToken.DateaddDetepart)
+			var datepart = SqlToken.Contains(SqlToken.DateaddDetepart)
 				.MapResult(x => new SqlOptionNameExpression()
 				{
 					Value = x.TextSpan.Text
@@ -145,7 +145,7 @@ namespace T1.ParserKit.SqlDom
 		//DATEDIFF(dd, 0, GETDATE())
 		public static IParser<SqlFunctionExpression> FuncDatediff(IParser<SqlExpression> factor)
 		{
-			var datepart = SqlToken.ContainsWord(SqlToken.DatediffDatepart)
+			var datepart = SqlToken.Contains(SqlToken.DatediffDatepart)
 				.MapResult(x => new SqlOptionNameExpression()
 				{
 					Value = x.TextSpan.Text
@@ -203,14 +203,14 @@ namespace T1.ParserKit.SqlDom
 		}
 
 		public static IParser<SqlExpression> OptionName =
-			SqlToken.ContainsWord("NOCOUNT",
+			SqlToken.Contains("NOCOUNT",
 				"ANSI_NULLS", "ANSI_PADDING", "ANSI_WARNINGS", "ARITHABORT", "CONCAT_NULL_YIELDS_NULL",
 				"QUOTED_IDENTIFIER",
 				"NUMERIC_ROUNDABORT"
 			);
 
 		public static IParser<bool> OnOffExpr =
-			from onOff1 in SqlToken.ContainsWord("OFF", "ON")
+			from onOff1 in SqlToken.Contains("OFF", "ON")
 			select string.Equals(onOff1.GetText().ToUpper(), "ON", StringComparison.Ordinal);
 
 		public static IParser<SetOptionExpression> SetOptionOnOffExpr =

@@ -171,7 +171,7 @@ namespace T1.ParserKit.SqlDom
 				});
 		}
 
-		public static IParser<SqlExpression> ContainsWord(params string[] texts)
+		public static IParser<SqlExpression> Contains(params string[] texts)
 		{
 			return Lexeme(ParseToken.Matchs(texts))
 				.MapResult(x => new SqlExpression()
