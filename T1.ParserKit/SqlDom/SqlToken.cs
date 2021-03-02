@@ -107,12 +107,22 @@ namespace T1.ParserKit.SqlDom
 			Parse.Any(Comment2, Comment1)
 				.Named("Comment");
 
+		public static IParser<SqlExpression> String2 =
+			Lexeme(
+			from start1 in Parse.Equal("\"")
+			from body1 in Parse.NotEqual("\"").Many()
+			from end1 in Parse.Equal("\"")
+			select new SqlExpression()
+			{
+				TextSpan = new [] { start1, body1, end1 }.GetTextSpan()
+			});
+
 		public static IParser<T> Lexeme<T>(IParser<T> parser)
 		{
 			return (from comment1 in Comment.Many()
-					 from blanks1 in Parse.Blanks.Optional()
-					 from p1 in parser
-					 select p1).Named($"\\s*{parser.Name}");
+					  from blanks1 in Parse.Blanks.Optional()
+					  from p1 in parser
+					  select p1).Named($"\\s*{parser.Name}");
 		}
 
 		public static IParser<SqlExpression> Word(string text)

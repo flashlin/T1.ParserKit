@@ -15,5 +15,21 @@ namespace T1.ParserKit.Helpers
 			init(to);
 			return to;
 		}
+
+		public static string GetCStyleStringText(this string cstyleString)
+		{
+			if (string.IsNullOrEmpty(cstyleString))
+			{
+				return cstyleString;
+			}
+
+			//var start = cstyleString.Substring(0, 1);
+			//var end = cstyleString.Substring(cstyleString.Length - 1, 1);
+			//if (start == end && start == "\"")
+			//{
+
+			//}
+			return cstyleString.Substring(1, cstyleString.Length - 2);
+		}
 	}
 }

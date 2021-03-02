@@ -634,16 +634,27 @@ namespace T1.ParserKit.SqlDom
 			};
 
 		//:setvar DatabaseName "AccountDB"
-		//TODO:
-		//public static IParser<SqlSetVarExpression> SetVarExpr =
-		//	from setVar1 in SqlToken.Word(":setVar")
-		//	from name1 in SqlToken.Lexeme(Parse.CStyleIdentifier)
-		//	from value1 in SqlToken.Lexeme(Parse.CStyleString)
+		public static IParser<SqlSetVarExpression> SetVarExpr =
+			from setVar1 in SqlToken.Word(":setVar")
+			from name1 in SqlToken.Lexeme(Parse.CStyleIdentifier)
+			from value1 in SqlToken.String2
+			select new SqlSetVarExpression
+			{
+				Name = name1.Text,
+				Value = value1.GetText().GetCStyleStringText()
+			};
 
+		//:on error exit
+
+		public static IParser<SqlExpression> BatchExpr =
+			Parse.AnyCast<SqlExpression>(
+				SetVarExpr,
+				DeclareVariableExpr
+				);
 
 		public static IParser<SqlExpression> StartExpr =
 			Parse.AnyCast<SqlExpression>(
-				DeclareVariableExpr,
+				BatchExpr,
 				SetOptionOnOffExpr,
 				SetManyOptionOnOffExpr,
 				GoExpr,

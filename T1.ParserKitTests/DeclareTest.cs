@@ -133,6 +133,18 @@ namespace T1.ParserKitTests
 			});
 		}
 
+		[Fact]
+		public void Test()
+		{
+			GiveText(":setvar DatabaseName \"CustomerDB\"");
+			WhenParse(SqlParser.StartExpr);
+			ThenResultShouldBe(new SqlSetVarExpression()
+			{
+				Name = "DatabaseName",
+				Value = "CustomerDB"
+			});
+		}
+
 		//[Fact]
 		//public void If_L_variable_eq_1_R_begin_select_field_from_table_end()
 		//{
