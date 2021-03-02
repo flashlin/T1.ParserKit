@@ -512,5 +512,33 @@ namespace T1.ParserKitTests
 				}
 			});
 		}
+
+		[Fact]
+		public void print_nstring()
+		{
+			GivenText("PRINT N'SQLCMD .';");	
+			WhenParse(SqlParser.PrintExpr);
+			ThenResultShouldBe(new SqlPrintExpression()
+			{
+				TextSpan = new TextSpan
+				{
+					File = "",
+					Text = "PRINT N'SQLCMD .';",
+					Position = 0,
+					Length = 18
+				},
+				Value = new SqlStringExpression()
+				{
+					TextSpan = new TextSpan
+					{
+						File = "",
+						Text = "N'SQLCMD .'",
+						Position = 6,
+						Length = 11
+					},
+					Text = "SQLCMD ."
+				}
+			});
+		}
 	}
 }

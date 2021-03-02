@@ -13,6 +13,14 @@ namespace T1.ParserKitTests
 	public class SqlTokenTest : ParseTestBase
 	{
 		[Fact]
+		public void Symbol()
+		{
+			GivenText(">=");
+			WhenParse(ParseToken.Symbol(">="));
+			ThenResultShouldBe(">=");
+		}
+
+		[Fact]
 		public void NonIdentifier()
 		{
 			GivenText("from");
@@ -95,14 +103,15 @@ namespace T1.ParserKitTests
 		{
 			GivenText("N'123'");
 			WhenParse(SqlToken.NString);
-			ThenResultShouldBe(new SqlExpression()
+			ThenResultShouldBe(new SqlStringExpression()
 			{
 				TextSpan = new TextSpan()
 				{
 					File = string.Empty,
 					Text = "N'123'",
 					Length = 6
-				}
+				},
+				Text = "123"
 			});
 		}
 	}

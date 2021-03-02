@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using T1.ParserKit.Core;
 using T1.ParserKit.Core.Parsers;
+using T1.ParserKit.Helpers;
 using T1.ParserKit.SqlDom.Expressions;
 
 namespace T1.ParserKit.SqlDom
@@ -137,13 +138,17 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<SqlExpression> String1 =
 			Surrounded(Parse.Equal("'"));
 
-		public static IParser<SqlExpression> NString =
+		public static IParser<SqlStringExpression> NString =
 			from n1 in Parse.Equal("N")
 			from s1 in String1
-			select new SqlExpression()
+			select new SqlStringExpression()
 			{
-				TextSpan = new[] { n1, s1.TextSpan }.GetTextSpan()
+				TextSpan = new[] { n1, s1.TextSpan }.GetTextSpan(),
+				Text = s1.GetText().GetCStyleStringText()
 			};
+
+		public static IParser<SqlExpression> LexemeString =
+			Lexeme(Parse.AnyCast<SqlExpression>(NString, String1));
 
 		public static IParser<T> Lexeme<T>(IParser<T> parser)
 		{

@@ -656,6 +656,17 @@ namespace T1.ParserKit.SqlDom
 			from exit1 in SqlToken.Word("EXIT")
 			select new SqlOnErrorExitExpression();
 
+		//PRINT N'xxx';
+		public static IParser<SqlPrintExpression> PrintExpr =
+			from print1 in SqlToken.Word("PRINT")
+			from str1 in SqlToken.LexemeString
+			from end1 in SemiColon.Optional()
+			select new SqlPrintExpression()
+			{
+				TextSpan = new[] { print1, str1, end1 }.GetTextSpan(),
+				Value = str1
+			};
+
 		public static IParser<SqlExpression> BatchExpr =
 			Parse.AnyCast<SqlExpression>(
 				SetVarExpr,
@@ -666,6 +677,7 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<SqlExpression> StartExpr =
 			Parse.AnyCast<SqlExpression>(
 				BatchExpr,
+				PrintExpr,
 				SetOptionOnOffExpr,
 				SetManyOptionOnOffExpr,
 				GoExpr,
