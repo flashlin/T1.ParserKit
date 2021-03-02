@@ -382,10 +382,11 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<SqlExpression> Atom =
 			Parse.AnyCast<SqlExpression>(
-					FuncGetdate,
-					TableFieldAliasExpr,
-					NumberExpr,
-					Variable);
+				SqlToken.NString,
+				FuncGetdate,
+				TableFieldAliasExpr,
+				NumberExpr,
+				Variable);
 
 		public static IParser<SqlExpression> ArithmeticOperatorAtomExpr =
 			ArithmeticOperatorExpr(Atom);
@@ -401,9 +402,13 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<FilterExpression> FilterExpr(IParser<SqlExpression> atom)
 		{
 			var oper = SqlToken.Symbols(">=", "<=", "!=", ">", "<", "=");
+			var oper2 = Parse.Any(
+				SqlToken.Word("LIKE"),
+				Parse.Seq(SqlToken.Word("NOT"), SqlToken.Word("LIKE")).Merge()
+				);
 			return Parse.Seq(
 				atom,
-				oper,
+				oper.Or(oper2),
 				atom
 				).MapResultList(x => new FilterExpression()
 				{
