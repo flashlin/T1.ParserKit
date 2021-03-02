@@ -63,15 +63,16 @@ namespace T1.ParserKitTests
 			});
 		}
 
-
-		[Fact]
-		public void Set_nocount_on2()
+		[Theory]
+		[InlineData("NOCOUNT")]
+		[InlineData("NOEXEC")]
+		public void Set_nocount_on2(string optionName)
 		{
-			GivenText("SET NOCOUNT ON");
+			GivenText($"SET {optionName} ON");
 			WhenParse(SqlParser.SetOptionOnOffExpr);
 			ThenResultShouldBe(new SetOptionExpression()
 			{
-				OptionName = "NOCOUNT",
+				OptionName = optionName,
 				IsToggle = true
 			});
 		}

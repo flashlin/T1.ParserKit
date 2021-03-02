@@ -203,7 +203,7 @@ namespace T1.ParserKit.SqlDom
 		}
 
 		public static IParser<SqlExpression> OptionName =
-			SqlToken.Contains("NOCOUNT",
+			SqlToken.Contains("NOCOUNT", "NOEXEC",
 				"ANSI_NULLS", "ANSI_PADDING", "ANSI_WARNINGS", "ARITHABORT", "CONCAT_NULL_YIELDS_NULL",
 				"QUOTED_IDENTIFIER",
 				"NUMERIC_ROUNDABORT"
@@ -528,6 +528,11 @@ namespace T1.ParserKit.SqlDom
 					 select p1;
 		}
 
+		public static IParser<T> GroupOptional<T>(this IParser<T> p)
+		{
+			return Parse.Any(p.Group(), p);
+		}
+
 		private static readonly IParser<AliasExpression> AliasExpr =
 			from as1 in SqlToken.Word("AS").Optional()
 			from identifier in Identifier
@@ -573,6 +578,22 @@ namespace T1.ParserKit.SqlDom
 
 			return Parse.Any(ifExpr.MapSqlExpr(), factor);
 		}
+
+		public static IParser<IfExpression> IfExprs2 =
+			(from if1 in SqlToken.Word("IF")
+			from conditionExpr1 in FilterExpr(Atom).GroupOptional()
+			from begin1 in SqlToken.Word("BEGIN")
+			from body1 in StartExpr.Many1()
+				.MapResult(x => new StatementsExpression()
+				{
+					Items = x.ToArray()
+				})
+			from end1 in SqlToken.Word("END")
+			select new IfExpression()
+			{
+				Condition = conditionExpr1,
+				Body = body1
+			}).Named(nameof(IfExprs2));
 
 		public static IParser<SqlDataTypeExpression> SqlDataType0Expr =
 			Parse.Any(SqlDataType0, SqlDataType1)
@@ -683,7 +704,8 @@ namespace T1.ParserKit.SqlDom
 				GoExpr,
 				SelectExpr.MapSqlExpr().LeftRecursive(
 				IfExpr,
-				SqlFunctions)
+				SqlFunctions),
+				IfExprs2
 			);
 
 		//public IParser StartExpr()
