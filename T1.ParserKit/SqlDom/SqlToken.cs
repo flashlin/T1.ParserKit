@@ -120,15 +120,30 @@ namespace T1.ParserKit.SqlDom
 				Comment.CastParser<SqlExpression>()
 			);
 
+		private static IParser<SqlExpression> Surrounded(IParser<TextSpan> mark)
+		{
+			return from start1 in mark
+					 from body1 in mark.Not().ThenRight(Parse.AnyChars(1)).Many()
+					 from end1 in mark
+					 select new SqlExpression()
+					 {
+						 TextSpan = new[] { start1, body1, end1 }.GetTextSpan()
+					 };
+		}
+
 		public static IParser<SqlExpression> String2 =
-			Lexeme(
-			from start1 in Parse.Equal("\"")
-			from body1 in Parse.NotEqual("\"").Many()
-			from end1 in Parse.Equal("\"")
+			Surrounded(Parse.Equal("\""));
+
+		public static IParser<SqlExpression> String1 =
+			Surrounded(Parse.Equal("'"));
+
+		public static IParser<SqlExpression> NString =
+			from n1 in Parse.Equal("N")
+			from s1 in String1
 			select new SqlExpression()
 			{
-				TextSpan = new[] { start1, body1, end1 }.GetTextSpan()
-			});
+				TextSpan = new[] { n1, s1.TextSpan }.GetTextSpan()
+			};
 
 		public static IParser<T> Lexeme<T>(IParser<T> parser)
 		{

@@ -90,6 +90,20 @@ namespace T1.ParserKitTests
 			});
 		}
 
-
+		[Fact]
+		public void NString()
+		{
+			GivenText("N'123'");
+			WhenParse(SqlToken.NString);
+			ThenResultShouldBe(new SqlExpression()
+			{
+				TextSpan = new TextSpan()
+				{
+					File = string.Empty,
+					Text = "N'123'",
+					Length = 6
+				}
+			});
+		}
 	}
 }

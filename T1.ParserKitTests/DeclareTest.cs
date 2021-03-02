@@ -134,7 +134,7 @@ namespace T1.ParserKitTests
 		}
 
 		[Fact]
-		public void Test()
+		public void Setvar_databasename_value()
 		{
 			GivenText(":setvar DatabaseName \"CustomerDB\"");
 			WhenParse(SqlParser.StartExpr);

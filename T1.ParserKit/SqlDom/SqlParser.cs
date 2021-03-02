@@ -637,7 +637,7 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<SqlSetVarExpression> SetVarExpr =
 			from setVar1 in SqlToken.Word(":setVar")
 			from name1 in SqlToken.Lexeme(Parse.CStyleIdentifier)
-			from value1 in SqlToken.String2
+			from value1 in SqlToken.Lexeme(SqlToken.String2)
 			select new SqlSetVarExpression
 			{
 				Name = name1.Text,
