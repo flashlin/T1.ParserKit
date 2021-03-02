@@ -107,6 +107,19 @@ namespace T1.ParserKit.SqlDom
 			Parse.Any(Comment2, Comment1)
 				.Named("Comment");
 
+		private static readonly IParser<SqlExpression> Blanks1 =
+			from blanks1 in Parse.Blanks
+			select new SqlExpression()
+			{
+				TextSpan = blanks1
+			};
+
+		public static IParser<IEnumerable<SqlExpression>> Blanks =
+			Parse.RepeatAny(
+				Blanks1,
+				Comment.CastParser<SqlExpression>()
+			);
+
 		public static IParser<SqlExpression> String2 =
 			Lexeme(
 			from start1 in Parse.Equal("\"")
@@ -114,15 +127,15 @@ namespace T1.ParserKit.SqlDom
 			from end1 in Parse.Equal("\"")
 			select new SqlExpression()
 			{
-				TextSpan = new [] { start1, body1, end1 }.GetTextSpan()
+				TextSpan = new[] { start1, body1, end1 }.GetTextSpan()
 			});
 
 		public static IParser<T> Lexeme<T>(IParser<T> parser)
 		{
-			return (from comment1 in Comment.Many()
-					  from blanks1 in Parse.Blanks.Optional()
-					  from p1 in parser
-					  select p1).Named($"\\s*{parser.Name}");
+			return (
+				from blanks1 in Blanks
+				from p1 in parser
+				select p1).Named($"\\s*{parser.Name}");
 		}
 
 		public static IParser<SqlExpression> Word(string text)

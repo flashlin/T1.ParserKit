@@ -35,7 +35,7 @@ namespace T1.ParserKit.Core
 		{
 			return new ParseResult<T>()
 			{
-				Result = (T) result,
+				Result = (T)result,
 				Error = ParseError.Empty,
 			};
 		}
@@ -83,7 +83,7 @@ namespace T1.ParserKit.Core
 			ParseError innerError,
 			int position)
 		{
-			return Error<T>(message, new[] {innerError}, position);
+			return Error<T>(message, new[] { innerError }, position);
 		}
 
 		public static IParser<T> AnyCast<T>(params object[] parsers)
@@ -415,7 +415,7 @@ namespace T1.ParserKit.Core
 
 		public static IParser<IEnumerable<T>> ManyDelimitedBy<T>(this IParser<T> parser, IParser<T> delimited)
 		{
-			var tail = delimited.Then(parser, (a, b) => { return new T[] {a, b}; });
+			var tail = delimited.Then(parser, (a, b) => { return new T[] { a, b }; });
 			var expr2 = parser.Then(tail.Many(), (a, b) =>
 			{
 				if (b == null)
@@ -571,7 +571,7 @@ namespace T1.ParserKit.Core
 		}
 
 		public static IParser<TextSpan> Blank =
-			Contains(new[] {" ", "\t", "\r", "\n"}).Named("blank");
+			Contains(new[] { " ", "\t", "\r", "\n" }).Named("blank");
 
 		public static IParser<TextSpan> Blanks =
 			Blank.Many1().Named("blanks");
@@ -612,7 +612,7 @@ namespace T1.ParserKit.Core
 			from start1 in Parse.Equal("\"")
 			from body1 in Parse.Any(Parse.Equal("\\\""), Parse.Equal("\"").Not().ThenRight(Parse.AnyChars(1))).Many()
 			from end1 in Parse.Equal("\"")
-			select new[] {start1, body1, end1}.GetTextSpan();
+			select new[] { start1, body1, end1 }.GetTextSpan();
 
 		public static IParser<TextSpan> NewLine =
 			Parse.Any(
@@ -667,7 +667,7 @@ namespace T1.ParserKit.Core
 		public static IParser<T> LeftRecursive<T>(this IParser<T> factor,
 			params Func<IParser<T>, IParser<T>>[] parsers)
 		{
-			var curr = (IParser<T>) null;
+			var curr = (IParser<T>)null;
 			foreach (var parser in parsers)
 			{
 				curr = parser(curr ?? factor);
@@ -733,5 +733,30 @@ namespace T1.ParserKit.Core
 			from body1 in Parse.Equal("*/").Not().ThenRight(Parse.AnyChars(1)).Many()
 			from end1 in Parse.Equal("*/")
 			select body1;
+
+		public static IParser<IEnumerable<T>> RepeatAny<T>(params IParser<T>[] parsers)
+		{
+			var name = string.Join(" / ", parsers.Select(x => x.Name));
+			return new Parser<IEnumerable<T>>($"({name})*", inp =>
+			{
+				var isParsedSuccess = false;
+				var results = new List<T>();
+				do
+				{
+					var parsedParser = parsers.FirstOrDefault(x =>
+					{
+						var parsed = x.TryParse(inp);
+						if (parsed.IsSuccess())
+						{
+							results.Add(parsed.Result);
+						}
+						return parsed.IsSuccess();
+					});
+					isParsedSuccess = parsedParser != null;
+				} while (isParsedSuccess);
+
+				return Parse.Success<IEnumerable<T>>(results);
+			});
+		}
 	}
 }
