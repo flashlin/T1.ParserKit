@@ -535,13 +535,13 @@ namespace T1.ParserKit.Core
 			});
 		}
 
-		public static IParser<TextSpan> Blank =
+		public static readonly IParser<TextSpan> Blank =
 			Contains(new[] { " ", "\t", "\r", "\n" }).Named("blank");
 
-		public static IParser<TextSpan> Blanks =
+		public static readonly IParser<TextSpan> Blanks =
 			Blank.Many1().Named("blanks");
 
-		public static IParser<TextSpan> Digit =
+		public static readonly IParser<TextSpan> Digit =
 			new Parser<TextSpan>("digit", inp =>
 			{
 				var ch = inp.Substr(1);
@@ -553,7 +553,7 @@ namespace T1.ParserKit.Core
 				return Parse.Error<TextSpan>($"Expect digit, but got '{ch}' at {inp}.", inp.GetPosition());
 			});
 
-		public static IParser<TextSpan> Letter =
+		public static readonly IParser<TextSpan> Letter =
 			new Parser<TextSpan>("letter", inp =>
 			{
 				var ch = inp.Substr(1);
@@ -565,21 +565,21 @@ namespace T1.ParserKit.Core
 				return Parse.Error<TextSpan>($"Expect letter, but got '{ch}' at {inp}.", inp.GetPosition());
 			});
 
-		public static IParser<TextSpan> Digits =
+		public static readonly IParser<TextSpan> Digits =
 			Digit.Many1().Named("digits");
 
-		public static IParser<TextSpan> Letters =
+		public static readonly IParser<TextSpan> Letters =
 			Letter.Many1().Named("letters");
 
-		public static IParser<TextSpan> CStyleIdentifier = CStyleIdentifierF().Named(nameof(CStyleIdentifier));
+		public static readonly IParser<TextSpan> CStyleIdentifier = CStyleIdentifierF().Named(nameof(CStyleIdentifier));
 
-		public static IParser<TextSpan> CStyleString =
+		public static readonly IParser<TextSpan> CStyleString =
 			from start1 in Parse.Equal("\"")
 			from body1 in Parse.Any(Parse.Equal("\\\""), Parse.Equal("\"").Not().ThenRight(Parse.AnyChars(1))).Many()
 			from end1 in Parse.Equal("\"")
 			select new[] { start1, body1, end1 }.GetTextSpan();
 
-		public static IParser<TextSpan> NewLine =
+		public static readonly IParser<TextSpan> NewLine =
 			Parse.Any(
 				Parse.Equal("\r\n"),
 				Parse.Equal("\n")
@@ -693,7 +693,7 @@ namespace T1.ParserKit.Core
 			return result;
 		}
 
-		public static IParser<TextSpan> CStyleComment2 =
+		public static readonly IParser<TextSpan> CStyleComment2 =
 			from start1 in Parse.Equal("/*")
 			from body1 in Parse.Equal("*/").Not().ThenRight(Parse.AnyChars(1)).Many()
 			from end1 in Parse.Equal("*/")
