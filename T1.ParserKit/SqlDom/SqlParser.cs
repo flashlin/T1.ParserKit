@@ -663,14 +663,14 @@ namespace T1.ParserKit.SqlDom
 
 		//:setvar DatabaseName "AccountDB"
 		public static IParser<SqlSetVarExpression> SetVarExpr =>
-			from setVar1 in SqlToken.Word(":setVar")
+			(from setVar1 in SqlToken.Word(":setVar")
 			from name1 in SqlToken.Lexeme(Parse.CStyleIdentifier)
 			from value1 in SqlToken.Lexeme(SqlToken.String2)
 			select new SqlSetVarExpression
 			{
 				Name = name1.Text,
 				Value = value1.GetText().GetCStyleStringText()
-			};
+			}).Named(nameof(SetVarExpr));
 
 		//:on error exit
 		public static IParser<SqlOnErrorExitExpression> OnErrorExitExpr =>
