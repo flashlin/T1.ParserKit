@@ -293,23 +293,25 @@ namespace T1.ParserKit.SqlDom
 			};
 
 		public static IParser<SqlUseDatabaseExpression> UseDatabaseExpr =
-			from use in SqlToken.Word("USE")
-			from dbname in Identifier
-			from end in SqlToken.SemiColon.Optional()
-			select new SqlUseDatabaseExpression()
-			{
-				DatabaseName = dbname.GetText()
-			};
+			(from use in SqlToken.Word("USE")
+				from dbname in Identifier
+				from end in SqlToken.SemiColon.Optional()
+				select new SqlUseDatabaseExpression()
+				{
+					DatabaseName = dbname.GetText()
+				}
+			).Named(nameof(UseDatabaseExpr));
 
 		public static IParser<DeclareExpression> DeclareVariableExpr =
-			from declare1 in SqlToken.Word("DECLARE")
-			from variable1 in Variable
-			from sqlDataType1 in SqlDataType
-			select new DeclareExpression()
-			{
-				Name = variable1,
-				DataType = sqlDataType1.GetText()
-			};
+			(from declare1 in SqlToken.Word("DECLARE")
+				from variable1 in Variable
+				from sqlDataType1 in SqlDataType
+				select new DeclareExpression()
+				{
+					Name = variable1,
+					DataType = sqlDataType1.GetText()
+				}
+			).Named(nameof(DeclareVariableExpr));
 
 		private static readonly IParser<FieldExpression> TableFieldExpr1 =
 			Identifier.MapResult(x => new FieldExpression()
