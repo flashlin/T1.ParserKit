@@ -228,8 +228,9 @@ namespace T1.ParserKit.SqlDom
 				}).Named(nameof(SetManyOptionOnOffExpr));
 
 		public static IParser<SqlExpression> GoExpr =
-			from go1 in SqlToken.Word("GO")
-			select go1;
+			(from go1 in SqlToken.Word("GO")
+				select go1
+			).Named(nameof(GoExpr));
 
 		public static IParser<WithOptionExpression> WithOptionExpr =
 			Parse.Seq(
@@ -292,7 +293,7 @@ namespace T1.ParserKit.SqlDom
 				Name = name.GetText()
 			};
 
-		public static IParser<SqlUseDatabaseExpression> UseDatabaseExpr =
+		public static readonly IParser<SqlUseDatabaseExpression> UseDatabaseExpr =
 			(from use in SqlToken.Word("USE")
 				from dbname in Identifier
 				from end in SqlToken.SemiColon.Optional()
