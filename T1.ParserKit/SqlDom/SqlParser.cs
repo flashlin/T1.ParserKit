@@ -82,7 +82,7 @@ namespace T1.ParserKit.SqlDom
 
 		public static TextSpan GetTextSpan(this IEnumerable<SqlExpression> exprs)
 		{
-			return exprs.Select(x => x.TextSpan).GetTextSpan();
+			return exprs.Where(x => x != null).Select(x => x.TextSpan).GetTextSpan();
 		}
 
 		public static IParser<SqlExpression> Merge(this IParser<IEnumerable<SqlExpression>> parsers)
@@ -278,6 +278,26 @@ namespace T1.ParserKit.SqlDom
 			{
 				Name = x.TextSpan.Text
 			});
+
+		public static IParser<SqlBatchVariableExpression> BatchVariableExpr =
+			from dollarSign in SqlToken.DollarSign
+			from lparen in SqlToken.LParen
+			from name in SqlToken.Lexeme(Parse.CStyleIdentifier).ToExpr()
+			from rparen in SqlToken.RParen
+			select new SqlBatchVariableExpression()
+			{
+				TextSpan = new[] { dollarSign, lparen, name, rparen }.GetTextSpan(),
+				Name = name.GetText()
+			};
+
+		public static IParser<SqlUseDatabaseExpression> UseDatabaseExpr =
+			from use in SqlToken.Word("USE")
+			from dbname in Identifier
+			from end in SqlToken.SemiColon.Optional()
+			select new SqlUseDatabaseExpression()
+			{
+				DatabaseName = dbname.GetText()
+			};
 
 		public static IParser<DeclareExpression> DeclareVariableExpr =
 			from declare1 in SqlToken.Word("DECLARE")
@@ -563,19 +583,19 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<IfExpression> IfExprs2 =
 			(from if1 in SqlToken.Word("IF")
-			from conditionExpr1 in FilterExpr(Atom).GroupOptional()
-			from begin1 in SqlToken.Word("BEGIN")
-			from body1 in StartExpr.Many1()
-				.MapResult(x => new StatementsExpression()
-				{
-					Items = x.ToArray()
-				})
-			from end1 in SqlToken.Word("END")
-			select new IfExpression()
-			{
-				Condition = conditionExpr1,
-				Body = body1
-			}).Named(nameof(IfExprs2));
+			 from conditionExpr1 in FilterExpr(Atom).GroupOptional()
+			 from begin1 in SqlToken.Word("BEGIN")
+			 from body1 in StartExpr.Many1()
+				 .MapResult(x => new StatementsExpression()
+				 {
+					 Items = x.ToArray()
+				 })
+			 from end1 in SqlToken.Word("END")
+			 select new IfExpression()
+			 {
+				 Condition = conditionExpr1,
+				 Body = body1
+			 }).Named(nameof(IfExprs2));
 
 		public static IParser<SqlDataTypeExpression> SqlDataType0Expr =
 			Parse.Any(SqlDataType0, SqlDataType1)
@@ -674,7 +694,8 @@ namespace T1.ParserKit.SqlDom
 			Parse.AnyCast<SqlExpression>(
 				SetVarExpr,
 				OnErrorExitExpr,
-				DeclareVariableExpr
+				DeclareVariableExpr,
+				UseDatabaseExpr
 				);
 
 		public static IParser<SqlExpression> StartExpr =

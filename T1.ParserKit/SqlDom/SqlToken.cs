@@ -194,6 +194,15 @@ namespace T1.ParserKit.SqlDom
 				});
 		}
 
+		public static IParser<SqlExpression> ToExpr(this IParser<TextSpan> p)
+		{
+			return from p1 in p
+				select new SqlExpression()
+				{
+					TextSpan = p1
+				};
+		}
+
 		public static IParser<SqlExpression> LParen = SqlToken.Symbol("(");
 		public static IParser<SqlExpression> RParen = SqlToken.Symbol(")");
 		public static IParser<SqlExpression> SemiColon = SqlToken.Symbol(";");
@@ -202,5 +211,6 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<SqlExpression> Minus = SqlToken.Symbol("-");
 		public static IParser<SqlExpression> At = SqlToken.Symbol("@");
 		public static IParser<SqlExpression> Assign = SqlToken.Symbol("=");
+		public static IParser<SqlExpression> DollarSign = SqlToken.Symbol("$");
 	}
 }
