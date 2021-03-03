@@ -341,12 +341,6 @@ namespace T1.ParserKit.Core
 			});
 		}
 
-		//private static IParseResult<T2> MapAccumSuccess<T1, T2>(IEnumerable<T1> accum, Func<T1[], T2> map)
-		//{
-		//	var accumArr = accum.CastArray();
-		//	return Parse.Success<T2>(map(accumArr));
-		//}
-
 		//public static IParser<T2> Many<T1, T2>(this IParser<T1> p,
 		//	Func<T1[], T2> apply,
 		//	int min = 0, int max = int.MaxValue)
@@ -437,40 +431,11 @@ namespace T1.ParserKit.Core
 				.MapResultList(x => x.TakeEvery(1).Cast<T1>());
 		}
 
-		//public static IParser MapResult(this IParser p, Func<IParseResult, IParseResult> f)
-		//{
-		//	return new Parser(p.Name, inp =>
-		//	{
-		//		var parsed = p.TryParse(inp);
-		//		if (!parsed.IsSuccess())
-		//		{
-		//			return parsed;
-		//		}
-		//		return f(parsed);
-		//	});
-		//}
-
 		public static IParser<T> Named<T>(this IParser<T> p, string name)
 		{
 			p.Name = name;
 			return p;
 		}
-
-		//public static IParser<T> Not<T>(this IParser<T> p)
-		//{
-		//	var name = $"!{p.Name}";
-		//	return new Parser<T>(name, inp =>
-		//	{
-		//		var parsed = p.TryParse(inp);
-		//		if (parsed.IsSuccess())
-		//		{
-		//			var ch = inp.Substr(20);
-		//			return Parse.Error<T>($"Expect {name}, but got '{ch}' at {inp}.", inp);
-		//		}
-
-		//		return Parse.Success<T>(inp);
-		//	});
-		//}
 
 		public static IParser<T3> Then<T1, T2, T3>(this IParser<T1> p1,
 			IParser<T2> p2,
