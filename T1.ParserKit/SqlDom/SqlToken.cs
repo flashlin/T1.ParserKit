@@ -11,7 +11,7 @@ namespace T1.ParserKit.SqlDom
 {
 	public static class SqlToken
 	{
-		public static string[] Keywords => new[]
+		public static string[] Keywords = new[]
 		{
 			"ABSOLUTE", "ACTION", "ADA", "ADD", "ALL", "ALLOCATE", "ALTER", "AND", "ANY", "ARE",
 			"AS", "ASC", "ASSERTION", "AT", "AUTHORIZATION", "AVG", "BEGIN", "BETWEEN", "BIT",
@@ -58,7 +58,7 @@ namespace T1.ParserKit.SqlDom
 			"ss", "s", "ms", "mcs", "ns"
 		};
 
-		public static string[] DateaddDetepart => DateaddDatepartStr.Concat(DateaddAbbreviationDatepartStr)
+		public static readonly string[] DateaddDetepart = DateaddDatepartStr.Concat(DateaddAbbreviationDatepartStr)
 			.ToArray();
 
 		static readonly string[] DatediffDatepartStr = new[]
@@ -76,17 +76,17 @@ namespace T1.ParserKit.SqlDom
 			"mcs", "ns"
 		};
 
-		public static string[] DatediffDatepart => DatediffDatepartStr
+		public static readonly string[] DatediffDatepart = DatediffDatepartStr
 			.Concat(DatediffAbbreviationDatepartStr)
 			.ToArray();
 
-		public static IParser<SqlExpression> Digits =>
+		public static IParser<SqlExpression> Digits =
 			Parse.Digits.MapResult(x => new SqlExpression()
 			{
 				TextSpan = x
 			});
 
-		public static IParser<SqlCommentExpression> Comment1 =>
+		public static IParser<SqlCommentExpression> Comment1 =
 			from start1 in Parse.Equal("--")
 			from body in Parse.NewLine.Not().ThenRight(Parse.AnyChars(1)).Many()
 			from end1 in Parse.Any(Parse.NewLine, Parse.Eos<TextSpan>())
@@ -96,7 +96,7 @@ namespace T1.ParserKit.SqlDom
 				Content = body.Text
 			};
 
-		public static IParser<SqlCommentExpression> Comment2 =>
+		public static IParser<SqlCommentExpression> Comment2 =
 			Parse.CStyleComment2
 				.MapResult(x => new SqlCommentExpression()
 				{
@@ -104,18 +104,18 @@ namespace T1.ParserKit.SqlDom
 					Content = x.Text
 				});
 
-		public static IParser<SqlCommentExpression> Comment =>
+		public static IParser<SqlCommentExpression> Comment =
 			Parse.Any(Comment2, Comment1)
 				.Named("Comment");
 
-		private static IParser<SqlExpression> Blanks1 =>
+		private static readonly IParser<SqlExpression> Blanks1 =
 			from blanks1 in Parse.Blanks
 			select new SqlExpression()
 			{
 				TextSpan = blanks1
 			};
 
-		public static IParser<IEnumerable<SqlExpression>> Blanks =>
+		public static IParser<IEnumerable<SqlExpression>> Blanks =
 			Parse.RepeatAny(
 				Blanks1,
 				Comment.CastParser<SqlExpression>()
@@ -132,13 +132,13 @@ namespace T1.ParserKit.SqlDom
 					 };
 		}
 
-		public static IParser<SqlExpression> String2 =>
+		public static IParser<SqlExpression> String2 =
 			Surrounded(Parse.Equal("\""));
 
-		public static IParser<SqlExpression> String1 =>
+		public static IParser<SqlExpression> String1 =
 			Surrounded(Parse.Equal("'"));
 
-		public static IParser<SqlStringExpression> NString =>
+		public static IParser<SqlStringExpression> NString =
 			from n1 in Parse.Equal("N")
 			from s1 in String1
 			select new SqlStringExpression()
@@ -147,7 +147,7 @@ namespace T1.ParserKit.SqlDom
 				Text = s1.GetText().GetCStyleStringText()
 			};
 
-		public static IParser<SqlExpression> LexemeString =>
+		public static IParser<SqlExpression> LexemeString =
 			Lexeme(Parse.AnyCast<SqlExpression>(NString, String1));
 
 		public static IParser<T> Lexeme<T>(IParser<T> parser)
@@ -203,14 +203,14 @@ namespace T1.ParserKit.SqlDom
 				};
 		}
 
-		public static IParser<SqlExpression> LParen => SqlToken.Symbol("(");
-		public static IParser<SqlExpression> RParen => SqlToken.Symbol(")");
-		public static IParser<SqlExpression> SemiColon => SqlToken.Symbol(";");
-		public static IParser<SqlExpression> Dot => SqlToken.Symbol(".");
-		public static IParser<SqlExpression> Comma => SqlToken.Symbol(",");
-		public static IParser<SqlExpression> Minus => SqlToken.Symbol("-");
-		public static IParser<SqlExpression> At => SqlToken.Symbol("@");
-		public static IParser<SqlExpression> Assign => SqlToken.Symbol("=");
-		public static IParser<SqlExpression> DollarSign => SqlToken.Symbol("$");
+		public static IParser<SqlExpression> LParen = SqlToken.Symbol("(");
+		public static IParser<SqlExpression> RParen = SqlToken.Symbol(")");
+		public static IParser<SqlExpression> SemiColon = SqlToken.Symbol(";");
+		public static IParser<SqlExpression> Dot = SqlToken.Symbol(".");
+		public static IParser<SqlExpression> Comma = SqlToken.Symbol(",");
+		public static IParser<SqlExpression> Minus = SqlToken.Symbol("-");
+		public static IParser<SqlExpression> At = SqlToken.Symbol("@");
+		public static IParser<SqlExpression> Assign = SqlToken.Symbol("=");
+		public static IParser<SqlExpression> DollarSign = SqlToken.Symbol("$");
 	}
 }

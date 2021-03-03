@@ -25,7 +25,6 @@ namespace T1.ParserKit.SqlDom
 				{
 					return Parse.Error<SqlExpression>(parsed.Error);
 				}
-
 				return Parse.Success(new SqlExpression()
 				{
 					TextSpan = parsed.Result
@@ -38,7 +37,7 @@ namespace T1.ParserKit.SqlDom
 			return p.CastParser<SqlExpression>();
 		}
 
-		public static IParser<SqlExpression> SqlIdentifier => _SqlIdentifier();
+		public static IParser<SqlExpression> SqlIdentifier = _SqlIdentifier();
 
 		public static IParser<SqlExpression> _SqlIdentifier()
 		{
@@ -53,24 +52,24 @@ namespace T1.ParserKit.SqlDom
 				});
 		}
 
-		public static IParser<SqlExpression> SqlDataType0 =>
+		public static IParser<SqlExpression> SqlDataType0 =
 			SqlToken.Contains(
 				"bit", "smallint", "smallmoney", "int", "tinyint",
 				"money", "real", "date", "smalldatetime", "datetime",
 				"image", "text", "ntext"
 			);
 
-		public static IParser<SqlExpression> SqlDataType1 =>
+		public static IParser<SqlExpression> SqlDataType1 =
 			SqlToken.Contains(
 				"bigint", "bit", "float", "datetime2", "time",
 				"char", "varchar", "binary", "varbinary", "nchar",
 				"nvarchar", "datetimeoffset"
 			);
 
-		public static IParser<SqlExpression> SqlDataType2 =>
+		public static IParser<SqlExpression> SqlDataType2 =
 			SqlToken.Contains("decimal");
 
-		public static IParser<SqlExpression> SqlDataType =>
+		public static IParser<SqlExpression> SqlDataType =
 			Parse.Any(SqlDataType0, SqlDataType1, SqlDataType2);
 		//SqlToken.ContainsWord(
 		//	"bigint", "numeric", "bit", "smallint", "decimal",
@@ -94,13 +93,13 @@ namespace T1.ParserKit.SqlDom
 			});
 		}
 
-		public static IParser<SqlFunctionExpression> FuncGetdate =>
+		public static IParser<SqlFunctionExpression> FuncGetdate =
 			from getdate in SqlToken.Word("GETDATE")
 			from lparen in SqlToken.LParen
 			from rparen in SqlToken.RParen
 			select new SqlFunctionExpression
 			{
-				TextSpan = new[] {getdate, lparen, rparen}.GetTextSpan(),
+				TextSpan = new[] { getdate, lparen, rparen }.GetTextSpan(),
 				Name = "GETDATE",
 				Parameters = new SqlExpression[0]
 			};
@@ -115,23 +114,23 @@ namespace T1.ParserKit.SqlDom
 				});
 
 			return from dateadd in SqlToken.Word("DATEADD")
-				from lparen in SqlToken.LParen
-				from tDatepart in datepart
-				from comma1 in SqlToken.Comma
-				from tFactor1 in factor
-				from comma2 in SqlToken.Comma
-				from tFactor2 in factor
-				from rparen in SqlToken.RParen
-				select new SqlFunctionExpression()
-				{
-					Name = "DATEADD",
-					Parameters = new SqlExpression[]
-					{
+					 from lparen in SqlToken.LParen
+					 from tDatepart in datepart
+					 from comma1 in SqlToken.Comma
+					 from tFactor1 in factor
+					 from comma2 in SqlToken.Comma
+					 from tFactor2 in factor
+					 from rparen in SqlToken.RParen
+					 select new SqlFunctionExpression()
+					 {
+						 Name = "DATEADD",
+						 Parameters = new SqlExpression[]
+						 {
 						tDatepart,
 						tFactor1,
 						tFactor2
-					}
-				};
+						 }
+					 };
 		}
 
 		//DATEDIFF(dd, 0, GETDATE())
@@ -144,32 +143,32 @@ namespace T1.ParserKit.SqlDom
 				});
 
 			return from datediff1 in SqlToken.Word("DATEDIFF")
-				from lparen in SqlToken.LParen
-				from datepart1 in datepart
-				from comma1 in SqlToken.Comma
-				from numberExpr1 in NumberExpr
-				from comma2 in SqlToken.Comma
-				from factor1 in factor
-				from rparen in SqlToken.RParen
-				select new SqlFunctionExpression()
-				{
-					Name = "DATEDIFF",
-					Parameters = new SqlExpression[]
-					{
-						datepart1,
-						numberExpr1,
-						factor1
-					}
-				};
+					 from lparen in SqlToken.LParen
+					 from datepart1 in datepart
+					 from comma1 in SqlToken.Comma
+					 from numberExpr1 in NumberExpr
+					 from comma2 in SqlToken.Comma
+					 from factor1 in factor
+					 from rparen in SqlToken.RParen
+					 select new SqlFunctionExpression()
+					 {
+						 Name = "DATEDIFF",
+						 Parameters = new SqlExpression[]
+						 {
+							datepart1,
+							numberExpr1,
+							factor1
+						}
+					 };
 		}
 
 		//ISNULL(@SblimitExpiredDate, xxx)
 		public static IParser<SqlFunctionExpression> FuncIsnull(IParser<SqlExpression> factor)
 		{
 			return Parse.Seq(
-					SqlToken.Word("ISNULL"), SqlToken.LParen,
-					factor, SqlToken.Comma,
-					factor, SqlToken.RParen)
+				SqlToken.Word("ISNULL"), SqlToken.LParen,
+				factor, SqlToken.Comma,
+				factor, SqlToken.RParen)
 				.MapResultList(x => new SqlFunctionExpression()
 				{
 					Name = "ISNULL",
@@ -191,47 +190,47 @@ namespace T1.ParserKit.SqlDom
 				factor);
 		}
 
-		public static IParser<SqlExpression> OptionName =>
+		public static IParser<SqlExpression> OptionName =
 			SqlToken.Contains("NOCOUNT", "NOEXEC",
 				"ANSI_NULLS", "ANSI_PADDING", "ANSI_WARNINGS", "ARITHABORT", "CONCAT_NULL_YIELDS_NULL",
 				"QUOTED_IDENTIFIER",
 				"NUMERIC_ROUNDABORT"
 			);
 
-		public static IParser<bool> OnOffExpr =>
+		public static IParser<bool> OnOffExpr =
 			from onOff1 in SqlToken.Contains("OFF", "ON")
 			select string.Equals(onOff1.GetText().ToUpper(), "ON", StringComparison.Ordinal);
 
-		public static IParser<SetOptionExpression> SetOptionOnOffExpr =>
+		public static IParser<SetOptionExpression> SetOptionOnOffExpr =
 			(from set1 in SqlToken.Word("SET")
-				from optionName1 in OptionName
-				from onOff1 in OnOffExpr
-				from semiColon1 in SqlToken.SemiColon.Optional()
-				select new SetOptionExpression()
-				{
-					OptionName = optionName1.GetText(),
-					IsToggle = onOff1
-				}).Named(nameof(SetOptionOnOffExpr));
+			 from optionName1 in OptionName
+			 from onOff1 in OnOffExpr
+			 from semiColon1 in SqlToken.SemiColon.Optional()
+			 select new SetOptionExpression()
+			 {
+				 OptionName = optionName1.GetText(),
+				 IsToggle = onOff1
+			 }).Named(nameof(SetOptionOnOffExpr));
 
-		public static IParser<SetManyOptionExpression> SetManyOptionOnOffExpr =>
+		public static IParser<SetManyOptionExpression> SetManyOptionOnOffExpr =
 			(from set1 in SqlToken.Word("SET")
-				from optionNames1 in OptionName.SeparatedBy(SqlToken.Comma)
-				from onOff1 in OnOffExpr
-				from semiColon1 in SqlToken.SemiColon.Optional()
-				select new SetManyOptionExpression()
-				{
-					Items = optionNames1.Select(x => new SetOptionExpression()
-					{
-						OptionName = x.GetText(),
-						IsToggle = onOff1
-					}).ToArray()
-				}).Named(nameof(SetManyOptionOnOffExpr));
+			 from optionNames1 in OptionName.SeparatedBy(SqlToken.Comma)
+			 from onOff1 in OnOffExpr
+			 from semiColon1 in SqlToken.SemiColon.Optional()
+			 select new SetManyOptionExpression()
+			 {
+				 Items = optionNames1.Select(x => new SetOptionExpression()
+				 {
+					 OptionName = x.GetText(),
+					 IsToggle = onOff1
+				 }).ToArray()
+			 }).Named(nameof(SetManyOptionOnOffExpr));
 
-		public static IParser<SqlExpression> GoExpr =>
+		public static IParser<SqlExpression> GoExpr =
 			from go1 in SqlToken.Word("GO")
 			select go1;
 
-		public static IParser<WithOptionExpression> WithOptionExpr =>
+		public static IParser<WithOptionExpression> WithOptionExpr =
 			Parse.Seq(
 				SqlToken.Word("with"), SqlToken.LParen,
 				SqlToken.Word("nolock"), SqlToken.RParen
@@ -257,7 +256,7 @@ namespace T1.ParserKit.SqlDom
 		private static readonly HashSet<string> Keywords = new HashSet<string>(
 			SqlToken.Keywords.Concat(SqlToken.Keywords.Select(x => x.ToLower())));
 
-		public static IParser<SqlExpression> SqlIdentifierExcludeKeyword =>
+		public static IParser<SqlExpression> SqlIdentifierExcludeKeyword =
 			SqlIdentifier.TransferToNext(rc =>
 			{
 				var ch = rc.TextSpan.Text;
@@ -265,34 +264,33 @@ namespace T1.ParserKit.SqlDom
 				{
 					return $"Expect not keyword, but got '{ch}'";
 				}
-
 				return "";
 			});
 
-		public static IParser<SqlExpression> Identifier =>
+		public static IParser<SqlExpression> Identifier =
 			ParseToken.Lexeme(SqlIdentifierExcludeKeyword);
 
-		public static IParser<VariableExpression> Variable =>
+		public static IParser<VariableExpression> Variable =
 			Parse.Seq(SqlToken.At,
-					Identifier
-				).Merge()
-				.MapResult(x => new VariableExpression()
-				{
-					Name = x.TextSpan.Text
-				});
+				Identifier
+			).Merge()
+			.MapResult(x => new VariableExpression()
+			{
+				Name = x.TextSpan.Text
+			});
 
-		public static IParser<SqlBatchVariableExpression> BatchVariableExpr =>
+		public static IParser<SqlBatchVariableExpression> BatchVariableExpr =
 			from dollarSign in SqlToken.DollarSign
 			from lparen in SqlToken.LParen
 			from name in SqlToken.Lexeme(Parse.CStyleIdentifier).ToExpr()
 			from rparen in SqlToken.RParen
 			select new SqlBatchVariableExpression()
 			{
-				TextSpan = new[] {dollarSign, lparen, name, rparen}.GetTextSpan(),
+				TextSpan = new[] { dollarSign, lparen, name, rparen }.GetTextSpan(),
 				Name = name.GetText()
 			};
 
-		public static IParser<SqlUseDatabaseExpression> UseDatabaseExpr =>
+		public static IParser<SqlUseDatabaseExpression> UseDatabaseExpr =
 			from use in SqlToken.Word("USE")
 			from dbname in Identifier
 			from end in SqlToken.SemiColon.Optional()
@@ -301,7 +299,7 @@ namespace T1.ParserKit.SqlDom
 				DatabaseName = dbname.GetText()
 			};
 
-		public static IParser<DeclareExpression> DeclareVariableExpr =>
+		public static IParser<DeclareExpression> DeclareVariableExpr =
 			from declare1 in SqlToken.Word("DECLARE")
 			from variable1 in Variable
 			from sqlDataType1 in SqlDataType
@@ -333,15 +331,18 @@ namespace T1.ParserKit.SqlDom
 					From = $"{x[0].GetText()}.{x[2].GetText()}"
 				});
 
-		public static IParser<FieldExpression> TableFieldExpr =>
+		public static IParser<FieldExpression> TableFieldExpr =
 			Parse.Any(TableFieldExpr3, TableFieldExpr2, TableFieldExpr1)
 				.Named(nameof(TableFieldExpr));
 
 
-		public static IParser<FieldExpression> TableFieldAliasExpr =>
+		public static readonly IParser<FieldExpression> TableFieldAliasExpr =
 			from tableField1 in TableFieldExpr
 			from alias1 in AliasExpr.Optional()
-			select tableField1.Assign(x => { x.AliasName = alias1?.Name; });
+			select tableField1.Assign(x =>
+			{
+				x.AliasName = alias1?.Name;
+			});
 
 
 		public static IParser<SqlExpression> RecFieldExpr(IParser<SqlExpression> factor)
@@ -365,7 +366,7 @@ namespace T1.ParserKit.SqlDom
 			});
 		}
 
-		public static IParser<NumberExpression> IntegerExpr =>
+		public static IParser<NumberExpression> IntegerExpr =
 			ParseToken.Lexeme(Parse.Digits)
 				.MapResult(x => new NumberExpression()
 				{
@@ -373,7 +374,7 @@ namespace T1.ParserKit.SqlDom
 					Value = int.Parse(x.Text)
 				});
 
-		public static IParser<NumberExpression> NegativeIntegerExpr =>
+		public static IParser<NumberExpression> NegativeIntegerExpr =
 			ParseToken.Lexeme(SqlToken.Minus, SqlToken.Digits)
 				.MapResultList(x => new NumberExpression()
 				{
@@ -381,10 +382,10 @@ namespace T1.ParserKit.SqlDom
 					Value = int.Parse($"{x[0].GetText()}{x[1].GetText()}")
 				});
 
-		public static IParser<NumberExpression> NumberExpr =>
+		public static IParser<NumberExpression> NumberExpr =
 			Parse.Any(NegativeIntegerExpr, IntegerExpr);
 
-		public static IParser<SqlExpression> Atom =>
+		public static IParser<SqlExpression> Atom =
 			Parse.AnyCast<SqlExpression>(
 				SqlToken.NString,
 				FuncGetdate,
@@ -392,10 +393,10 @@ namespace T1.ParserKit.SqlDom
 				NumberExpr,
 				Variable);
 
-		public static IParser<SqlExpression> ArithmeticOperatorAtomExpr =>
+		public static IParser<SqlExpression> ArithmeticOperatorAtomExpr =
 			ArithmeticOperatorExpr(Atom);
 
-		public static IParser<FieldsExpression> FieldsExpr =>
+		public static IParser<FieldsExpression> FieldsExpr =
 			RecFieldExpr(ArithmeticOperatorAtomExpr.MapSqlExpr())
 				.ManyDelimitedBy(SqlToken.Comma)
 				.MapResultList(x => new FieldsExpression()
@@ -409,20 +410,20 @@ namespace T1.ParserKit.SqlDom
 			var oper2 = Parse.Any(
 				SqlToken.Word("LIKE"),
 				Parse.Seq(SqlToken.Word("NOT"), SqlToken.Word("LIKE")).Merge()
-			);
+				);
 			return Parse.Seq(
 				atom,
 				oper.Or(oper2),
 				atom
-			).MapResultList(x => new FilterExpression()
-			{
-				Left = x[0],
-				Oper = x[1].GetText(),
-				Right = x[2],
-			});
+				).MapResultList(x => new FilterExpression()
+				{
+					Left = x[0],
+					Oper = x[1].GetText(),
+					Right = x[2],
+				});
 		}
 
-		public static IParser<WhereExpression> WhereExpr =>
+		public static IParser<WhereExpression> WhereExpr =
 			from _ in SqlToken.Word("WHERE")
 			from filter1 in FilterExpr(Atom)
 			select new WhereExpression()
@@ -433,15 +434,15 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<SourceExpression> ToTableExpr(this IParser<SelectExpression> subSelect)
 		{
 			return from subQuery1 in subSelect.Group()
-				from alias1 in AliasExpr.Optional()
-				select new SourceExpression()
-				{
-					Item = subQuery1,
-					AliasName = alias1?.Name
-				};
+					 from alias1 in AliasExpr.Optional()
+					 select new SourceExpression()
+					 {
+						 Item = subQuery1,
+						 AliasName = alias1?.Name
+					 };
 		}
 
-		public static IParser<SelectExpression> SelectExpr =>
+		public static IParser<SelectExpression> SelectExpr =
 			from select1 in SqlToken.Word("SELECT")
 			from fields1 in FieldsExpr
 			from from1 in SqlToken.Word("FROM")
@@ -456,31 +457,31 @@ namespace T1.ParserKit.SqlDom
 
 		private static readonly IParser<ObjectNameExpression> DatabaseDboSchemaName3 =
 			Parse.Seq(Identifier, SqlToken.Dot,
-					Identifier, SqlToken.Dot,
-					Identifier
-				).Merge()
-				.MapResult(x => new ObjectNameExpression()
-				{
-					Name = x.GetText()
-				});
+				Identifier, SqlToken.Dot,
+				Identifier
+			).Merge()
+			.MapResult(x => new ObjectNameExpression()
+			{
+				Name = x.GetText()
+			});
 
 		private static readonly IParser<ObjectNameExpression> DatabaseDboSchemaName2 =
 			Parse.Seq(Identifier, SqlToken.Dot,
-					Identifier
-				).Merge()
-				.MapResult(x => new ObjectNameExpression()
-				{
-					Name = x.GetText()
-				});
+				Identifier
+			).Merge()
+			.MapResult(x => new ObjectNameExpression()
+			{
+				Name = x.GetText()
+			});
 
 		private static readonly IParser<ObjectNameExpression> DatabaseDboSchemaName1 =
 			Identifier
-				.MapResult(x => new ObjectNameExpression()
-				{
-					Name = x.GetText()
-				});
+			.MapResult(x => new ObjectNameExpression()
+			{
+				Name = x.GetText()
+			});
 
-		public static IParser<ObjectNameExpression> DatabaseSchemaObjectName =>
+		public static readonly IParser<ObjectNameExpression> DatabaseSchemaObjectName =
 			Parse.Any(DatabaseDboSchemaName3,
 				DatabaseDboSchemaName2,
 				DatabaseDboSchemaName1);
@@ -488,13 +489,13 @@ namespace T1.ParserKit.SqlDom
 		private static IParser<UpdateSetFieldExpression> SetFieldEqualExpr(IParser<SqlExpression> factor)
 		{
 			return from field1 in DatabaseDboSchemaName1
-				from _ in SqlToken.Assign
-				from expr1 in factor
-				select new UpdateSetFieldExpression()
-				{
-					FieldName = field1.Name,
-					AssignExpr = expr1
-				};
+					 from _ in SqlToken.Assign
+					 from expr1 in factor
+					 select new UpdateSetFieldExpression()
+					 {
+						 FieldName = field1.Name,
+						 AssignExpr = expr1
+					 };
 		}
 
 		private static IParser<UpdateSetFieldExpression[]> SetFieldEqualExprs(IParser<SqlExpression> factor)
@@ -524,9 +525,9 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<T> Group<T>(this IParser<T> p)
 		{
 			return from lparen1 in SqlToken.LParen
-				from p1 in p
-				from rparen1 in SqlToken.RParen
-				select p1;
+					 from p1 in p
+					 from rparen1 in SqlToken.RParen
+					 select p1;
 		}
 
 		public static IParser<T> GroupOptional<T>(this IParser<T> p)
@@ -542,7 +543,7 @@ namespace T1.ParserKit.SqlDom
 				Name = identifier.GetText()
 			};
 
-		public static IParser<TableExpression> TableExpr =>
+		public static IParser<TableExpression> TableExpr =
 			from databaseTable1 in DatabaseSchemaObjectName
 			from withOption1 in WithOptionExpr.Optional()
 			from alias1 in AliasExpr.Optional()
@@ -580,30 +581,30 @@ namespace T1.ParserKit.SqlDom
 			return Parse.Any(ifExpr.MapSqlExpr(), factor);
 		}
 
-		public static IParser<IfExpression> IfExprs2 =>
+		public static IParser<IfExpression> IfExprs2 =
 			(from if1 in SqlToken.Word("IF")
-				from conditionExpr1 in FilterExpr(Atom).GroupOptional()
-				from begin1 in SqlToken.Word("BEGIN")
-				from body1 in StartExpr.Many1()
-					.MapResult(x => new StatementsExpression()
-					{
-						Items = x.ToArray()
-					})
-				from end1 in SqlToken.Word("END")
-				select new IfExpression()
-				{
-					Condition = conditionExpr1,
-					Body = body1
-				}).Named(nameof(IfExprs2));
+			 from conditionExpr1 in FilterExpr(Atom).GroupOptional()
+			 from begin1 in SqlToken.Word("BEGIN")
+			 from body1 in StartExpr.Many1()
+				 .MapResult(x => new StatementsExpression()
+				 {
+					 Items = x.ToArray()
+				 })
+			 from end1 in SqlToken.Word("END")
+			 select new IfExpression()
+			 {
+				 Condition = conditionExpr1,
+				 Body = body1
+			 }).Named(nameof(IfExprs2));
 
-		public static IParser<SqlDataTypeExpression> SqlDataType0Expr =>
+		public static IParser<SqlDataTypeExpression> SqlDataType0Expr =
 			Parse.Any(SqlDataType0, SqlDataType1)
 				.MapResult(x => new SqlDataTypeExpression()
 				{
 					DataType = x.GetText(),
 				});
 
-		public static IParser<SqlDataTypeExpression> SqlDataType1Expr =>
+		public static IParser<SqlDataTypeExpression> SqlDataType1Expr =
 			from dataType1 in Parse.Any(SqlDataType2, SqlDataType1)
 			from lparen1 in SqlToken.LParen
 			from size1 in IntegerExpr
@@ -611,10 +612,10 @@ namespace T1.ParserKit.SqlDom
 			select new SqlDataTypeExpression()
 			{
 				DataType = dataType1.GetText(),
-				Size = (int) size1.Value
+				Size = (int)size1.Value
 			};
 
-		public static IParser<SqlDataTypeExpression> SqlDataType2Expr =>
+		public static IParser<SqlDataTypeExpression> SqlDataType2Expr =
 			from dataType1 in SqlDataType2
 			from lparen1 in SqlToken.LParen
 			from size1 in IntegerExpr
@@ -624,14 +625,14 @@ namespace T1.ParserKit.SqlDom
 			select new SqlDataTypeExpression()
 			{
 				DataType = dataType1.GetText(),
-				Size = (int) size1.Value,
-				Scale = (int) scale1.Value
+				Size = (int)size1.Value,
+				Scale = (int)scale1.Value
 			};
 
-		public static IParser<SqlDataTypeExpression> SqlDataTypeExpr =>
+		public static IParser<SqlDataTypeExpression> SqlDataTypeExpr =
 			Parse.Any(SqlDataType2Expr, SqlDataType1Expr, SqlDataType0Expr);
 
-		public static IParser<SqlParameterExpression> SqlParameterExpr =>
+		public static IParser<SqlParameterExpression> SqlParameterExpr =
 			from variableName1 in Variable
 			from dataType1 in SqlDataTypeExpr
 			select new SqlParameterExpression()
@@ -640,11 +641,11 @@ namespace T1.ParserKit.SqlDom
 				DataType = dataType1
 			};
 
-		public static IParser<IEnumerable<SqlParameterExpression>> SqlParameterListExpr =>
+		public static IParser<IEnumerable<SqlParameterExpression>> SqlParameterListExpr =
 			SqlParameterExpr.SeparatedBy(SqlToken.Comma);
 
 		//CREATE PROCEDURE [dbo].[AccountAPI_AddSportsCashUsed_19.05]
-		public static IParser<SqlCreateStoredProcedureExpression> CreateStoredProcedureExpr =>
+		public static IParser<SqlCreateStoredProcedureExpression> CreateStoredProcedureExpr =
 			from create1 in SqlToken.Word("CREATE")
 			from proc1 in SqlToken.Word("PROCEDURE")
 			from procName1 in Parse.Any(DatabaseDboSchemaName2, DatabaseDboSchemaName1)
@@ -661,44 +662,43 @@ namespace T1.ParserKit.SqlDom
 			};
 
 		//:setvar DatabaseName "AccountDB"
-		public static IParser<SqlSetVarExpression> SetVarExpr =>
-			(from setVar1 in SqlToken.Word(":setVar")
-				from name1 in SqlToken.Lexeme(Parse.CStyleIdentifier)
-				from value1 in SqlToken.Lexeme(SqlToken.String2)
-				select new SqlSetVarExpression
-				{
-					Name = name1.Text,
-					Value = value1.GetText().GetCStyleStringText()
-				}).Named(nameof(SetVarExpr));
+		public static IParser<SqlSetVarExpression> SetVarExpr =
+			from setVar1 in SqlToken.Word(":setVar")
+			from name1 in SqlToken.Lexeme(Parse.CStyleIdentifier)
+			from value1 in SqlToken.Lexeme(SqlToken.String2)
+			select new SqlSetVarExpression
+			{
+				Name = name1.Text,
+				Value = value1.GetText().GetCStyleStringText()
+			};
 
 		//:on error exit
-		public static IParser<SqlOnErrorExitExpression> OnErrorExitExpr =>
-			(from on1 in SqlToken.Word(":ON")
-				from error1 in SqlToken.Word("ERROR")
-				from exit1 in SqlToken.Word("EXIT")
-				select new SqlOnErrorExitExpression()
-			).Named(nameof(OnErrorExitExpr));
+		public static IParser<SqlOnErrorExitExpression> OnErrorExitExpr =
+			from on1 in SqlToken.Word(":ON")
+			from error1 in SqlToken.Word("ERROR")
+			from exit1 in SqlToken.Word("EXIT")
+			select new SqlOnErrorExitExpression();
 
 		//PRINT N'xxx';
-		public static IParser<SqlPrintExpression> PrintExpr =>
+		public static IParser<SqlPrintExpression> PrintExpr =
 			from print1 in SqlToken.Word("PRINT")
 			from str1 in SqlToken.LexemeString
 			from end1 in SqlToken.SemiColon.Optional()
 			select new SqlPrintExpression()
 			{
-				TextSpan = new[] {print1, str1, end1}.GetTextSpan(),
+				TextSpan = new[] { print1, str1, end1 }.GetTextSpan(),
 				Value = str1
 			};
 
-		public static IParser<SqlExpression> BatchExpr =>
+		public static IParser<SqlExpression> BatchExpr =
 			Parse.AnyCast<SqlExpression>(
 				SetVarExpr,
 				OnErrorExitExpr,
 				DeclareVariableExpr,
 				UseDatabaseExpr
-			);
+				);
 
-		public static IParser<SqlExpression> StartExpr =>
+		public static IParser<SqlExpression> StartExpr =
 			Parse.AnyCast<SqlExpression>(
 				BatchExpr,
 				PrintExpr,
@@ -706,8 +706,8 @@ namespace T1.ParserKit.SqlDom
 				SetManyOptionOnOffExpr,
 				GoExpr,
 				SelectExpr.MapSqlExpr().LeftRecursive(
-					IfExpr,
-					SqlFunctions),
+				IfExpr,
+				SqlFunctions),
 				IfExprs2
 			);
 
