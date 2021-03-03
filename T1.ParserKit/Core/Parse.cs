@@ -35,7 +35,7 @@ namespace T1.ParserKit.Core
 		{
 			return new ParseResult<T>()
 			{
-				Result = (T)result,
+				Result = (T) result,
 				Error = ParseError.Empty,
 			};
 		}
@@ -83,7 +83,7 @@ namespace T1.ParserKit.Core
 			ParseError innerError,
 			int position)
 		{
-			return Error<T>(message, new[] { innerError }, position);
+			return Error<T>(message, new[] {innerError}, position);
 		}
 
 		public static IParser<T> AnyCast<T>(params object[] parsers)
@@ -409,7 +409,7 @@ namespace T1.ParserKit.Core
 
 		public static IParser<IEnumerable<T>> ManyDelimitedBy<T>(this IParser<T> parser, IParser<T> delimited)
 		{
-			var tail = delimited.Then(parser, (a, b) => { return new T[] { a, b }; });
+			var tail = delimited.Then(parser, (a, b) => { return new T[] {a, b}; });
 			var expr2 = parser.Then(tail.Many(), (a, b) =>
 			{
 				if (b == null)
@@ -535,13 +535,13 @@ namespace T1.ParserKit.Core
 			});
 		}
 
-		public static IParser<TextSpan> Blank =
-			Contains(new[] { " ", "\t", "\r", "\n" }).Named("blank");
+		public static IParser<TextSpan> Blank =>
+			Contains(new[] {" ", "\t", "\r", "\n"}).Named("blank");
 
-		public static IParser<TextSpan> Blanks =
+		public static IParser<TextSpan> Blanks =>
 			Blank.Many1().Named("blanks");
 
-		public static IParser<TextSpan> Digit =
+		public static IParser<TextSpan> Digit =>
 			new Parser<TextSpan>("digit", inp =>
 			{
 				var ch = inp.Substr(1);
@@ -553,7 +553,7 @@ namespace T1.ParserKit.Core
 				return Parse.Error<TextSpan>($"Expect digit, but got '{ch}' at {inp}.", inp.GetPosition());
 			});
 
-		public static IParser<TextSpan> Letter =
+		public static IParser<TextSpan> Letter =>
 			new Parser<TextSpan>("letter", inp =>
 			{
 				var ch = inp.Substr(1);
@@ -565,21 +565,21 @@ namespace T1.ParserKit.Core
 				return Parse.Error<TextSpan>($"Expect letter, but got '{ch}' at {inp}.", inp.GetPosition());
 			});
 
-		public static IParser<TextSpan> Digits =
+		public static IParser<TextSpan> Digits =>
 			Digit.Many1().Named("digits");
 
-		public static IParser<TextSpan> Letters =
+		public static IParser<TextSpan> Letters =>
 			Letter.Many1().Named("letters");
 
-		public static IParser<TextSpan> CStyleIdentifier = CStyleIdentifierF().Named(nameof(CStyleIdentifier));
+		public static IParser<TextSpan> CStyleIdentifier => CStyleIdentifierF().Named(nameof(CStyleIdentifier));
 
-		public static IParser<TextSpan> CStyleString =
+		public static IParser<TextSpan> CStyleString =>
 			from start1 in Parse.Equal("\"")
 			from body1 in Parse.Any(Parse.Equal("\\\""), Parse.Equal("\"").Not().ThenRight(Parse.AnyChars(1))).Many()
 			from end1 in Parse.Equal("\"")
-			select new[] { start1, body1, end1 }.GetTextSpan();
+			select new[] {start1, body1, end1}.GetTextSpan();
 
-		public static IParser<TextSpan> NewLine =
+		public static IParser<TextSpan> NewLine =>
 			Parse.Any(
 				Parse.Equal("\r\n"),
 				Parse.Equal("\n")
@@ -632,7 +632,7 @@ namespace T1.ParserKit.Core
 		public static IParser<T> LeftRecursive<T>(this IParser<T> factor,
 			params Func<IParser<T>, IParser<T>>[] parsers)
 		{
-			var curr = (IParser<T>)null;
+			var curr = (IParser<T>) null;
 			foreach (var parser in parsers)
 			{
 				curr = parser(curr ?? factor);
@@ -693,7 +693,7 @@ namespace T1.ParserKit.Core
 			return result;
 		}
 
-		public static IParser<TextSpan> CStyleComment2 =
+		public static IParser<TextSpan> CStyleComment2 =>
 			from start1 in Parse.Equal("/*")
 			from body1 in Parse.Equal("*/").Not().ThenRight(Parse.AnyChars(1)).Many()
 			from end1 in Parse.Equal("*/")
@@ -715,6 +715,7 @@ namespace T1.ParserKit.Core
 						{
 							results.Add(parsed.Result);
 						}
+
 						return parsed.IsSuccess();
 					});
 					isParsedSuccess = parsedParser != null;
