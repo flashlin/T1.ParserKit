@@ -669,25 +669,28 @@ namespace T1.ParserKit.SqlDom
 				{
 					Name = name1.Text,
 					Value = value1.GetText().GetCStyleStringText()
-				}).Named(nameof(SetVarExpr));
+				}
+			).Named(nameof(SetVarExpr));
 
 		//:on error exit
 		public static IParser<SqlOnErrorExitExpression> OnErrorExitExpr =
-			from on1 in SqlToken.Word(":ON")
-			from error1 in SqlToken.Word("ERROR")
-			from exit1 in SqlToken.Word("EXIT")
-			select new SqlOnErrorExitExpression();
+			(from on1 in SqlToken.Word(":ON")
+				from error1 in SqlToken.Word("ERROR")
+				from exit1 in SqlToken.Word("EXIT")
+				select new SqlOnErrorExitExpression()
+			).Named(nameof(OnErrorExitExpr));
 
 		//PRINT N'xxx';
 		public static IParser<SqlPrintExpression> PrintExpr =
-			from print1 in SqlToken.Word("PRINT")
-			from str1 in SqlToken.LexemeString
-			from end1 in SqlToken.SemiColon.Optional()
-			select new SqlPrintExpression()
-			{
-				TextSpan = new[] {print1, str1, end1}.GetTextSpan(),
-				Value = str1
-			};
+			(from print1 in SqlToken.Word("PRINT")
+				from str1 in SqlToken.LexemeString
+				from end1 in SqlToken.SemiColon.Optional()
+				select new SqlPrintExpression()
+				{
+					TextSpan = new[] {print1, str1, end1}.GetTextSpan(),
+					Value = str1
+				}
+			).Named(nameof(PrintExpr));
 
 		public static IParser<SqlExpression> BatchExpr =
 			Parse.AnyCast<SqlExpression>(
