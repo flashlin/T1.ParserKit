@@ -86,7 +86,7 @@ namespace T1.ParserKitTests
 		public void Comma()
 		{
 			GivenText(",");
-			WhenParse(SqlParser.Comma);
+			WhenParse(SqlToken.Comma);
 			ThenResultShouldBe(new SqlExpression()
 			{
 				TextSpan = new TextSpan()

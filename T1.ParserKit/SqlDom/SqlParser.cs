@@ -52,15 +52,6 @@ namespace T1.ParserKit.SqlDom
 				});
 		}
 
-		public static IParser<SqlExpression> LParen = SqlToken.Symbol("(");
-		public static IParser<SqlExpression> RParen = SqlToken.Symbol(")");
-		public static IParser<SqlExpression> SemiColon = SqlToken.Symbol(";");
-		public static IParser<SqlExpression> Dot = SqlToken.Symbol(".");
-		public static IParser<SqlExpression> Comma = SqlToken.Symbol(",");
-		public static IParser<SqlExpression> Minus = SqlToken.Symbol("-");
-		public static IParser<SqlExpression> At = SqlToken.Symbol("@");
-		public static IParser<SqlExpression> Assign = SqlToken.Symbol("=");
-
 		public static IParser<SqlExpression> SqlDataType0 =
 			SqlToken.Contains(
 				"bit", "smallint", "smallmoney", "int", "tinyint",
@@ -104,8 +95,8 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<SqlFunctionExpression> FuncGetdate =
 			from getdate in SqlToken.Word("GETDATE")
-			from lparen in LParen
-			from rparen in RParen
+			from lparen in SqlToken.LParen
+			from rparen in SqlToken.RParen
 			select new SqlFunctionExpression
 			{
 				TextSpan = new[] { getdate, lparen, rparen }.GetTextSpan(),
@@ -123,13 +114,13 @@ namespace T1.ParserKit.SqlDom
 				});
 
 			return from dateadd in SqlToken.Word("DATEADD")
-					 from lparen in LParen
+					 from lparen in SqlToken.LParen
 					 from tDatepart in datepart
-					 from comma1 in Comma
+					 from comma1 in SqlToken.Comma
 					 from tFactor1 in factor
-					 from comma2 in Comma
+					 from comma2 in SqlToken.Comma
 					 from tFactor2 in factor
-					 from rparen in RParen
+					 from rparen in SqlToken.RParen
 					 select new SqlFunctionExpression()
 					 {
 						 Name = "DATEADD",
@@ -152,13 +143,13 @@ namespace T1.ParserKit.SqlDom
 				});
 
 			return from datediff1 in SqlToken.Word("DATEDIFF")
-					 from lparen in LParen
+					 from lparen in SqlToken.LParen
 					 from datepart1 in datepart
-					 from comma1 in Comma
+					 from comma1 in SqlToken.Comma
 					 from numberExpr1 in NumberExpr
-					 from comma2 in Comma
+					 from comma2 in SqlToken.Comma
 					 from factor1 in factor
-					 from rparen in RParen
+					 from rparen in SqlToken.RParen
 					 select new SqlFunctionExpression()
 					 {
 						 Name = "DATEDIFF",
@@ -175,12 +166,9 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<SqlFunctionExpression> FuncIsnull(IParser<SqlExpression> factor)
 		{
 			return Parse.Seq(
-				SqlToken.Word("ISNULL"),
-				LParen,
-				factor,
-				Comma,
-				factor,
-				RParen)
+				SqlToken.Word("ISNULL"), SqlToken.LParen,
+				factor, SqlToken.Comma,
+				factor, SqlToken.RParen)
 				.MapResultList(x => new SqlFunctionExpression()
 				{
 					Name = "ISNULL",
@@ -217,7 +205,7 @@ namespace T1.ParserKit.SqlDom
 			(from set1 in SqlToken.Word("SET")
 			 from optionName1 in OptionName
 			 from onOff1 in OnOffExpr
-			 from semiColon1 in SemiColon.Optional()
+			 from semiColon1 in SqlToken.SemiColon.Optional()
 			 select new SetOptionExpression()
 			 {
 				 OptionName = optionName1.GetText(),
@@ -226,9 +214,9 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<SetManyOptionExpression> SetManyOptionOnOffExpr =
 			(from set1 in SqlToken.Word("SET")
-			 from optionNames1 in OptionName.SeparatedBy(Comma)
+			 from optionNames1 in OptionName.SeparatedBy(SqlToken.Comma)
 			 from onOff1 in OnOffExpr
-			 from semiColon1 in SemiColon.Optional()
+			 from semiColon1 in SqlToken.SemiColon.Optional()
 			 select new SetManyOptionExpression()
 			 {
 				 Items = optionNames1.Select(x => new SetOptionExpression()
@@ -244,10 +232,8 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<WithOptionExpression> WithOptionExpr =
 			Parse.Seq(
-				SqlToken.Word("with"),
-				LParen,
-				SqlToken.Word("nolock"),
-				RParen
+				SqlToken.Word("with"), SqlToken.LParen,
+				SqlToken.Word("nolock"), SqlToken.RParen
 			).MapResult(x => new WithOptionExpression()
 			{
 				Nolock = true
@@ -257,7 +243,7 @@ namespace T1.ParserKit.SqlDom
 		{
 			var assignExpr =
 				from variable1 in Variable
-				from assign1 in Assign
+				from assign1 in SqlToken.Assign
 				from expr1 in fieldExpr
 				select new VariableAssignFieldExpression()
 				{
@@ -285,8 +271,7 @@ namespace T1.ParserKit.SqlDom
 			ParseToken.Lexeme(SqlIdentifierExcludeKeyword);
 
 		public static IParser<VariableExpression> Variable =
-			Parse.Seq(
-			At,
+			Parse.Seq(SqlToken.At,
 				Identifier
 			).Merge()
 			.MapResult(x => new VariableExpression()
@@ -311,7 +296,7 @@ namespace T1.ParserKit.SqlDom
 			});
 
 		private static readonly IParser<FieldExpression> TableFieldExpr2 =
-			Parse.Seq(Identifier, Dot, Identifier)
+			Parse.Seq(Identifier, SqlToken.Dot, Identifier)
 				.MapResultList(x => new FieldExpression()
 				{
 					Name = x[2].GetText(),
@@ -319,7 +304,7 @@ namespace T1.ParserKit.SqlDom
 				});
 
 		private static readonly IParser<FieldExpression> TableFieldExpr3 =
-			Parse.Seq(Identifier, Dot, Identifier, Dot, Identifier)
+			Parse.Seq(Identifier, SqlToken.Dot, Identifier, SqlToken.Dot, Identifier)
 				.MapResultList(x => new FieldExpression()
 				{
 					Name = x[4].GetText(),
@@ -347,7 +332,7 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<SqlExpression> ArithmeticOperatorExpr(IParser<SqlExpression> atom)
 		{
-			return Parse.RecGroupOperatorExpr(LParen, atom, RParen, new[]
+			return Parse.RecGroupOperatorExpr(SqlToken.LParen, atom, SqlToken.RParen, new[]
 			{
 				SqlToken.Symbol("*"),
 				SqlToken.Symbol("/"),
@@ -370,7 +355,7 @@ namespace T1.ParserKit.SqlDom
 				});
 
 		public static IParser<NumberExpression> NegativeIntegerExpr =
-			ParseToken.Lexeme(Minus, SqlToken.Digits)
+			ParseToken.Lexeme(SqlToken.Minus, SqlToken.Digits)
 				.MapResultList(x => new NumberExpression()
 				{
 					ValueTypeFullname = typeof(int).FullName,
@@ -393,7 +378,7 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<FieldsExpression> FieldsExpr =
 			RecFieldExpr(ArithmeticOperatorAtomExpr.MapSqlExpr())
-				.ManyDelimitedBy(Comma)
+				.ManyDelimitedBy(SqlToken.Comma)
 				.MapResultList(x => new FieldsExpression()
 				{
 					Items = x.TakeEvery(1).ToList()
@@ -451,10 +436,8 @@ namespace T1.ParserKit.SqlDom
 			};
 
 		private static readonly IParser<ObjectNameExpression> DatabaseDboSchemaName3 =
-			Parse.Seq(Identifier,
-				Dot,
-				Identifier,
-				Dot,
+			Parse.Seq(Identifier, SqlToken.Dot,
+				Identifier, SqlToken.Dot,
 				Identifier
 			).Merge()
 			.MapResult(x => new ObjectNameExpression()
@@ -463,8 +446,7 @@ namespace T1.ParserKit.SqlDom
 			});
 
 		private static readonly IParser<ObjectNameExpression> DatabaseDboSchemaName2 =
-			Parse.Seq(Identifier,
-				Dot,
+			Parse.Seq(Identifier, SqlToken.Dot,
 				Identifier
 			).Merge()
 			.MapResult(x => new ObjectNameExpression()
@@ -487,7 +469,7 @@ namespace T1.ParserKit.SqlDom
 		private static IParser<UpdateSetFieldExpression> SetFieldEqualExpr(IParser<SqlExpression> factor)
 		{
 			return from field1 in DatabaseDboSchemaName1
-					 from _ in Assign
+					 from _ in SqlToken.Assign
 					 from expr1 in factor
 					 select new UpdateSetFieldExpression()
 					 {
@@ -500,7 +482,7 @@ namespace T1.ParserKit.SqlDom
 		{
 			return SetFieldEqualExpr(factor)
 				.CastParser<SqlExpression>()
-				.ManyDelimitedBy(Comma)
+				.ManyDelimitedBy(SqlToken.Comma)
 				.MapResult(x => x.TakeEvery(1).Cast<UpdateSetFieldExpression>().ToArray());
 		}
 
@@ -522,9 +504,9 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<T> Group<T>(this IParser<T> p)
 		{
-			return from lparen1 in LParen
+			return from lparen1 in SqlToken.LParen
 					 from p1 in p
-					 from rparen1 in RParen
+					 from rparen1 in SqlToken.RParen
 					 select p1;
 		}
 
@@ -604,9 +586,9 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<SqlDataTypeExpression> SqlDataType1Expr =
 			from dataType1 in Parse.Any(SqlDataType2, SqlDataType1)
-			from lparen1 in LParen
+			from lparen1 in SqlToken.LParen
 			from size1 in IntegerExpr
-			from rparen1 in RParen
+			from rparen1 in SqlToken.RParen
 			select new SqlDataTypeExpression()
 			{
 				DataType = dataType1.GetText(),
@@ -615,11 +597,11 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<SqlDataTypeExpression> SqlDataType2Expr =
 			from dataType1 in SqlDataType2
-			from lparen1 in LParen
+			from lparen1 in SqlToken.LParen
 			from size1 in IntegerExpr
-			from comma1 in Comma
+			from comma1 in SqlToken.Comma
 			from scale1 in IntegerExpr
-			from rparen1 in RParen
+			from rparen1 in SqlToken.RParen
 			select new SqlDataTypeExpression()
 			{
 				DataType = dataType1.GetText(),
@@ -640,7 +622,7 @@ namespace T1.ParserKit.SqlDom
 			};
 
 		public static IParser<IEnumerable<SqlParameterExpression>> SqlParameterListExpr =
-			SqlParameterExpr.SeparatedBy(Comma);
+			SqlParameterExpr.SeparatedBy(SqlToken.Comma);
 
 		//CREATE PROCEDURE [dbo].[AccountAPI_AddSportsCashUsed_19.05]
 		public static IParser<SqlCreateStoredProcedureExpression> CreateStoredProcedureExpr =
@@ -681,7 +663,7 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<SqlPrintExpression> PrintExpr =
 			from print1 in SqlToken.Word("PRINT")
 			from str1 in SqlToken.LexemeString
-			from end1 in SemiColon.Optional()
+			from end1 in SqlToken.SemiColon.Optional()
 			select new SqlPrintExpression()
 			{
 				TextSpan = new[] { print1, str1, end1 }.GetTextSpan(),
