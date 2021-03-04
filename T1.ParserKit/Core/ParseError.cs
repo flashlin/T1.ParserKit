@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using T1.Standard.IO;
 
 namespace T1.ParserKit.Core
@@ -26,7 +27,7 @@ namespace T1.ParserKit.Core
 				Indent = tabs
 			};
 
-			errorMessage.WriteLine(Message);
+			errorMessage.WriteLine(ToDebugText(Message));
 			if (InnerErrors.Length > 0)
 			{
 				errorMessage.Indent++;
@@ -37,6 +38,14 @@ namespace T1.ParserKit.Core
 				errorMessage.Indent--;
 			}
 			return errorMessage.ToString();
+		}
+
+		private string ToDebugText(string message)
+		{
+			var text = message.Replace("\r", "\\r");
+			text = text.Replace("\n", "\\n");
+			text = text.Replace("\t", "\\t");
+			return text;
 		}
 
 		public override string ToString()
