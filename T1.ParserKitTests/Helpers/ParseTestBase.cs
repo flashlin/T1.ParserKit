@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using ExpectedObjects;
+using FluentAssertions;
 using T1.ParserKit.Core;
 using T1.ParserKit.SqlDom.Expressions;
+using T1.Standard.Extensions;
 using Xunit;
 
 namespace T1.ParserKitTests.Helpers
@@ -54,6 +56,16 @@ namespace T1.ParserKitTests.Helpers
 			if (actualName != expectedName)
 			{
 				throw new Exception($"Expect {expectedName} result, but got {actualName} result.");
+			}
+
+			if (expected is SqlExpression expectedSqlExpr && typeof(T) != typeof(SqlExpression))
+			{
+				expectedSqlExpr.Should().BeEquivalentTo(actualResult, options => options
+					.IncludingProperties()
+					.RespectingRuntimeTypes()
+					.Excluding(ctx => ctx.SelectedMemberInfo.Name == "TextSpan")
+				);
+				return;
 			}
 
 			expected.ToExpectedObject()

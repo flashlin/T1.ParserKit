@@ -111,6 +111,7 @@ namespace T1.ParserKitTests
 					Text = "N'123'",
 					Length = 6
 				},
+				IsUnicode = true,
 				Text = "123"
 			});
 		}

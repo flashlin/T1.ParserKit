@@ -1,4 +1,6 @@
-﻿using T1.ParserKit.Core;
+﻿using System;
+using T1.ParserKit.Core;
+using T1.ParserKit.Core.Parsers;
 using T1.ParserKit.SqlDom;
 using T1.ParserKit.SqlDom.Expressions;
 using T1.ParserKitTests.Helpers;
@@ -25,9 +27,57 @@ namespace T1.ParserKitTests
 					Right = new NumberExpression()
 					{
 						ValueTypeFullname = typeof(int).FullName,
-						Value = 1
-					}
+						Value = 1,
+						TextSpan = new TextSpan()
+						{
+							File = "",
+							Text = "1",
+							Position = 13,
+							Length = 1
+						},
+					},
 				}
+			});
+		}
+
+		[Fact]
+		public void Filter()
+		{
+			GivenText("1 = 1");
+			WhenParse(SqlParser.FilterExpr);
+			ThenResultShouldBe(new FilterExpression()
+			{
+				TextSpan = new TextSpan()
+				{
+					File = String.Empty,
+					Text = "1 = 1",
+					Length = 5,
+				},
+				Left = new NumberExpression
+				{
+					Value = 1,
+					ValueTypeFullname = "System.Int32",
+					TextSpan = new TextSpan
+					{
+						File = string.Empty,
+						Text = "1",
+						Position = 0,
+						Length = 1
+					}
+				},
+				Oper = "=",
+				Right = new NumberExpression
+				{
+					Value = 1,
+					ValueTypeFullname = "System.Int32",
+					TextSpan = new TextSpan
+					{
+						File = string.Empty,
+						Text = "1",
+						Position = 4,
+						Length = 1
+					}
+				},
 			});
 		}
 
@@ -40,7 +90,7 @@ namespace T1.ParserKitTests
 			{
 				Filter = new FilterExpression
 				{
-					Left = new SqlExpression
+					Left = new SqlStringExpression
 					{
 						TextSpan = new TextSpan
 						{
@@ -48,10 +98,12 @@ namespace T1.ParserKitTests
 							Text = "N'$(__IsSqlCmdEnabled)'",
 							Position = 6,
 							Length = 23
-						}
+						},
+						IsUnicode = true,
+						Text = "$(__IsSqlCmdEnabled)"
 					},
 					Oper = "NOT LIKE",
-					Right = new SqlExpression
+					Right = new SqlStringExpression()
 					{
 						TextSpan = new TextSpan
 						{
@@ -59,7 +111,9 @@ namespace T1.ParserKitTests
 							Text = "N'True'",
 							Position = 39,
 							Length = 7
-						}
+						},
+						IsUnicode = true,
+						Text = "True"
 					},
 				}
 			});
@@ -76,6 +130,7 @@ namespace T1.ParserKitTests
 				{
 					Left = new SqlStringExpression
 					{
+						IsUnicode = true,
 						Text = "$(__IsSqlCmdEnabled)",
 						TextSpan = new TextSpan
 						{
@@ -88,6 +143,7 @@ namespace T1.ParserKitTests
 					Oper = "NOT LIKE",
 					Right = new SqlStringExpression
 					{
+						IsUnicode = true,
 						Text = "True",
 						TextSpan = new TextSpan
 						{
@@ -111,6 +167,7 @@ namespace T1.ParserKitTests
 						{
 							Value = new SqlStringExpression
 							{
+								IsUnicode = true,
 								Text = "123",
 								TextSpan = new TextSpan
 								{

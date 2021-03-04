@@ -144,6 +144,7 @@ namespace T1.ParserKit.SqlDom
 			select new SqlStringExpression()
 			{
 				TextSpan = new[] { n1, s1.TextSpan }.GetTextSpan(),
+				IsUnicode = true,
 				Text = s1.GetText().GetCStyleStringText()
 			};
 

@@ -17,7 +17,7 @@ namespace T1.ParserKitTests
 		public void FilterExpr_variable_eq_1()
 		{
 			GivenText("@name = 1");
-			WhenParse(SqlParser.FilterExpr(SqlParser.Atom));
+			WhenParse(SqlParser.FilterExpr);
 			ThenResultShouldBe(new FilterExpression()
 			{
 				Left = new VariableExpression
@@ -64,6 +64,8 @@ namespace T1.ParserKitTests
 					},
 					TextSpan = new TextSpan
 					{
+						File = "",
+						Text= "name = 1",
 						Position = 0,
 						Length = 0
 					}
@@ -536,6 +538,7 @@ namespace T1.ParserKitTests
 						Position = 6,
 						Length = 11
 					},
+					IsUnicode = true,
 					Text = "SQLCMD ."
 				}
 			});

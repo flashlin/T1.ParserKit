@@ -3,5 +3,6 @@
 	public class SqlStringExpression : SqlExpression
 	{
 		public string Text { get; set; }
+		public bool IsUnicode { get; set; }
 	}
 }

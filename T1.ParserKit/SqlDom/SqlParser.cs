@@ -381,6 +381,7 @@ namespace T1.ParserKit.SqlDom
 			ParseToken.Lexeme(Parse.Digits)
 				.MapResult(x => new NumberExpression()
 				{
+					TextSpan = x,
 					ValueTypeFullname = typeof(int).FullName,
 					Value = int.Parse(x.Text)
 				});
@@ -415,23 +416,35 @@ namespace T1.ParserKit.SqlDom
 					Items = x.TakeEvery(1).ToList()
 				});
 
-		public static IParser<FilterExpression> FilterExpr(IParser<SqlExpression> atom)
-		{
-			return Parse.Seq(
-				atom,
-				Oper1.Or(Oper2),
-				atom
-			).MapResultList(x => new FilterExpression()
+		//public static IParser<FilterExpression> FilterExpr(IParser<SqlExpression> atom)
+		//{
+		//	return Parse.Seq(
+		//		atom,
+		//		Oper1.Or(Oper2),
+		//		atom
+		//	).MapResultList(x => new FilterExpression()
+		//	{
+		//		Left = x[0],
+		//		Oper = x[1].GetText(),
+		//		Right = x[2],
+		//	});
+		//}
+
+		public static readonly IParser<FilterExpression> FilterExpr =
+			from left in Atom
+			from oper in Oper1.Or(Oper2)
+			from right in Atom
+			select new FilterExpression()
 			{
-				Left = x[0],
-				Oper = x[1].GetText(),
-				Right = x[2],
-			});
-		}
+				TextSpan = new[] {left, oper, right}.GetTextSpan(),
+				Left = left,
+				Oper = oper.GetText(),
+				Right = right
+			};
 
 		public static readonly IParser<WhereExpression> WhereExpr =
 			from _ in SqlToken.Word("WHERE")
-			from filter1 in FilterExpr(Atom)
+			from filter1 in FilterExpr
 			select new WhereExpression()
 			{
 				Filter = filter1
@@ -568,9 +581,7 @@ namespace T1.ParserKit.SqlDom
 					Items = x.ToArray()
 				});
 
-			var groupFilterExpr = FilterExpr(Atom).Group();
-
-			var conditionExpr = Parse.Any(groupFilterExpr, FilterExpr(Atom));
+			var conditionExpr = FilterExpr.GroupOptional();
 
 			var ifExpr =
 				from if1 in SqlToken.Word("IF")
@@ -589,7 +600,7 @@ namespace T1.ParserKit.SqlDom
 
 		public static readonly IParser<IfExpression> IfExprs2 =
 			(from if1 in SqlToken.Word("IF")
-			 from conditionExpr1 in FilterExpr(Atom).GroupOptional()
+			 from conditionExpr1 in FilterExpr.GroupOptional()
 			 from begin1 in SqlToken.Word("BEGIN")
 			 from body1 in StartExpr.Many1()
 				 .MapResult(x => new StatementsExpression()
