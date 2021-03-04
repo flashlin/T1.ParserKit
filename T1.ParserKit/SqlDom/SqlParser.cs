@@ -417,14 +417,9 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<FilterExpression> FilterExpr(IParser<SqlExpression> atom)
 		{
-			var oper = SqlToken.Symbols(">=", "<=", "!=", ">", "<", "=").Named("cp-oper");
-			var oper2 = Parse.Any(
-				SqlToken.Word("LIKE"),
-				Parse.Seq(SqlToken.Word("NOT"), SqlToken.Word("LIKE")).Merge()
-			);
 			return Parse.Seq(
 				atom,
-				oper.Or(oper2),
+				Oper1.Or(Oper2),
 				atom
 			).MapResultList(x => new FilterExpression()
 			{
@@ -724,6 +719,15 @@ namespace T1.ParserKit.SqlDom
 					SqlFunctions),
 				IfExprs2
 			);
+
+		private static readonly IParser<SqlExpression> Oper1 = 
+			SqlToken.Symbols(">=", "<=", "!=", ">", "<", "=")
+				.Named("cp-oper");
+
+		private static readonly IParser<SqlExpression> Oper2 = Parse.Any(
+			SqlToken.Word("LIKE"),
+			Parse.Seq(SqlToken.Word("NOT"), SqlToken.Word("LIKE")).Merge()
+		);
 
 		//public IParser StartExpr()
 		//{
