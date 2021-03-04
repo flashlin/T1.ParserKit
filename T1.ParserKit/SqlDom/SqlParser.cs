@@ -417,7 +417,7 @@ namespace T1.ParserKit.SqlDom
 
 		public static IParser<FilterExpression> FilterExpr(IParser<SqlExpression> atom)
 		{
-			var oper = SqlToken.Symbols(">=", "<=", "!=", ">", "<", "=").Named("comp-oper");
+			var oper = SqlToken.Symbols(">=", "<=", "!=", ">", "<", "=").Named("cp-oper");
 			var oper2 = Parse.Any(
 				SqlToken.Word("LIKE"),
 				Parse.Seq(SqlToken.Word("NOT"), SqlToken.Word("LIKE")).Merge()
