@@ -95,15 +95,16 @@ namespace T1.ParserKit.SqlDom
 		}
 
 		public static readonly IParser<SqlFunctionExpression> FuncGetdate =
-			from getdate in SqlToken.Word("GETDATE")
-			from lparen in SqlToken.LParen
-			from rparen in SqlToken.RParen
-			select new SqlFunctionExpression
-			{
-				TextSpan = new[] {getdate, lparen, rparen}.GetTextSpan(),
-				Name = "GETDATE",
-				Parameters = new SqlExpression[0]
-			};
+			(from getdate in SqlToken.Word("GETDATE")
+				from lparen in SqlToken.LParen
+				from rparen in SqlToken.RParen
+				select new SqlFunctionExpression
+				{
+					TextSpan = new[] {getdate, lparen, rparen}.GetTextSpan(),
+					Name = "GETDATE",
+					Parameters = new SqlExpression[0]
+				}
+			).Named(nameof(FuncGetdate));
 
 		//DATEADD(DD,-1,DATEDIFF(dd, 0, GETDATE()))
 		public static IParser<SqlFunctionExpression> FuncDateadd(IParser<SqlExpression> factor)
