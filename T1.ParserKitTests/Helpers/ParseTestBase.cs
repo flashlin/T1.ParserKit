@@ -51,12 +51,7 @@ namespace T1.ParserKitTests.Helpers
 
 			var actualResult = _parsed.Result;
 
-			var actualName = actualResult.GetType().FullName;
-			var expectedName = typeof(T).FullName;
-			if (actualName != expectedName)
-			{
-				throw new Exception($"Expect {expectedName} result, but got {actualName} result.");
-			}
+			ResultTypeShouldBeSameType<T>(actualResult);
 
 			if (expected is SqlExpression expectedSqlExpr && typeof(T) != typeof(SqlExpression))
 			{
@@ -70,6 +65,16 @@ namespace T1.ParserKitTests.Helpers
 
 			expected.ToExpectedObject()
 				.ShouldMatch(actualResult);
+		}
+
+		private static void ResultTypeShouldBeSameType<T>(object actualResult)
+		{
+			var actualName = actualResult.GetType().FullName;
+			var expectedName = typeof(T).FullName;
+			if (actualName != expectedName)
+			{
+				throw new Exception($"Expect {expectedName} result, but got {actualName} result.");
+			}
 		}
 
 		protected void WhenParse<T>(IParser<T> parser)
