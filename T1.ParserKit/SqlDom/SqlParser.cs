@@ -152,24 +152,24 @@ namespace T1.ParserKit.SqlDom
 					Value = x.TextSpan.Text
 				});
 
-			return from datediff1 in SqlToken.Word("DATEDIFF")
-					 from lparen in SqlToken.LParen
-					 from datepart1 in datepart
-					 from comma1 in SqlToken.Comma
-					 from numberExpr1 in NumberExpr
-					 from comma2 in SqlToken.Comma
-					 from factor1 in factor
-					 from rparen in SqlToken.RParen
-					 select new SqlFunctionExpression()
-					 {
-						 Name = "DATEDIFF",
-						 Parameters = new SqlExpression[]
-						 {
+			return (from datediff1 in SqlToken.Word("DATEDIFF")
+				from lparen in SqlToken.LParen
+				from datepart1 in datepart
+				from comma1 in SqlToken.Comma
+				from numberExpr1 in NumberExpr
+				from comma2 in SqlToken.Comma
+				from factor1 in factor
+				from rparen in SqlToken.RParen
+				select new SqlFunctionExpression()
+				{
+					Name = "DATEDIFF",
+					Parameters = new SqlExpression[]
+					{
 						datepart1,
 						numberExpr1,
 						factor1
-						 }
-					 };
+					}
+				}).Named(nameof(FuncDatediff));
 		}
 
 		//ISNULL(@SblimitExpiredDate, xxx)
@@ -197,7 +197,7 @@ namespace T1.ParserKit.SqlDom
 				FuncDateadd(factor),
 				FuncIsnull(factor),
 				FuncDatediff(factor),
-				factor);
+				factor).Named(nameof(SqlFunctions));
 		}
 
 		public static readonly IParser<SqlExpression> OptionName =
