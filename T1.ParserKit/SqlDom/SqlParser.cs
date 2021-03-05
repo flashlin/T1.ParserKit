@@ -436,8 +436,8 @@ namespace T1.ParserKit.SqlDom
 			};
 
 		public static readonly IParser<FilterExpression> FilterExpr =
-			from filterExpr in FilterExpr2.Or(FilterExpr1)
-			select filterExpr;
+			(from filterExpr in FilterExpr2.Or(FilterExpr1)
+				select filterExpr).Named(nameof(FilterExpr));
 
 		public static readonly IParser<WhereExpression> WhereExpr =
 			from _ in SqlToken.Word("WHERE")
@@ -560,42 +560,17 @@ namespace T1.ParserKit.SqlDom
 			};
 
 		public static readonly IParser<TableExpression> TableExpr =
-			from databaseTable1 in DatabaseSchemaObjectName
-			from withOption1 in WithOptionExpr.Optional()
-			from alias1 in AliasExpr.Optional()
-			select new TableExpression()
-			{
-				Name = databaseTable1.Name,
-				AliasName = alias1?.Name,
-				WithOption = withOption1
-			};
-
-		public static IParser<SqlExpression> IfExpr(IParser<SqlExpression> factor)
-		{
-			var body = factor.Many1()
-				.MapResult(x => new StatementsExpression()
+			(from databaseTable1 in DatabaseSchemaObjectName
+				from withOption1 in WithOptionExpr.Optional()
+				from alias1 in AliasExpr.Optional()
+				select new TableExpression()
 				{
-					Items = x.ToArray()
-				});
+					Name = databaseTable1.Name,
+					AliasName = alias1?.Name,
+					WithOption = withOption1
+				}).Named(nameof(TableExpr));
 
-			var conditionExpr = FilterExpr.GroupOptional();
-
-			var ifExpr =
-				from if1 in SqlToken.Word("IF")
-				from conditionExpr1 in conditionExpr
-				from begin1 in SqlToken.Word("BEGIN")
-				from body1 in body
-				from end1 in SqlToken.Word("END")
-				select new IfExpression()
-				{
-					Condition = conditionExpr1,
-					Body = body1
-				};
-
-			return Parse.Any(ifExpr.MapSqlExpr(), factor);
-		}
-
-		public static readonly IParser<IfExpression> IfExprs2 =
+		public static readonly IParser<IfExpression> IfExprs =
 			(from if1 in SqlToken.Word("IF")
 				from conditionExpr1 in FilterExpr.GroupOptional()
 				from begin1 in SqlToken.Word("BEGIN")
@@ -609,7 +584,7 @@ namespace T1.ParserKit.SqlDom
 				{
 					Condition = conditionExpr1,
 					Body = body1
-				}).Named(nameof(IfExprs2));
+				}).Named(nameof(IfExprs));
 
 		public static readonly IParser<SqlDataTypeExpression> SqlDataType0Expr =
 			Parse.Any(SqlDataType0, SqlDataType1)
@@ -723,9 +698,9 @@ namespace T1.ParserKit.SqlDom
 				SetManyOptionOnOffExpr,
 				GoExpr,
 				SelectExpr,
-				IfExprs2,
+				IfExprs,
 				SqlFunctionsExpr
-			);
+			).Named(nameof(StartExpr));
 
 		private static readonly IParser<SqlExpression> Oper1 =
 			SqlToken.Symbols(">=", "<=", "!=", ">", "<", "=")

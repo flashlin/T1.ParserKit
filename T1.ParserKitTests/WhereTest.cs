@@ -148,7 +148,7 @@ namespace T1.ParserKitTests
 		public void If_nstring_eq_nstring_begin_print_string_end()
 		{
 			GivenText("IF N'$(__IsSqlCmdEnabled)' NOT LIKE N'True' BEGIN PRINT N'123'; SET NOEXEC ON; END");
-			WhenParse(SqlParser.IfExprs2);
+			WhenParse(SqlParser.IfExprs);
 			ThenResultShouldBe(new IfExpression()
 			{
 				Condition = new FilterExpression
