@@ -13,7 +13,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("name");
 			WhenParse(SqlParser.TableFieldExpr);
-			ThenResultShouldBe(new FieldExpression()
+			ThenResultShouldBe(new SqlTableFieldExpression()
 			{
 				Name = "name",
 			});
@@ -24,7 +24,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("name");
 			WhenParse(SqlParser.TableFieldExpr);
-			ThenResultShouldBe(new FieldExpression()
+			ThenResultShouldBe(new SqlTableFieldExpression()
 			{
 				Name = "name",
 			});
@@ -35,7 +35,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("customer.name");
 			WhenParse(SqlParser.TableFieldExpr);
-			ThenResultShouldBe(new FieldExpression()
+			ThenResultShouldBe(new SqlTableFieldExpression()
 			{
 				Name = "name",
 				From = "customer"
@@ -47,7 +47,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("customer.name");
 			WhenParse(SqlParser.TableFieldExpr);
-			ThenResultShouldBe(new FieldExpression()
+			ThenResultShouldBe(new SqlTableFieldExpression()
 			{
 				Name = "name",
 				From = "customer"
@@ -59,7 +59,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("db1.customer.name");
 			WhenParse(SqlParser.TableFieldExpr);
-			ThenResultShouldBe(new FieldExpression()
+			ThenResultShouldBe(new SqlTableFieldExpression()
 			{
 				Name = "name",
 				From = "db1.customer"
@@ -71,7 +71,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("db1.customer.name");
 			WhenParse(SqlParser.TableFieldExpr);
-			ThenResultShouldBe(new FieldExpression()
+			ThenResultShouldBe(new SqlTableFieldExpression()
 			{
 				Name = "name",
 				From = "db1.customer"
@@ -83,7 +83,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("123");
 			WhenParse(SqlParser.IntegerExpr);
-			ThenResultShouldBe(new NumberExpression()
+			ThenResultShouldBe(new SqlNumberExpression()
 			{
 				ValueTypeFullname = typeof(int).FullName,
 				Value = 123
@@ -95,7 +95,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("-32");
 			WhenParse(SqlParser.NegativeIntegerExpr);
-			ThenResultShouldBe(new NumberExpression()
+			ThenResultShouldBe(new SqlNumberExpression()
 			{
 				ValueTypeFullname = typeof(int).FullName,
 				Value = -32
@@ -107,7 +107,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("-32");
 			WhenParse(SqlParser.NumberExpr);
-			ThenResultShouldBe(new NumberExpression()
+			ThenResultShouldBe(new SqlNumberExpression()
 			{
 				ValueTypeFullname = typeof(int).FullName,
 				Value = -32
@@ -119,7 +119,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("32");
 			WhenParse(SqlParser.NumberExpr);
-			ThenResultShouldBe(new NumberExpression()
+			ThenResultShouldBe(new SqlNumberExpression()
 			{
 				ValueTypeFullname = typeof(int).FullName,
 				Value = 32
@@ -131,7 +131,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("32");
 			WhenParse(SqlParser.Atom);
-			ThenResultShouldBe(new NumberExpression()
+			ThenResultShouldBe(new SqlNumberExpression()
 			{
 				ValueTypeFullname = typeof(int).FullName,
 				Value = 32

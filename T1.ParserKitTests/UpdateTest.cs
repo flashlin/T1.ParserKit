@@ -23,7 +23,7 @@ namespace T1.ParserKitTests
 					new UpdateSetFieldExpression()
 					{
 						FieldName = "id",
-						AssignExpr = new NumberExpression
+						AssignExpr = new SqlNumberExpression
 						{
 							Value = 1,
 							ValueTypeFullname = typeof(int).FullName,
@@ -32,9 +32,9 @@ namespace T1.ParserKitTests
 				},
 				WhereExpr = new WhereExpression
 				{
-					Filter = new FilterExpression
+					SqlFilter = new SqlFilterExpression
 					{
-						Left = new FieldExpression
+						Left = new SqlTableFieldExpression
 						{
 							Name = "custId",
 						},

@@ -119,7 +119,7 @@ namespace T1.ParserKit.SqlDom
 			Parse.RepeatAny(
 				Blanks1,
 				Comment.CastParser<SqlExpression>()
-			);
+			).Named(nameof(Blanks));
 
 		private static IParser<SqlExpression> Surrounded(IParser<TextSpan> mark)
 		{

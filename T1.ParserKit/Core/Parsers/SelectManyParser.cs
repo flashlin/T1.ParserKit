@@ -15,7 +15,7 @@ namespace T1.ParserKit.Core.Parsers
 			_parser = parser;
 			_bindParser = bindParser;
 			_combineResult = combineResult;
-			Name = $"{parser.Name}";
+			Name = $"{parser.Name}*";
 		}
 
 		public string Name { get; set; }

@@ -2,6 +2,6 @@
 {
 	public class WhereExpression : SqlExpression
 	{
-		public FilterExpression Filter { get; set; }
+		public SqlFilterExpression SqlFilter { get; set; }
 	}
 }

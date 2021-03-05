@@ -143,7 +143,7 @@ namespace T1.ParserKit.Core.Parsers
 		{
 			var parserArr = parsers.CastArray();
 			var name = string.Join(" / ", parserArr.Select(x => x.Name));
-			return new Parser<T>(name, inp =>
+			return new Parser<T>($"({name})", inp =>
 			{
 				var acc = new List<ParseError>();
 				foreach (var parser in parserArr)
@@ -158,7 +158,7 @@ namespace T1.ParserKit.Core.Parsers
 					acc.Add(parsed.Error);
 				}
 				var ch = inp.Substr(20);
-				return Parse.Error<T>($"Expect {name}, but got '{ch}' at {inp}",
+				return Parse.Error<T>($"Expect ({name}), but got '{ch}' at {inp}",
 					acc, inp.GetPosition());
 			});
 		}

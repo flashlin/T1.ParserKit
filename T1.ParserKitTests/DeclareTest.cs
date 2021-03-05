@@ -47,7 +47,7 @@ namespace T1.ParserKitTests
 			WhenParse(SqlParser.SetManyOptionOnOffExpr);
 			ThenResultShouldBe(new SetManyOptionExpression()
 			{
-				Items = new []
+				Items = new[]
 				{
 					new SetOptionExpression()
 					{
@@ -82,7 +82,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("with(nolock)");
 			WhenParse(SqlParser.WithOptionExpr);
-			ThenResultShouldBe(new WithOptionExpression()
+			ThenResultShouldBe(new SqlWithOptionExpression()
 			{
 				Nolock = true
 			});
@@ -93,16 +93,16 @@ namespace T1.ParserKitTests
 		{
 			GivenText("if @name=1 BEGIN select name from customer END");
 			WhenParse(SqlParser.StartExpr);
-			ThenResultShouldBe(new IfExpression()
+			ThenResultShouldBe(new SqlIfExpression()
 			{
-				Condition = new FilterExpression
+				Condition = new SqlFilterExpression
 				{
 					Left = new VariableExpression
 					{
 						Name = "@name",
 					},
 					Oper = "=",
-					Right = new NumberExpression
+					Right = new SqlNumberExpression
 					{
 						Value = 1,
 						ValueTypeFullname = typeof(int).FullName,
@@ -110,21 +110,18 @@ namespace T1.ParserKitTests
 				},
 				Body = new StatementsExpression
 				{
-					Items = new SqlExpression[] 
-					{ 
-						new SelectExpression
+					Items = new SqlExpression[]
+					{
+						new SqlSelectExpression
 						{
-							Fields = new FieldsExpression
+							Fields = new SqlExpression[]
 							{
-								Items = new List<SqlExpression> 
+								new SqlTableFieldExpression
 								{
-									new FieldExpression
-									{
-										Name = "name",
-									}
-								},
+									Name = "name",
+								}
 							},
-							From = new TableExpression
+							From = new SqlTableExpression
 							{
 								Name = "customer",
 							},

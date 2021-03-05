@@ -75,10 +75,10 @@ namespace T1.ParserKit.Core
 
 		public static IParseResult<TResult> SelectMany<T1, T2, TResult>(
 			this IParseResult<T1> parsed, 
-			Func<T1, IParseResult<T2>> func, 
+			Func<T1, IParseResult<T2>> bindResultToParser, 
 			Func<T1, T2, TResult> select)
 		{
-			return parsed.Select(x => func(x).Select(
+			return parsed.Select(x => bindResultToParser(x).Select(
 				y => select(x, y))
 			);
 		}

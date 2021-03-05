@@ -64,7 +64,7 @@ namespace T1.ParserKitTests
 					{
 						Value = "dd",
 					},
-					new NumberExpression
+					new SqlNumberExpression
 					{
 						Value = 0,
 						ValueTypeFullname = typeof(int).FullName,
@@ -109,7 +109,7 @@ namespace T1.ParserKitTests
 							Length = 0
 						}
 					},
-					new NumberExpression
+					new SqlNumberExpression
 					{
 						Value = 50,
 						ValueTypeFullname = typeof(int).FullName,
@@ -133,7 +133,7 @@ namespace T1.ParserKitTests
 				Name = "EXISTS",
 				Parameters = new SqlExpression[]
 				{
-					new NumberExpression()
+					new SqlNumberExpression()
 					{
 						ValueTypeFullname = typeof(int).FullName,
 						Value = 1

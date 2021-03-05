@@ -14,13 +14,13 @@ namespace T1.ParserKitTests
 			WhenParse(SqlParser.ArithmeticOperatorAtomExpr);
 			ThenResultShouldBe(new ArithmeticOperatorExpression()
 			{
-				Left = new NumberExpression()
+				Left = new SqlNumberExpression()
 				{
 					Value = 1,
 					ValueTypeFullname = typeof(int).FullName
 				},
 				Oper = "+",
-				Right = new NumberExpression()
+				Right = new SqlNumberExpression()
 				{
 					Value = 2,
 					ValueTypeFullname = typeof(int).FullName
@@ -35,7 +35,7 @@ namespace T1.ParserKitTests
 			WhenParse(SqlParser.ArithmeticOperatorAtomExpr);
 			ThenResultShouldBe(new ArithmeticOperatorExpression()
 			{
-				Left = new NumberExpression()
+				Left = new SqlNumberExpression()
 				{
 					Value = 1,
 					ValueTypeFullname = typeof(int).FullName
@@ -43,13 +43,13 @@ namespace T1.ParserKitTests
 				Oper = "+",
 				Right = new ArithmeticOperatorExpression()
 				{
-					Left = new NumberExpression()
+					Left = new SqlNumberExpression()
 					{
 						Value = 2,
 						ValueTypeFullname = typeof(int).FullName
 					},
 					Oper = "*",
-					Right = new NumberExpression()
+					Right = new SqlNumberExpression()
 					{
 						Value = 3,
 						ValueTypeFullname = typeof(int).FullName
@@ -68,7 +68,7 @@ namespace T1.ParserKitTests
 				Oper = "+",
 				Left = new ArithmeticOperatorExpression
 				{
-					Left = new NumberExpression
+					Left = new SqlNumberExpression
 					{
 						Value = 1,
 						ValueTypeFullname = typeof(int).FullName,
@@ -76,20 +76,20 @@ namespace T1.ParserKitTests
 					Oper = "+",
 					Right = new ArithmeticOperatorExpression
 					{
-						Left = new NumberExpression
+						Left = new SqlNumberExpression
 						{
 							Value = 2,
 							ValueTypeFullname = typeof(int).FullName,
 						},
 						Oper = "*",
-						Right = new NumberExpression
+						Right = new SqlNumberExpression
 						{
 							Value = 3,
 							ValueTypeFullname = typeof(int).FullName,
 						},
 					},
 				},
-				Right = new NumberExpression
+				Right = new SqlNumberExpression
 				{
 					Value = 4,
 					ValueTypeFullname = typeof(int).FullName,
@@ -106,20 +106,20 @@ namespace T1.ParserKitTests
 			{
 				Left = new ArithmeticOperatorExpression
 				{
-					Left = new NumberExpression
+					Left = new SqlNumberExpression
 					{
 						Value = 1,
 						ValueTypeFullname = typeof(int).FullName,
 					},
 					Oper = "+",
-					Right = new NumberExpression
+					Right = new SqlNumberExpression
 					{
 						Value = 2,
 						ValueTypeFullname = typeof(int).FullName,
 					},
 				},
 				Oper = "*",
-				Right = new NumberExpression
+				Right = new SqlNumberExpression
 				{
 					Value = 3,
 					ValueTypeFullname = typeof(int).FullName,

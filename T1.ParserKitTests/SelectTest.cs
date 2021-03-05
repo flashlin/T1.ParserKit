@@ -14,18 +14,44 @@ namespace T1.ParserKitTests
 	public class SelectTest : ParseTestBase
 	{
 		[Fact]
+		public void Select_1_from_table_with_nolock()
+		{
+			GivenText("select 1 from Ref with (nolock)");
+			WhenParse(SqlParser.SelectExpr);
+			ThenResultShouldBe(new SqlSelectExpression()
+			{
+				Fields = new SqlExpression[]
+				{
+					new SqlNumberExpression
+					{
+						Value = 1,
+						ValueTypeFullname = "System.Int32"
+					}
+				},
+				From = new SqlTableExpression()
+				{
+					Name = "Ref",
+					WithOption = new SqlWithOptionExpression()
+					{
+						Nolock = true
+					}
+				}
+			});
+		}
+
+		[Fact]
 		public void FilterExpr_variable_eq_1()
 		{
 			GivenText("@name = 1");
 			WhenParse(SqlParser.FilterExpr);
-			ThenResultShouldBe(new FilterExpression()
+			ThenResultShouldBe(new SqlFilterExpression()
 			{
 				Left = new VariableExpression
 				{
 					Name = "@name",
 				},
 				Oper = "=",
-				Right = new NumberExpression()
+				Right = new SqlNumberExpression()
 				{
 					Value = 1,
 					ValueTypeFullname = typeof(int).FullName,
@@ -40,9 +66,9 @@ namespace T1.ParserKitTests
 			WhenParse(SqlParser.WhereExpr);
 			ThenResultShouldBe(new WhereExpression()
 			{
-				Filter = new FilterExpression
+				SqlFilter = new SqlFilterExpression
 				{
-					Left = new FieldExpression
+					Left = new SqlTableFieldExpression
 					{
 						Name = "name",
 						TextSpan = new TextSpan
@@ -52,7 +78,7 @@ namespace T1.ParserKitTests
 						}
 					},
 					Oper = "=",
-					Right = new NumberExpression
+					Right = new SqlNumberExpression
 					{
 						Value = 1,
 						ValueTypeFullname = "System.Int32",
@@ -65,7 +91,7 @@ namespace T1.ParserKitTests
 					TextSpan = new TextSpan
 					{
 						File = "",
-						Text= "name = 1",
+						Text = "name = 1",
 						Position = 0,
 						Length = 0
 					}
@@ -111,7 +137,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("customer as c1");
 			WhenParse(SqlParser.TableExpr);
-			ThenResultShouldBe(new TableExpression()
+			ThenResultShouldBe(new SqlTableExpression()
 			{
 				Name = "customer",
 				AliasName = "c1"
@@ -123,11 +149,11 @@ namespace T1.ParserKitTests
 		{
 			GivenText("customer with(nolock) as c1");
 			WhenParse(SqlParser.TableExpr);
-			ThenResultShouldBe(new TableExpression()
+			ThenResultShouldBe(new SqlTableExpression()
 			{
 				Name = "customer",
 				AliasName = "c1",
-				WithOption = new WithOptionExpression()
+				WithOption = new SqlWithOptionExpression()
 				{
 					Nolock = true
 				}
@@ -139,10 +165,10 @@ namespace T1.ParserKitTests
 		{
 			GivenText("customer with(nolock)");
 			WhenParse(SqlParser.TableExpr);
-			ThenResultShouldBe(new TableExpression()
+			ThenResultShouldBe(new SqlTableExpression()
 			{
 				Name = "customer",
-				WithOption = new WithOptionExpression()
+				WithOption = new SqlWithOptionExpression()
 				{
 					Nolock = true
 				}
@@ -154,19 +180,16 @@ namespace T1.ParserKitTests
 		{
 			GivenText("select name from customer");
 			WhenParse(SqlParser.SelectExpr);
-			ThenResultShouldBe(new SelectExpression()
+			ThenResultShouldBe(new SqlSelectExpression()
 			{
-				Fields = new FieldsExpression()
+				Fields = new SqlExpression[]
 				{
-					Items = new List<SqlExpression>()
+					new SqlTableFieldExpression()
 					{
-						new FieldExpression()
-						{
-							Name = "name",
-						}
+						Name = "name",
 					}
 				},
-				From = new TableExpression()
+				From = new SqlTableExpression()
 				{
 					Name = "customer"
 				}
@@ -178,28 +201,25 @@ namespace T1.ParserKitTests
 		{
 			GivenText("select id+1 from customer");
 			WhenParse(SqlParser.SelectExpr);
-			ThenResultShouldBe(new SelectExpression()
+			ThenResultShouldBe(new SqlSelectExpression()
 			{
-				Fields = new FieldsExpression()
+				Fields = new SqlExpression[]
 				{
-					Items = new List<SqlExpression>()
+					new ArithmeticOperatorExpression
 					{
-						new ArithmeticOperatorExpression
+						Left = new SqlTableFieldExpression
 						{
-							Left = new FieldExpression
-							{
-								Name = "id",
-							},
-							Oper = "+",
-							Right = new NumberExpression
-							{
-								Value = 1,
-								ValueTypeFullname = typeof(int).FullName,
-							},
-						}
+							Name = "id",
+						},
+						Oper = "+",
+						Right = new SqlNumberExpression
+						{
+							Value = 1,
+							ValueTypeFullname = typeof(int).FullName,
+						},
 					}
 				},
-				From = new TableExpression()
+				From = new SqlTableExpression()
 				{
 					Name = "customer"
 				}
@@ -211,32 +231,29 @@ namespace T1.ParserKitTests
 		{
 			GivenText("select name from customer where name = 1");
 			WhenParse(SqlParser.SelectExpr);
-			ThenResultShouldBe(new SelectExpression()
+			ThenResultShouldBe(new SqlSelectExpression()
 			{
-				Fields = new FieldsExpression()
+				Fields = new SqlExpression[]
 				{
-					Items = new List<SqlExpression>()
+					new SqlTableFieldExpression()
 					{
-						new FieldExpression()
-						{
-							Name = "name",
-						}
+						Name = "name",
 					}
 				},
-				From = new TableExpression()
+				From = new SqlTableExpression()
 				{
 					Name = "customer"
 				},
 				Where = new WhereExpression()
 				{
-					Filter = new FilterExpression()
+					SqlFilter = new SqlFilterExpression()
 					{
-						Left = new FieldExpression()
+						Left = new SqlTableFieldExpression()
 						{
 							Name = "name"
 						},
 						Oper = "=",
-						Right = new NumberExpression()
+						Right = new SqlNumberExpression()
 						{
 							ValueTypeFullname = typeof(int).FullName,
 							Value = 1
@@ -251,27 +268,24 @@ namespace T1.ParserKitTests
 		{
 			GivenText("select name from customer where name = @name");
 			WhenParse(SqlParser.SelectExpr);
-			ThenResultShouldBe(new SelectExpression()
+			ThenResultShouldBe(new SqlSelectExpression()
 			{
-				Fields = new FieldsExpression()
+				Fields = new SqlExpression[]
 				{
-					Items = new List<SqlExpression>()
+					new SqlTableFieldExpression()
 					{
-						new FieldExpression()
-						{
-							Name = "name",
-						}
+						Name = "name",
 					}
 				},
-				From = new TableExpression()
+				From = new SqlTableExpression()
 				{
 					Name = "customer"
 				},
 				Where = new WhereExpression()
 				{
-					Filter = new FilterExpression()
+					SqlFilter = new SqlFilterExpression()
 					{
-						Left = new FieldExpression()
+						Left = new SqlTableFieldExpression()
 						{
 							Name = "name"
 						},
@@ -290,26 +304,23 @@ namespace T1.ParserKitTests
 		{
 			GivenText("select @name=name from customer");
 			WhenParse(SqlParser.SelectExpr);
-			ThenResultShouldBe(new SelectExpression()
+			ThenResultShouldBe(new SqlSelectExpression()
 			{
-				Fields = new FieldsExpression()
+				Fields = new SqlExpression[]
 				{
-					Items = new List<SqlExpression>()
+					new SqlVariableAssignFieldExpression
 					{
-						new VariableAssignFieldExpression
+						VariableName = new VariableExpression
 						{
-							VariableName = new VariableExpression
-							{
-								Name = "@name",
-							},
-							From = new FieldExpression
-							{
-								Name = "name",
-							},
+							Name = "@name",
 						},
-					}
+						From = new SqlTableFieldExpression
+						{
+							Name = "name",
+						},
+					},
 				},
-				From = new TableExpression()
+				From = new SqlTableExpression()
 				{
 					Name = "customer"
 				}
@@ -321,22 +332,19 @@ namespace T1.ParserKitTests
 		{
 			GivenText("select name from customer with(nolock)");
 			WhenParse(SqlParser.SelectExpr);
-			ThenResultShouldBe(new SelectExpression()
+			ThenResultShouldBe(new SqlSelectExpression()
 			{
-				Fields = new FieldsExpression()
+				Fields = new SqlExpression[]
 				{
-					Items = new List<SqlExpression>()
+					new SqlTableFieldExpression()
 					{
-						new FieldExpression()
-						{
-							Name = "name",
-						}
+						Name = "name",
 					}
 				},
-				From = new TableExpression()
+				From = new SqlTableExpression()
 				{
 					Name = "customer",
-					WithOption = new WithOptionExpression()
+					WithOption = new SqlWithOptionExpression()
 					{
 						Nolock = true
 					}
@@ -349,20 +357,17 @@ namespace T1.ParserKitTests
 		{
 			GivenText("select c.name from customer c");
 			WhenParse(SqlParser.SelectExpr);
-			ThenResultShouldBe(new SelectExpression()
+			ThenResultShouldBe(new SqlSelectExpression()
 			{
-				Fields = new FieldsExpression()
+				Fields = new SqlExpression[]
 				{
-					Items = new List<SqlExpression>()
+					new SqlTableFieldExpression()
 					{
-						new FieldExpression()
-						{
-							Name = "name",
-							From = "c"
-						}
+						Name = "name",
+						From = "c"
 					}
 				},
-				From = new TableExpression()
+				From = new SqlTableExpression()
 				{
 					Name = "customer",
 					AliasName = "c"
@@ -375,21 +380,18 @@ namespace T1.ParserKitTests
 		{
 			GivenText("select c.name username from customer c");
 			WhenParse(SqlParser.SelectExpr);
-			ThenResultShouldBe(new SelectExpression()
+			ThenResultShouldBe(new SqlSelectExpression()
 			{
-				Fields = new FieldsExpression()
+				Fields = new SqlExpression[]
 				{
-					Items = new List<SqlExpression>()
+					new SqlTableFieldExpression()
 					{
-						new FieldExpression()
-						{
-							Name = "name",
-							From = "c",
-							AliasName = "username"
-						}
+						Name = "name",
+						From = "c",
+						AliasName = "username"
 					}
 				},
-				From = new TableExpression()
+				From = new SqlTableExpression()
 				{
 					Name = "customer",
 					AliasName = "c"
@@ -402,20 +404,17 @@ namespace T1.ParserKitTests
 		{
 			GivenText("select name n1 from customer");
 			WhenParse(SqlParser.SelectExpr);
-			ThenResultShouldBe(new SelectExpression()
+			ThenResultShouldBe(new SqlSelectExpression()
 			{
-				Fields = new FieldsExpression()
+				Fields = new SqlExpression[]
 				{
-					Items = new List<SqlExpression>()
+					new SqlTableFieldExpression()
 					{
-						new FieldExpression()
-						{
-							Name = "name",
-							AliasName = "n1",
-						}
+						Name = "name",
+						AliasName = "n1",
 					}
 				},
-				From = new TableExpression()
+				From = new SqlTableExpression()
 				{
 					Name = "customer"
 				}
@@ -427,20 +426,17 @@ namespace T1.ParserKitTests
 		{
 			GivenText("select name as n1 from customer");
 			WhenParse(SqlParser.SelectExpr);
-			ThenResultShouldBe(new SelectExpression()
+			ThenResultShouldBe(new SqlSelectExpression()
 			{
-				Fields = new FieldsExpression()
+				Fields = new SqlExpression[]
 				{
-					Items = new List<SqlExpression>()
+					new SqlTableFieldExpression()
 					{
-						new FieldExpression()
-						{
-							Name = "name",
-							AliasName = "n1"
-						}
+						Name = "name",
+						AliasName = "n1"
 					}
 				},
-				From = new TableExpression()
+				From = new SqlTableExpression()
 				{
 					Name = "customer"
 				}
@@ -452,20 +448,17 @@ namespace T1.ParserKitTests
 		{
 			GivenText("select name as n1 from customer as c");
 			WhenParse(SqlParser.SelectExpr);
-			ThenResultShouldBe(new SelectExpression()
+			ThenResultShouldBe(new SqlSelectExpression()
 			{
-				Fields = new FieldsExpression()
+				Fields = new SqlExpression[]
 				{
-					Items = new List<SqlExpression>()
+					new SqlTableFieldExpression()
 					{
-						new FieldExpression()
-						{
-							Name = "name",
-							AliasName = "n1"
-						}
+						Name = "name",
+						AliasName = "n1"
 					}
 				},
-				From = new TableExpression()
+				From = new SqlTableExpression()
 				{
 					Name = "customer",
 					AliasName = "c"
@@ -478,34 +471,28 @@ namespace T1.ParserKitTests
 		{
 			GivenText("select name as n1 from (select name1 from customer) c");
 			WhenParse(SqlParser.SelectExpr);
-			ThenResultShouldBe(new SelectExpression()
+			ThenResultShouldBe(new SqlSelectExpression()
 			{
-				Fields = new FieldsExpression()
+				Fields = new SqlExpression[]
 				{
-					Items = new List<SqlExpression>()
+					new SqlTableFieldExpression()
 					{
-						new FieldExpression()
-						{
-							Name = "name",
-							AliasName = "n1"
-						}
+						Name = "name",
+						AliasName = "n1"
 					}
 				},
 				From = new SourceExpression()
 				{
-					Item = new SelectExpression()
+					Item = new SqlSelectExpression()
 					{
-						Fields = new FieldsExpression()
+						Fields = new SqlExpression[]
 						{
-							Items = new List<SqlExpression>()
+							new SqlTableFieldExpression()
 							{
-								new FieldExpression()
-								{
-									Name = "name1"
-								}
+								Name = "name1"
 							}
 						},
-						From = new TableExpression()
+						From = new SqlTableExpression()
 						{
 							Name = "customer"
 						}
@@ -518,7 +505,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void print_nstring()
 		{
-			GivenText("PRINT N'SQLCMD .';");	
+			GivenText("PRINT N'SQLCMD .';");
 			WhenParse(SqlParser.PrintExpr);
 			ThenResultShouldBe(new SqlPrintExpression()
 			{

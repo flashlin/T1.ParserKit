@@ -17,14 +17,14 @@ namespace T1.ParserKitTests
 			WhenParse(SqlParser.WhereExpr);
 			ThenResultShouldBe(new WhereExpression()
 			{
-				Filter = new FilterExpression()
+				SqlFilter = new SqlFilterExpression()
 				{
-					Left = new FieldExpression()
+					Left = new SqlTableFieldExpression()
 					{
 						Name = "name"
 					},
 					Oper = "=",
-					Right = new NumberExpression()
+					Right = new SqlNumberExpression()
 					{
 						ValueTypeFullname = typeof(int).FullName,
 						Value = 1,
@@ -45,7 +45,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("1 = 1");
 			WhenParse(SqlParser.FilterExpr);
-			ThenResultShouldBe(new FilterExpression()
+			ThenResultShouldBe(new SqlFilterExpression()
 			{
 				TextSpan = new TextSpan()
 				{
@@ -53,7 +53,7 @@ namespace T1.ParserKitTests
 					Text = "1 = 1",
 					Length = 5,
 				},
-				Left = new NumberExpression
+				Left = new SqlNumberExpression
 				{
 					Value = 1,
 					ValueTypeFullname = "System.Int32",
@@ -66,7 +66,7 @@ namespace T1.ParserKitTests
 					}
 				},
 				Oper = "=",
-				Right = new NumberExpression
+				Right = new SqlNumberExpression
 				{
 					Value = 1,
 					ValueTypeFullname = "System.Int32",
@@ -86,7 +86,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("not exists(1)");
 			WhenParse(SqlParser.FilterExpr);
-			ThenResultShouldBe(new FilterExpression()
+			ThenResultShouldBe(new SqlFilterExpression()
 			{
 				Left = null,
 				Oper = "NOT",
@@ -95,7 +95,7 @@ namespace T1.ParserKitTests
 					Name = "EXISTS",
 					Parameters = new SqlExpression[]
 					{
-						new NumberExpression
+						new SqlNumberExpression
 						{
 							Value = 1,
 							ValueTypeFullname = "System.Int32",
@@ -113,7 +113,7 @@ namespace T1.ParserKitTests
 			WhenParse(SqlParser.WhereExpr);
 			ThenResultShouldBe(new WhereExpression()
 			{
-				Filter = new FilterExpression
+				SqlFilter = new SqlFilterExpression
 				{
 					Left = new SqlStringExpression
 					{
@@ -149,9 +149,9 @@ namespace T1.ParserKitTests
 		{
 			GivenText("IF N'$(__IsSqlCmdEnabled)' NOT LIKE N'True' BEGIN PRINT N'123'; SET NOEXEC ON; END");
 			WhenParse(SqlParser.IfExprs);
-			ThenResultShouldBe(new IfExpression()
+			ThenResultShouldBe(new SqlIfExpression()
 			{
-				Condition = new FilterExpression
+				Condition = new SqlFilterExpression
 				{
 					Left = new SqlStringExpression
 					{
@@ -225,6 +225,61 @@ namespace T1.ParserKitTests
 					{
 						Position = 0,
 						Length = 0
+					}
+				}
+			});
+		}
+
+		[Fact]
+		public void If_not_exists_select_1_begin_select_1()
+		{
+			GivenText(@"if not exists (select 1 from Ref with (nolock)) Begin
+select 1 END");
+			WhenParse(SqlParser.IfExprs);
+			ThenResultShouldBe(new SqlIfExpression()
+			{
+				Condition = new SqlFilterExpression()
+				{
+					Oper = "NOT",
+					Right = new SqlFuncExistsExpression()
+					{
+						Name = "EXISTS",
+						Parameters = new SqlExpression[]
+						{
+							new SqlSelectExpression()
+							{
+								Fields = new SqlExpression[]
+								{
+									new SqlNumberExpression()
+									{
+										Value = 1,
+										ValueTypeFullname = typeof(int).FullName
+									}
+								},
+								From = new SqlTableExpression()
+								{
+									Name = "Ref",
+									WithOption = new SqlWithOptionExpression()
+									{
+										Nolock = true
+									}
+								}
+							}
+						}
+					}
+				},
+				Body = new StatementsExpression()
+				{
+					Items = new SqlExpression[]
+					{
+						new SqlSimpleExpression()
+						{
+							Value = new SqlNumberExpression()
+							{
+								Value = 1,
+								ValueTypeFullname = typeof(int).FullName
+							}
+						}
 					}
 				}
 			});
