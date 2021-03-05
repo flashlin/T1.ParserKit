@@ -153,23 +153,23 @@ namespace T1.ParserKit.SqlDom
 				});
 
 			return (from datediff1 in SqlToken.Word("DATEDIFF")
-				from lparen in SqlToken.LParen
-				from datepart1 in datepart
-				from comma1 in SqlToken.Comma
-				from numberExpr1 in NumberExpr
-				from comma2 in SqlToken.Comma
-				from factor1 in factor
-				from rparen in SqlToken.RParen
-				select new SqlFunctionExpression()
-				{
-					Name = "DATEDIFF",
-					Parameters = new SqlExpression[]
-					{
+					  from lparen in SqlToken.LParen
+					  from datepart1 in datepart
+					  from comma1 in SqlToken.Comma
+					  from numberExpr1 in NumberExpr
+					  from comma2 in SqlToken.Comma
+					  from factor1 in factor
+					  from rparen in SqlToken.RParen
+					  select new SqlFunctionExpression()
+					  {
+						  Name = "DATEDIFF",
+						  Parameters = new SqlExpression[]
+						  {
 						datepart1,
 						numberExpr1,
 						factor1
-					}
-				}).Named(nameof(FuncDatediff));
+						  }
+					  }).Named(nameof(FuncDatediff));
 		}
 
 		//ISNULL(@SblimitExpiredDate, xxx)
@@ -186,9 +186,23 @@ namespace T1.ParserKit.SqlDom
 					{
 						x[2], x[4]
 					}
-				});
+				}
+			).Named(nameof(FuncIsnull));
 		}
 
+		public static IParser<SqlFuncExistsExpression> FuncExists(IParser<SqlExpression> factor)
+		{
+			return from exists in SqlToken.Word("EXISTS")
+				from start in SqlToken.LParen
+				from subquery in factor
+				from end in SqlToken.RParen
+				select new SqlFuncExistsExpression()
+				{
+					TextSpan = new [] { start, subquery, end }.GetTextSpan(),
+					Name = "EXISTS",
+					Parameters = new[] {subquery},
+				};
+		}
 
 		public static IParser<SqlExpression> SqlFunctions(IParser<SqlExpression> factor)
 		{
@@ -197,6 +211,7 @@ namespace T1.ParserKit.SqlDom
 				FuncDateadd(factor),
 				FuncIsnull(factor),
 				FuncDatediff(factor),
+				FuncExists(factor),
 				factor).Named(nameof(SqlFunctions));
 		}
 
@@ -436,7 +451,7 @@ namespace T1.ParserKit.SqlDom
 			from right in Atom
 			select new FilterExpression()
 			{
-				TextSpan = new[] {left, oper, right}.GetTextSpan(),
+				TextSpan = new[] { left, oper, right }.GetTextSpan(),
 				Left = left,
 				Oper = oper.GetText(),
 				Right = right
@@ -731,7 +746,7 @@ namespace T1.ParserKit.SqlDom
 				IfExprs2
 			);
 
-		private static readonly IParser<SqlExpression> Oper1 = 
+		private static readonly IParser<SqlExpression> Oper1 =
 			SqlToken.Symbols(">=", "<=", "!=", ">", "<", "=")
 				.Named("cp-oper");
 
