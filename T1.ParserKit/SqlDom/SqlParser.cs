@@ -116,34 +116,34 @@ namespace T1.ParserKit.SqlDom
 
 		//DATEADD(DD,-1,DATEDIFF(dd, 0, GETDATE()))
 		public static IParser<SqlFunctionExpression> FuncDateaddExpr =
-			from dateadd in SqlToken.Word("DATEADD")
-			from lparen in SqlToken.LParen
-			from tDatepart in SqlToken.Contains(SqlToken.DateaddDetepart)
-			from comma1 in SqlToken.Comma
-			from tFactor1 in FunctionFactor
-			from comma2 in SqlToken.Comma
-			from tFactor2 in FunctionFactor
-			from rparen in SqlToken.RParen
-			select new SqlFunctionExpression()
-			{
-				Name = "DATEADD",
-				Parameters = new SqlExpression[]
+			(from dateadd in SqlToken.Word("DATEADD")
+				from lparen in SqlToken.LParen
+				from tDatepart in SqlToken.Contains(SqlToken.DateaddDetepart)
+				from comma1 in SqlToken.Comma
+				from tFactor1 in FunctionFactor
+				from comma2 in SqlToken.Comma
+				from tFactor2 in FunctionFactor
+				from rparen in SqlToken.RParen
+				select new SqlFunctionExpression()
 				{
-					tDatepart,
-					tFactor1,
-					tFactor2
-				}
-			};
+					Name = "DATEADD",
+					Parameters = new SqlExpression[]
+					{
+						tDatepart,
+						tFactor1,
+						tFactor2
+					}
+				}).Named(nameof(FuncDatediffExpr));
 
 		//DATEDIFF(dd, 0, GETDATE())
-		public static readonly IParser<SqlFunctionExpression> FuncDatediffExpr = 
+		public static readonly IParser<SqlFunctionExpression> FuncDatediffExpr =
 			(from datediff1 in SqlToken.Word("DATEDIFF")
 				from lparen in SqlToken.LParen
 				from datepart1 in SqlToken.Contains(SqlToken.DatediffDatepart)
 				from comma1 in SqlToken.Comma
 				from numberExpr1 in NumberExpr
 				from comma2 in SqlToken.Comma
-				from factor1 in FunctionFactor 
+				from factor1 in FunctionFactor
 				from rparen in SqlToken.RParen
 				select new SqlFunctionExpression()
 				{
@@ -155,38 +155,38 @@ namespace T1.ParserKit.SqlDom
 						factor1
 					}
 				}).Named(nameof(FuncDatediffExpr));
-		
+
 
 		//ISNULL(@SblimitExpiredDate, xxx)
 		public static readonly IParser<SqlFunctionExpression> FuncIsnullExpr =
-			from isNull1 in SqlToken.Word("ISNULL")
-			from lparen in SqlToken.LParen
-			from checkExpr1 in FunctionFactor
-			from comma1 in SqlToken.Comma
-			from replacementValue in FunctionFactor
-			from rparen1 in SqlToken.RParen
-			select new SqlFunctionExpression()
-			{
-				Name = "ISNULL",
-				Parameters = new[]
+			(from isNull1 in SqlToken.Word("ISNULL")
+				from lparen in SqlToken.LParen
+				from checkExpr1 in FunctionFactor
+				from comma1 in SqlToken.Comma
+				from replacementValue in FunctionFactor
+				from rparen1 in SqlToken.RParen
+				select new SqlFunctionExpression()
 				{
-					checkExpr1,
-					replacementValue
-				}
-			};
+					Name = "ISNULL",
+					Parameters = new[]
+					{
+						checkExpr1,
+						replacementValue
+					}
+				}).Named(nameof(FuncIsnullExpr));
 
 
 		public static readonly IParser<SqlFuncExistsExpression> FuncExistsExpr =
-			from exists in SqlToken.Word("EXISTS")
-			from start in SqlToken.LParen
-			from subquery in FunctionFactor
-			from end in SqlToken.RParen
-			select new SqlFuncExistsExpression()
-			{
-				TextSpan = new[] {start, subquery, end}.GetTextSpan(),
-				Name = "EXISTS",
-				Parameters = new[] {subquery},
-			};
+			(from exists in SqlToken.Word("EXISTS")
+				from start in SqlToken.LParen
+				from subquery in FunctionFactor
+				from end in SqlToken.RParen
+				select new SqlFuncExistsExpression()
+				{
+					TextSpan = new[] {start, subquery, end}.GetTextSpan(),
+					Name = "EXISTS",
+					Parameters = new[] {subquery},
+				}).Named(nameof(FuncExistsExpr));
 
 		public static readonly IParser<SqlFunctionExpression> SqlFunctionsExpr =
 			Parse.AnyCast<SqlFunctionExpression>(
