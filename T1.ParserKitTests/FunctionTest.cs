@@ -123,7 +123,24 @@ namespace T1.ParserKitTests
 			});
 		}
 
-
+		[Fact]
+		public void Exists()
+		{
+			GivenText("exists(1)");	
+			WhenParse(SqlParser.SqlFunctions(SqlParser.Atom));
+			ThenResultShouldBe(new SqlFuncExistsExpression()
+			{
+				Name = "EXISTS",
+				Parameters = new SqlExpression[]
+				{
+					new NumberExpression()
+					{
+						ValueTypeFullname = typeof(int).FullName,
+						Value = 1
+					}
+				}
+			});
+		}
 
 		//[Fact]
 		//public void Dateadd_d_1_datediff_getdate()

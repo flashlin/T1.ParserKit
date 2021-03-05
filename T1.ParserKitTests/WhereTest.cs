@@ -82,6 +82,31 @@ namespace T1.ParserKitTests
 		}
 
 		[Fact]
+		public void Filter_not_exists()
+		{
+			GivenText("not exists(1)");
+			WhenParse(SqlParser.FilterExpr);
+			ThenResultShouldBe(new FilterExpression()
+			{
+				Left = null,
+				Oper = "NOT",
+				Right = new SqlFuncExistsExpression()
+				{
+					Name = "EXISTS",
+					Parameters = new SqlExpression[]
+					{
+						new NumberExpression
+						{
+							Value = 1,
+							ValueTypeFullname = "System.Int32",
+						}
+					}
+				},
+			});
+		}
+
+
+		[Fact]
 		public void NString_not_like_NString()
 		{
 			GivenText("Where N'$(__IsSqlCmdEnabled)' NOT LIKE N'True'");

@@ -193,16 +193,32 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<SqlFuncExistsExpression> FuncExists(IParser<SqlExpression> factor)
 		{
 			return from exists in SqlToken.Word("EXISTS")
-				from start in SqlToken.LParen
-				from subquery in factor
-				from end in SqlToken.RParen
-				select new SqlFuncExistsExpression()
-				{
-					TextSpan = new [] { start, subquery, end }.GetTextSpan(),
-					Name = "EXISTS",
-					Parameters = new[] {subquery},
-				};
+					 from start in SqlToken.LParen
+					 from subquery in factor
+					 from end in SqlToken.RParen
+					 select new SqlFuncExistsExpression()
+					 {
+						 TextSpan = new[] { start, subquery, end }.GetTextSpan(),
+						 Name = "EXISTS",
+						 Parameters = new[] { subquery },
+					 };
 		}
+
+		public static readonly IParser<SqlFuncExistsExpression> FuncExistsExpr =
+			from exists in SqlToken.Word("EXISTS")
+			from start in SqlToken.LParen
+			from subquery in StartExpr.Or(Atom)
+			from end in SqlToken.RParen
+			select new SqlFuncExistsExpression()
+			{
+				TextSpan = new[] { start, subquery, end }.GetTextSpan(),
+				Name = "EXISTS",
+				Parameters = new[] { subquery },
+			};
+
+		public static readonly IParser<SqlFunctionExpression> SqlFunctionsExpr =
+			Parse.AnyCast<SqlFunctionExpression>(
+				FuncExistsExpr);
 
 		public static IParser<SqlExpression> SqlFunctions(IParser<SqlExpression> factor)
 		{
@@ -431,21 +447,18 @@ namespace T1.ParserKit.SqlDom
 					Items = x.TakeEvery(1).ToList()
 				});
 
-		//public static IParser<FilterExpression> FilterExpr(IParser<SqlExpression> atom)
-		//{
-		//	return Parse.Seq(
-		//		atom,
-		//		Oper1.Or(Oper2),
-		//		atom
-		//	).MapResultList(x => new FilterExpression()
-		//	{
-		//		Left = x[0],
-		//		Oper = x[1].GetText(),
-		//		Right = x[2],
-		//	});
-		//}
+		public static readonly IParser<FilterExpression> FilterExpr1 =
+			from not1 in SqlToken.Word("NOT")
+			from subquery in StartExpr.GroupOptional()
+			select new FilterExpression()
+			{
+				TextSpan = new[] { not1, subquery }.GetTextSpan(),
+				Oper = "NOT",
+				Right = subquery
+			};
 
-		public static readonly IParser<FilterExpression> FilterExpr =
+
+		public static readonly IParser<FilterExpression> FilterExpr2 =
 			from left in Atom
 			from oper in Oper1.Or(Oper2)
 			from right in Atom
@@ -456,6 +469,10 @@ namespace T1.ParserKit.SqlDom
 				Oper = oper.GetText(),
 				Right = right
 			};
+
+		public static readonly IParser<FilterExpression> FilterExpr =
+			from filterExpr in FilterExpr2.Or(FilterExpr1)
+			select filterExpr;
 
 		public static readonly IParser<WhereExpression> WhereExpr =
 			from _ in SqlToken.Word("WHERE")
@@ -743,7 +760,8 @@ namespace T1.ParserKit.SqlDom
 				SelectExpr.MapSqlExpr().LeftRecursive(
 					//IfExpr,
 					SqlFunctions),
-				IfExprs2
+				IfExprs2,
+				SqlFunctionsExpr
 			);
 
 		private static readonly IParser<SqlExpression> Oper1 =
