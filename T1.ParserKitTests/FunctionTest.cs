@@ -16,7 +16,7 @@ namespace T1.ParserKitTests
 		public void FuncGetdate()
 		{
 			GivenText("GETDATE()");
-			WhenParse(SqlParser.FuncGetdate);
+			WhenParse(SqlParser.FuncGetdateExpr);
 			ThenResultShouldBe(new SqlFunctionExpression()
 			{
 				TextSpan = new TextSpan()
@@ -35,7 +35,7 @@ namespace T1.ParserKitTests
 		public void SqlFunctions_Getdate()
 		{
 			GivenText("GETDATE()");
-			WhenParse(SqlParser.SqlFunctions(SqlParser.Atom));
+			WhenParse(SqlParser.SqlFunctionsExpr);
 			ThenResultShouldBe(new SqlFunctionExpression()
 			{
 				TextSpan = new TextSpan()
@@ -54,7 +54,7 @@ namespace T1.ParserKitTests
 		public void Datediff_dd_0_getdate()
 		{
 			GivenText("DATEDIFF(dd, 0, GETDATE())");
-			WhenParse(SqlParser.FuncDatediff(SqlParser.Atom));
+			WhenParse(SqlParser.FuncDatediffExpr);
 			ThenResultShouldBe(new SqlFunctionExpression()
 			{
 				Name = "DATEDIFF",
@@ -94,7 +94,7 @@ namespace T1.ParserKitTests
 		public void SqlFunctions_isnull()
 		{
 			GivenText("isnull(@name, 50)");
-			WhenParse(SqlParser.SqlFunctions(SqlParser.Atom));
+			WhenParse(SqlParser.SqlFunctionsExpr);
 			ThenResultShouldBe(new SqlFunctionExpression()
 			{
 				Name = "ISNULL",
@@ -127,7 +127,7 @@ namespace T1.ParserKitTests
 		public void Exists()
 		{
 			GivenText("exists(1)");	
-			WhenParse(SqlParser.SqlFunctions(SqlParser.Atom));
+			WhenParse(SqlParser.SqlFunctionsExpr);
 			ThenResultShouldBe(new SqlFuncExistsExpression()
 			{
 				Name = "EXISTS",
