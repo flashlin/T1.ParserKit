@@ -115,7 +115,7 @@
 
 		public override string ToString()
 		{
-			var ch = Substr(20);
+			var ch = Substr(40);
 			var linePos = GetLinePosition(_position);
 			return $"Pos:{_position} {linePos} Rest='{ch}'";
 		}
