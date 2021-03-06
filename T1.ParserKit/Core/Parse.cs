@@ -345,28 +345,6 @@ namespace T1.ParserKit.Core
 		//	Func<T1[], T2> apply,
 		//	int min = 0, int max = int.MaxValue)
 		//{
-		//	var name = $"{p.Name}({min},{max})";
-
-		//	if (max == int.MaxValue)
-		//	{
-		//		name = $"{p.Name}({min})";
-		//	}
-
-		//	if (min == 0 && max == 1)
-		//	{
-		//		name = $"{p.Name}?";
-		//	}
-
-		//	if (min == 0 && max == int.MaxValue)
-		//	{
-		//		name = $"{p.Name}*";
-		//	}
-
-		//	if (min == 1 && max == int.MaxValue)
-		//	{
-		//		name = $"{p.Name}+";
-		//	}
-
 		//	return new Parser<T2>(name, (inp) =>
 		//	{
 		//		var acc = new List<T1>();
