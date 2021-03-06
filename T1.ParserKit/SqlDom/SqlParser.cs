@@ -226,6 +226,16 @@ namespace T1.ParserKit.SqlDom
 				 }
 			 }).Named(nameof(FuncSuserSnameExpr));
 
+		public static readonly IParser<SqlFuncDbNameExpression> FuncDbNameExpr =
+			(from db_name in SqlToken.Word("DB_NAME")
+				from lparen in SqlToken.LParen
+				from rparen in SqlToken.RParen
+				select new SqlFuncDbNameExpression()
+				{
+					TextSpan = new[] { db_name, lparen, rparen }.GetTextSpan(),
+					Name = "DB_NAME"
+				}).Named(nameof(FuncDbNameExpr));
+
 		public static readonly IParser<SqlFunctionExpression> SqlFunctionsExpr =
 			Parse.AnyCast<SqlFunctionExpression>(
 				FuncGetdateExpr,
@@ -233,6 +243,7 @@ namespace T1.ParserKit.SqlDom
 				FuncDateaddExpr,
 				FuncDatediffExpr,
 				FuncSuserSnameExpr,
+				FuncDbNameExpr,
 				FuncExistsExpr);
 
 		public static readonly IParser<SqlExpression> OptionName =
@@ -421,6 +432,7 @@ namespace T1.ParserKit.SqlDom
 		public static readonly IParser<SqlExpression> Atom =
 			Parse.AnyCast<SqlExpression>(
 				SqlToken.NString,
+				SqlToken.LexemeString,
 				FuncGetdateExpr,
 				TableFieldAliasExpr,
 				NumberExpr,
@@ -452,9 +464,10 @@ namespace T1.ParserKit.SqlDom
 
 
 		public static readonly IParser<SqlFilterExpression> FilterExpr2 =
-			from left in Atom
+			from _ in SqlToken.Blanks.Optional()
+			from left in StartExpr.Or(Atom)
 			from oper in Oper1.Or(Oper2)
-			from right in Atom
+			from right in StartExpr.Or(Atom)
 			select new SqlFilterExpression()
 			{
 				TextSpan = new[] { left, oper, right }.GetTextSpan(),
@@ -472,7 +485,7 @@ namespace T1.ParserKit.SqlDom
 			from filter1 in FilterExpr
 			select new WhereExpression()
 			{
-				SqlFilter = filter1
+				Filter = filter1
 			};
 
 		public static IParser<SourceExpression> ToTableExpr(this IParser<SqlSelectExpression> subSelect)

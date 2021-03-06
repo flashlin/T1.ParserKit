@@ -17,7 +17,7 @@ namespace T1.ParserKitTests
 			WhenParse(SqlParser.WhereExpr);
 			ThenResultShouldBe(new WhereExpression()
 			{
-				SqlFilter = new SqlFilterExpression()
+				Filter = new SqlFilterExpression()
 				{
 					Left = new SqlTableFieldExpression()
 					{
@@ -105,6 +105,34 @@ namespace T1.ParserKitTests
 			});
 		}
 
+		// where name = DB_NAME()
+		// and SUSER_SNAME(owner_sid) = 'sa'
+		[Fact]
+		public void Filter_func_eq_str()
+		{
+			GivenText("SUSER_SNAME(owner_sid) = 'sa'");
+			WhenParse(SqlParser.FilterExpr);
+			ThenResultShouldBe(new SqlFilterExpression()
+			{
+				Left = new SqlFuncSuserSnameExpression()
+				{
+					Name = "SUSER_SNAME",
+					Parameters = new SqlExpression[]
+					{
+						new SqlIdentifierExpression()
+						{
+							Name = "owner_sid"
+						}
+					}
+				},
+				Oper = "=",
+				Right = new SqlStringExpression()
+				{
+					Text = "sa"
+				}
+			});
+		}
+
 
 		[Fact]
 		public void NString_not_like_NString()
@@ -113,7 +141,7 @@ namespace T1.ParserKitTests
 			WhenParse(SqlParser.WhereExpr);
 			ThenResultShouldBe(new WhereExpression()
 			{
-				SqlFilter = new SqlFilterExpression
+				Filter = new SqlFilterExpression
 				{
 					Left = new SqlStringExpression
 					{

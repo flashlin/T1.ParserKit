@@ -66,7 +66,7 @@ namespace T1.ParserKitTests
 			WhenParse(SqlParser.WhereExpr);
 			ThenResultShouldBe(new WhereExpression()
 			{
-				SqlFilter = new SqlFilterExpression
+				Filter = new SqlFilterExpression
 				{
 					Left = new SqlTableFieldExpression
 					{
@@ -246,7 +246,7 @@ namespace T1.ParserKitTests
 				},
 				Where = new WhereExpression()
 				{
-					SqlFilter = new SqlFilterExpression()
+					Filter = new SqlFilterExpression()
 					{
 						Left = new SqlTableFieldExpression()
 						{
@@ -283,7 +283,7 @@ namespace T1.ParserKitTests
 				},
 				Where = new WhereExpression()
 				{
-					SqlFilter = new SqlFilterExpression()
+					Filter = new SqlFilterExpression()
 					{
 						Left = new SqlTableFieldExpression()
 						{
@@ -506,7 +506,38 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Select_1_from_table_where_field_eq_func_and_func_eq_str1()
 		{
-			
+			GivenText("select 1 from sys.databases where name = DB_NAME() and SUSER_SNAME(owner_sid) = 'sa'");	
+			WhenParse(SqlParser.SelectExpr);
+			ThenResultShouldBe(new SqlSelectExpression()
+			{
+				Fields = new SqlExpression[]
+				{
+					new SqlNumberExpression()
+					{
+						Value = 1,
+						ValueTypeFullname = typeof(int).FullName
+					}
+				},
+				From = new SqlTableExpression()
+				{
+					Name = "sys.databases"
+				},
+				Where = new WhereExpression()
+				{
+					Filter = new SqlFilterExpression()
+					{
+						Left = new SqlTableFieldExpression()
+						{
+							Name = "name"
+						},
+						Oper = "=",
+						Right = new SqlFuncDbNameExpression()
+						{
+							Name = "DB_NAME"
+						}
+					}
+				}
+			});
 		}
 
 		[Fact]
