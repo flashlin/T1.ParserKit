@@ -524,7 +524,7 @@ namespace T1.ParserKit.SqlDom
 
 		public static readonly IParser<WhereExpression> WhereExpr =
 			from _ in SqlToken.Word("WHERE")
-			from filter1 in FilterExpr//FilterChainExpr.Or(FilterExpr.CastParser<SqlExpression>())
+			from filter1 in FilterChainExpr
 			select new WhereExpression()
 			{
 				Filter = filter1

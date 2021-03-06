@@ -506,7 +506,7 @@ namespace T1.ParserKitTests
 		[Fact]
 		public void Select_1_from_table_where_field_eq_func_and_func_eq_str1()
 		{
-			GivenText("select 1 from sys.databases where name = DB_NAME() and SUSER_SNAME(owner_sid) = 'sa'");	
+			GivenText("select 1 from sys.databases where name = DB_NAME() and SUSER_SNAME(owner_sid) = 'sa'");
 			WhenParse(SqlParser.SelectExpr);
 			ThenResultShouldBe(new SqlSelectExpression()
 			{
@@ -524,16 +524,39 @@ namespace T1.ParserKitTests
 				},
 				Where = new WhereExpression()
 				{
-					Filter = new SqlFilterExpression()
+					Filter = new SqlAndOperExpression()
 					{
-						Left = new SqlTableFieldExpression()
+						Left = new SqlFilterExpression()
 						{
-							Name = "name"
+							Left = new SqlTableFieldExpression()
+							{
+								Name = "name"
+							},
+							Oper = "=",
+							Right = new SqlFuncDbNameExpression()
+							{
+								Name = "DB_NAME"
+							}
 						},
-						Oper = "=",
-						Right = new SqlFuncDbNameExpression()
+						Oper = "AND",
+						Right = new SqlFilterExpression()
 						{
-							Name = "DB_NAME"
+							Left = new SqlFuncSuserSnameExpression()
+							{
+								Name = "SUSER_SNAME",
+								Parameters = new SqlExpression[]
+								{
+									new SqlIdentifierExpression()
+									{
+										Name = "owner_sid"
+									}
+								}
+							},
+							Oper = "=",
+							Right = new SqlStringExpression()
+							{
+								Text = "sa"
+							}
 						}
 					}
 				}
