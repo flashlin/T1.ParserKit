@@ -702,6 +702,17 @@ namespace T1.ParserKit.SqlDom
 			 }
 			).Named(nameof(PrintExpr));
 
+		public static readonly IParser<SqlExecExpression> ExecExpr =
+			from exec1 in SqlToken.Word("EXEC")
+			from name1 in DatabaseSchemaObjectName
+			from parameters1 in Atom.SeparatedBy(SqlToken.Comma)
+			select new SqlExecExpression()
+			{
+				TextSpan = new[] { exec1, name1 }.Concat(parameters1).GetTextSpan(),
+				Name = name1,
+				Parameters = parameters1.ToArray()
+			};
+
 		public static readonly IParser<SqlExpression> BatchExpr =
 			Parse.AnyCast<SqlExpression>(
 				SetVarExpr,
