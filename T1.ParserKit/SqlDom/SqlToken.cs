@@ -11,7 +11,7 @@ namespace T1.ParserKit.SqlDom
 {
 	public static class SqlToken
 	{
-		public static readonly string[] Keywords = new[]
+		public static readonly string[] UpperKeywords = new[]
 		{
 			"ABSOLUTE", "ACTION", "ADA", "ADD", "ALL", "ALLOCATE", "ALTER", "AND", "ANY", "ARE",
 			"AS", "ASC", "ASSERTION", "AT", "AUTHORIZATION", "AVG", "BEGIN", "BETWEEN", "BIT",

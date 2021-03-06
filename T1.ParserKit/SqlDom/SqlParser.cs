@@ -43,7 +43,7 @@ namespace T1.ParserKit.SqlDom
 			_SqlIdentifier().Named(nameof(SqlIdentifier));
 		
 		private static readonly HashSet<string> Keywords = new HashSet<string>(
-			SqlToken.Keywords.Concat(SqlToken.Keywords.Select(x => x.ToLower())));
+			SqlToken.UpperKeywords.Concat(SqlToken.UpperKeywords.Select(x => x.ToLower())));
 		
 		public static readonly IParser<SqlIdentifierExpression> SqlIdentifierExcludeKeyword =
 			SqlIdentifier.TransferToNext(rc =>
