@@ -39,50 +39,6 @@ namespace T1.ParserKit.SqlDom
 			return p.CastParser<SqlExpression>();
 		}
 
-		public static readonly IParser<SqlIdentifierExpression> SqlIdentifier =
-			_SqlIdentifier().Named(nameof(SqlIdentifier));
-		
-		private static readonly HashSet<string> Keywords = new HashSet<string>(
-			SqlToken.UpperKeywords.Concat(SqlToken.UpperKeywords.Select(x => x.ToLower())));
-		
-		public static readonly IParser<SqlIdentifierExpression> SqlIdentifierExcludeKeyword =
-			SqlIdentifier.TransferToNext(rc =>
-			{
-				var ch = rc.TextSpan.Text;
-				if (Keywords.Contains($"{ch}"))
-				{
-					return $"Expect not keyword, but got '{ch}'";
-				}
-
-				return "";
-			});
-
-		public static readonly IParser<SqlIdentifierExpression> Identifier =
-			ParseToken.Lexeme(SqlIdentifierExcludeKeyword);
-
-		private static IParser<SqlIdentifierExpression> _SqlIdentifier()
-		{
-			var cstyleIdentifier =
-				from ident in Parse.CStyleIdentifier
-				select new SqlIdentifierExpression()
-				{
-					TextSpan = ident,
-					Name = ident.Text
-				};
-
-			var sqlIdentifier =
-				from start in Parse.Equal("[")
-				from body in Parse.NotEqual("]").Many1()
-				from end in Parse.Equal("]")
-				select new SqlIdentifierExpression()
-				{
-					TextSpan = new[] { start, body, end }.GetTextSpan(),
-					Name = start.Text + body.Text + end.Text
-				};
-
-			return sqlIdentifier.Or(cstyleIdentifier);
-		}
-
 		public static readonly IParser<SqlExpression> SqlDataType0 =
 			SqlToken.Contains(
 				"bit", "smallint", "smallmoney", "int", "tinyint",
@@ -105,7 +61,7 @@ namespace T1.ParserKit.SqlDom
 
 		public static readonly IParser<SqlVariableExpression> Variable =
 			from at1 in SqlToken.At
-			from identifier in Identifier
+			from identifier in SqlToken.Identifier
 			select new SqlVariableExpression()
 			{
 				TextSpan = new[] { at1, identifier }.GetTextSpan(),
@@ -214,7 +170,7 @@ namespace T1.ParserKit.SqlDom
 		public static readonly IParser<SqlFuncSuserSnameExpression> FuncSuserSnameExpr =
 			(from suser_sname in SqlToken.Word("SUSER_SNAME")
 			 from lparen in SqlToken.LParen
-			 from server_user_sid in SqlIdentifier
+			 from server_user_sid in SqlToken.SqlIdentifier
 			 from rparen in SqlToken.RParen
 			 select new SqlFuncSuserSnameExpression()
 			 {
@@ -333,7 +289,7 @@ namespace T1.ParserKit.SqlDom
 
 		public static readonly IParser<SqlUseDatabaseExpression> UseDatabaseExpr =
 			(from use in SqlToken.Word("USE")
-			 from dbname in Identifier
+			 from dbname in SqlToken.Identifier
 			 from end in SqlToken.SemiColon.Optional()
 			 select new SqlUseDatabaseExpression()
 			 {
@@ -352,14 +308,13 @@ namespace T1.ParserKit.SqlDom
 			 }
 			).Named(nameof(DeclareVariableExpr));
 
-		private static readonly IParser<SqlTableFieldExpression> TableFieldExpr1 =
-			Identifier.MapResult(x => new SqlTableFieldExpression()
+		private static readonly IParser<SqlTableFieldExpression> TableFieldExpr1 = SqlToken.Identifier.MapResult(x => new SqlTableFieldExpression()
 			{
 				Name = x.GetText()
 			});
 
 		private static readonly IParser<SqlTableFieldExpression> TableFieldExpr2 =
-			Parse.SeqCast<SqlExpression>(Identifier, SqlToken.Dot, Identifier)
+			Parse.SeqCast<SqlExpression>(SqlToken.Identifier, SqlToken.Dot, SqlToken.Identifier)
 				.MapResultList(x => new SqlTableFieldExpression()
 				{
 					Name = x[2].GetText(),
@@ -367,7 +322,7 @@ namespace T1.ParserKit.SqlDom
 				});
 
 		private static readonly IParser<SqlTableFieldExpression> TableFieldExpr3 =
-			Parse.SeqCast<SqlExpression>(Identifier, SqlToken.Dot, Identifier, SqlToken.Dot, Identifier)
+			Parse.SeqCast<SqlExpression>(SqlToken.Identifier, SqlToken.Dot, SqlToken.Identifier, SqlToken.Dot, SqlToken.Identifier)
 				.MapResultList(x => new SqlTableFieldExpression()
 				{
 					Name = x[4].GetText(),
@@ -566,9 +521,7 @@ namespace T1.ParserKit.SqlDom
 			Parse.AnyCast<SqlExpression>(ComplexSelectExpr, SimpleSelectExpr);
 
 		private static readonly IParser<ObjectNameExpression> DatabaseDboSchemaName3 =
-			Parse.SeqCast<SqlExpression>(Identifier, SqlToken.Dot,
-					Identifier, SqlToken.Dot,
-					Identifier
+			Parse.SeqCast<SqlExpression>(SqlToken.Identifier, SqlToken.Dot, SqlToken.Identifier, SqlToken.Dot, SqlToken.Identifier
 				).Merge()
 				.MapResult(x => new ObjectNameExpression()
 				{
@@ -576,16 +529,14 @@ namespace T1.ParserKit.SqlDom
 				});
 
 		private static readonly IParser<ObjectNameExpression> DatabaseDboSchemaName2 =
-			Parse.SeqCast<SqlExpression>(Identifier, SqlToken.Dot,
-					Identifier
+			Parse.SeqCast<SqlExpression>(SqlToken.Identifier, SqlToken.Dot, SqlToken.Identifier
 				).Merge()
 				.MapResult(x => new ObjectNameExpression()
 				{
 					Name = x.GetText()
 				});
 
-		private static readonly IParser<ObjectNameExpression> DatabaseDboSchemaName1 =
-			Identifier
+		private static readonly IParser<ObjectNameExpression> DatabaseDboSchemaName1 = SqlToken.Identifier
 				.MapResult(x => new ObjectNameExpression()
 				{
 					Name = x.GetText()
@@ -647,7 +598,7 @@ namespace T1.ParserKit.SqlDom
 
 		private static readonly IParser<AliasExpression> AliasExpr =
 			from as1 in SqlToken.Word("AS").Optional()
-			from identifier in Identifier
+			from identifier in SqlToken.Identifier
 			select new AliasExpression()
 			{
 				Name = identifier.GetText()

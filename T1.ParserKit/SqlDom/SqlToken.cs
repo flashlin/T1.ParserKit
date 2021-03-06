@@ -213,5 +213,48 @@ namespace T1.ParserKit.SqlDom
 		public static readonly IParser<SqlExpression> At = SqlToken.Symbol("@");
 		public static readonly IParser<SqlExpression> Assign = SqlToken.Symbol("=");
 		public static readonly IParser<SqlExpression> DollarSign = SqlToken.Symbol("$");
+
+		public static readonly IParser<SqlIdentifierExpression> SqlIdentifier =
+			Parse.Named<SqlIdentifierExpression>(_SqlIdentifier(), nameof(SqlIdentifier));
+
+		private static readonly HashSet<string> Keywords = new HashSet<string>(
+			SqlToken.UpperKeywords.Concat(SqlToken.UpperKeywords.Select(x => x.ToLower())));
+
+		public static readonly IParser<SqlIdentifierExpression> SqlIdentifierExcludeKeyword = SqlIdentifier.TransferToNext(rc =>
+			{
+				var ch = rc.TextSpan.Text;
+				if (Keywords.Contains($"{ch}"))
+				{
+					return $"Expect not keyword, but got '{ch}'";
+				}
+
+				return "";
+			});
+
+		public static readonly IParser<SqlIdentifierExpression> Identifier =
+			ParseToken.Lexeme(SqlIdentifierExcludeKeyword);
+
+		private static IParser<SqlIdentifierExpression> _SqlIdentifier()
+		{
+			var cstyleIdentifier =
+				from ident in Parse.CStyleIdentifier
+				select new SqlIdentifierExpression()
+				{
+					TextSpan = ident,
+					Name = ident.Text
+				};
+
+			var sqlIdentifier =
+				from start in Parse.Equal("[")
+				from body in Parse.NotEqual("]").Many1()
+				from end in Parse.Equal("]")
+				select new SqlIdentifierExpression()
+				{
+					TextSpan = new[] { start, body, end }.GetTextSpan(),
+					Name = start.Text + body.Text + end.Text
+				};
+
+			return sqlIdentifier.Or(cstyleIdentifier);
+		}
 	}
 }

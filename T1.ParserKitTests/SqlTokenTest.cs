@@ -24,7 +24,7 @@ namespace T1.ParserKitTests
 		public void NonIdentifier()
 		{
 			GivenText("from");
-			WhenParse(SqlParser.Identifier);
+			WhenParse(SqlToken.Identifier);
 			ThenResultShouldFail();
 		}
 
@@ -32,7 +32,7 @@ namespace T1.ParserKitTests
 		public void Identifier()
 		{
 			GivenText("name");
-			WhenParse(SqlParser.Identifier);
+			WhenParse(SqlToken.Identifier);
 			ThenResultShouldBe("name");
 		}
 
@@ -42,7 +42,7 @@ namespace T1.ParserKitTests
 		public void MoreNonIdentifier(string keyword)
 		{
 			GivenText(keyword);
-			WhenParse(SqlParser.Identifier);
+			WhenParse(SqlToken.Identifier);
 			ThenResultShouldFail();
 		}
 
