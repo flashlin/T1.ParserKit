@@ -1,6 +1,6 @@
 ﻿namespace T1.ParserKit.SqlDom.Expressions
 {
-	public class WhereExpression : SqlExpression
+	public class SqlWhereExpression : SqlExpression
 	{
 		public SqlExpression Filter { get; set; }
 	}

@@ -15,7 +15,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("where name = 1");
 			WhenParse(SqlParser.WhereExpr);
-			ThenResultShouldBe(new WhereExpression()
+			ThenResultShouldBe(new SqlWhereExpression()
 			{
 				Filter = new SqlFilterExpression()
 				{
@@ -318,7 +318,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("Where N'$(__IsSqlCmdEnabled)' NOT LIKE N'True'");
 			WhenParse(SqlParser.WhereExpr);
-			ThenResultShouldBe(new WhereExpression()
+			ThenResultShouldBe(new SqlWhereExpression()
 			{
 				Filter = new SqlFilterExpression
 				{

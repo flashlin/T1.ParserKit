@@ -30,7 +30,7 @@ namespace T1.ParserKitTests
 						},
 					}
 				},
-				WhereExpr = new WhereExpression
+				WhereExpr = new SqlWhereExpression
 				{
 					Filter = new SqlFilterExpression
 					{

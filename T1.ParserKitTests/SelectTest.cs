@@ -64,7 +64,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("where name = 1");
 			WhenParse(SqlParser.WhereExpr);
-			ThenResultShouldBe(new WhereExpression()
+			ThenResultShouldBe(new SqlWhereExpression()
 			{
 				Filter = new SqlFilterExpression
 				{
@@ -244,7 +244,7 @@ namespace T1.ParserKitTests
 				{
 					Name = "customer"
 				},
-				Where = new WhereExpression()
+				Where = new SqlWhereExpression()
 				{
 					Filter = new SqlFilterExpression()
 					{
@@ -281,7 +281,7 @@ namespace T1.ParserKitTests
 				{
 					Name = "customer"
 				},
-				Where = new WhereExpression()
+				Where = new SqlWhereExpression()
 				{
 					Filter = new SqlFilterExpression()
 					{
@@ -522,7 +522,7 @@ namespace T1.ParserKitTests
 				{
 					Name = "sys.databases"
 				},
-				Where = new WhereExpression()
+				Where = new SqlWhereExpression()
 				{
 					Filter = new SqlAndOperExpression()
 					{

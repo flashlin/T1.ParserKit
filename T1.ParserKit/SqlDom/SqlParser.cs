@@ -522,10 +522,10 @@ namespace T1.ParserKit.SqlDom
 			return orExpr.CastParser<SqlExpression>().Or(factor.CastParser<SqlExpression>());
 		}
 
-		public static readonly IParser<WhereExpression> WhereExpr =
+		public static readonly IParser<SqlWhereExpression> WhereExpr =
 			from _ in SqlToken.Word("WHERE")
 			from filter1 in FilterChainExpr
-			select new WhereExpression()
+			select new SqlWhereExpression()
 			{
 				Filter = filter1
 			};
