@@ -703,6 +703,7 @@ namespace T1.ParserKit.SqlDom
 				 VariableAssignExpr(Atom), 
 				 Atom)
 				.SeparatedBy(SqlToken.Comma)
+			from semicolon in SqlToken.SemiColon.Optional()
 			select new SqlExecExpression()
 			{
 				TextSpan = new[] { exec1, name1 }.Concat(parameters1).GetTextSpan(),
