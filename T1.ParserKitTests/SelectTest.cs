@@ -502,6 +502,13 @@ namespace T1.ParserKitTests
 			});
 		}
 
+		//select 1 from sys.databases where name = DB_NAME() and SUSER_SNAME(owner_sid) = 'sa'
+		[Fact]
+		public void Select_1_from_table_where_field_eq_func_and_func_eq_str1()
+		{
+			
+		}
+
 		[Fact]
 		public void print_nstring()
 		{

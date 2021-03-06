@@ -142,6 +142,24 @@ namespace T1.ParserKitTests
 			});
 		}
 
+		[Fact]
+		public void SUSER_SNAME()
+		{
+			GivenText("SUSER_SNAME(server_user_sid)");
+			WhenParse(SqlParser.SqlFunctionsExpr);
+			ThenResultShouldBe(new SqlFuncSuserSnameExpression()
+			{
+				Name = "SUSER_SNAME",
+				Parameters = new SqlExpression[]
+				{
+					new SqlIdentifierExpression()
+					{
+						Name = "server_user_sid"
+					}
+				}
+			});
+		}
+
 		//[Fact]
 		//public void Dateadd_d_1_datediff_getdate()
 		//{
