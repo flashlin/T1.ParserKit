@@ -718,7 +718,8 @@ namespace T1.ParserKit.SqlDom
 				SetVarExpr,
 				OnErrorExitExpr,
 				DeclareVariableExpr,
-				UseDatabaseExpr
+				UseDatabaseExpr,
+				ExecExpr
 			);
 
 		public static readonly IParser<SqlExpression> StartExpr =
