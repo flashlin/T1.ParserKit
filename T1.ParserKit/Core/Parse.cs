@@ -407,21 +407,68 @@ namespace T1.ParserKit.Core
 		//	return p.Many(accum => accum.GetTextSpan(), min, max);
 		//}
 
+		//public static IParser<IEnumerable<T>> ManyDelimitedBy<T>(this IParser<T> parser, IParser<T> delimited)
+		//{
+		//	var tail = delimited.Then(parser, (a, b) => { return new T[] { a, b }; });
+		//	var expr2 = parser.Then(tail.Many(), (a, b) =>
+		//	{
+		//		if (b == null)
+		//		{
+		//			return Enumerable.Repeat(a, 1);
+		//		}
+
+		//		var list = Enumerable.Repeat(a, 1).Concat(b.SelectMany(x => x));
+		//		return list;
+		//	});
+		//	var expr1 = parser.MapResult(x => Enumerable.Repeat(x, 1));
+		//	return Parse.Any(expr2, expr1);
+		//}
+
 		public static IParser<IEnumerable<T>> ManyDelimitedBy<T>(this IParser<T> parser, IParser<T> delimited)
 		{
-			var tail = delimited.Then(parser, (a, b) => { return new T[] { a, b }; });
-			var expr2 = parser.Then(tail.Many(), (a, b) =>
+			var name = $"{parser.Name} {delimited.Name}...";
+			return new Parser<IEnumerable<T>>(name, inp =>
 			{
-				if (b == null)
+				var acc = new List<T>();
+				var lastPos = inp.GetPosition();
+				do
 				{
-					return Enumerable.Repeat(a, 1);
+					var pos1 = inp.GetPosition();
+					var parsed1 = parser.TryParse(inp);
+					if (!parsed1.IsSuccess())
+					{
+						inp.Seek(pos1);
+						break;
+					}
+					acc.Add(parsed1.Result);
+
+					var pos2 = inp.GetPosition();
+					lastPos = pos2;
+					var parsed2 = delimited.TryParse(inp);
+					if (!parsed2.IsSuccess())
+					{
+						inp.Seek(pos2);
+						break;
+					}
+					acc.Add(parsed2.Result);
+				} while (true);
+
+				if (acc.Count == 0)
+				{
+					var ch = inp.Substr(20);
+					return Parse.Error<IEnumerable<T>>($"Expect {name}, but got '{ch}' at {inp}.", inp.GetPosition());
 				}
 
-				var list = Enumerable.Repeat(a, 1).Concat(b.SelectMany(x => x));
-				return list;
+				if (acc.Count % 2 == 0)
+				{
+					inp.Seek(lastPos);
+					var ch = inp.Substr(20);
+					var outOfRangeIndex = acc.Count / 2 + 1;
+					return Parse.Error<IEnumerable<T>>($"Expect {name}, but got '{ch}' outOfRangeIndex:{outOfRangeIndex}  at {inp}.", inp.GetPosition());
+				}
+
+				return Parse.Success<IEnumerable<T>>(acc);
 			});
-			var expr1 = parser.MapResult(x => Enumerable.Repeat(x, 1));
-			return Parse.Any(expr2, expr1);
 		}
 
 		public static IParser<IEnumerable<T1>> SeparatedBy<T1, T2>(this IParser<T1> p, IParser<T2> delimited)
@@ -444,15 +491,19 @@ namespace T1.ParserKit.Core
 			var name = $"{p1.Name} {p2.Name}";
 			return new Parser<T3>(name, inp =>
 			{
+				var pos1 = inp.GetPosition();
 				var parsed1 = p1.TryParse(inp);
 				if (!parsed1.IsSuccess())
 				{
+					inp.Seek(pos1);
 					return Parse.Error<T3>(parsed1.Error);
 				}
 
+				var pos2 = inp.GetPosition();
 				var parsed2 = p2.TryParse(inp);
 				if (!parsed2.IsSuccess())
 				{
+					inp.Seek(pos2);
 					return Parse.Error<T3>(parsed2.Error);
 				}
 

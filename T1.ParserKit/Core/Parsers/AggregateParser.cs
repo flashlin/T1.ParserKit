@@ -28,9 +28,11 @@ namespace T1.ParserKit.Core.Parsers
 			TAccum acc = _seed();
 			do
 			{
+				var pos = inp.GetPosition();
 				var parsed = _parser.TryParse(inp);
 				if (!parsed.IsSuccess())
 				{
+					inp.Seek(pos);
 					break;
 				}
 				acc = _accFunc(acc, parsed.Result);

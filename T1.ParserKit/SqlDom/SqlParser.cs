@@ -40,8 +40,9 @@ namespace T1.ParserKit.SqlDom
 		}
 
 		public static readonly IParser<SqlVariableExpression> Variable =
+			from _ in SqlToken.Blanks.Optional()
 			from at1 in SqlToken.At
-			from identifier in SqlToken.Identifier
+			from identifier in SqlToken.SqlIdentifier
 			select new SqlVariableExpression()
 			{
 				TextSpan = new[] { at1, identifier }.GetTextSpan(),
@@ -237,18 +238,16 @@ namespace T1.ParserKit.SqlDom
 					From = expr1,
 				};
 
-		public static IParser<SqlExpression> VariableAssignFieldExpr(IParser<SqlExpression> fieldExpr)
+		public static IParser<SqlVariableAssignExpression> VariableAssignExpr(IParser<SqlExpression> factor)
 		{
-			var assignExpr =
-				from variable1 in Variable
-				from assign1 in SqlToken.Assign
-				from expr1 in fieldExpr
-				select new SqlVariableAssignFieldExpression()
-				{
-					VariableName = variable1,
-					From = expr1,
-				};
-			return Parse.AnyCast<SqlExpression>(assignExpr, fieldExpr);
+			return from variable1 in Variable
+					 from assign1 in SqlToken.Assign
+					 from expr1 in factor
+					 select new SqlVariableAssignExpression()
+					 {
+						 VariableName = variable1,
+						 AssignFrom = expr1,
+					 };
 		}
 
 		public static readonly IParser<SqlBatchVariableExpression> BatchVariableExpr =
@@ -284,9 +283,9 @@ namespace T1.ParserKit.SqlDom
 			).Named(nameof(DeclareVariableExpr));
 
 		private static readonly IParser<SqlTableFieldExpression> TableFieldExpr1 = SqlToken.Identifier.MapResult(x => new SqlTableFieldExpression()
-			{
-				Name = x.GetText()
-			});
+		{
+			Name = x.GetText()
+		});
 
 		private static readonly IParser<SqlTableFieldExpression> TableFieldExpr2 =
 			Parse.SeqCast<SqlExpression>(SqlToken.Identifier, SqlToken.Dot, SqlToken.Identifier)
@@ -317,11 +316,6 @@ namespace T1.ParserKit.SqlDom
 			from alias1 in AliasExpr.Optional()
 			select tableField1.Assign(x => { x.AliasName = alias1?.Name; });
 
-
-		public static IParser<SqlExpression> RecFieldExpr(IParser<SqlExpression> factor)
-		{
-			return VariableAssignFieldExpr(factor);
-		}
 
 		public static IParser<SqlExpression> ArithmeticOperatorExpr(IParser<SqlExpression> atom)
 		{
@@ -705,7 +699,10 @@ namespace T1.ParserKit.SqlDom
 		public static readonly IParser<SqlExecExpression> ExecExpr =
 			from exec1 in SqlToken.Word("EXEC")
 			from name1 in DatabaseSchemaObjectName
-			from parameters1 in Atom.SeparatedBy(SqlToken.Comma)
+			from parameters1 in Parse.AnyCast<SqlExpression>(
+				 VariableAssignExpr(Atom), 
+				 Atom)
+				.SeparatedBy(SqlToken.Comma)
 			select new SqlExecExpression()
 			{
 				TextSpan = new[] { exec1, name1 }.Concat(parameters1).GetTextSpan(),
