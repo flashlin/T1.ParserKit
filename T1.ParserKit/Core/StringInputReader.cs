@@ -82,10 +82,42 @@
 			return textSpan;
 		}
 
+		public LinePosition GetLinePosition(int offset)
+		{
+			int pos = 0;
+			int line = 1;
+			int col = 1;
+			while (pos < _length && pos < offset)
+			{
+				var ch = _text.Substring(pos, 1);
+				pos++;
+				if (ch == "\r")
+				{
+					col = 1;
+					continue;
+				}
+
+				if (ch == "\n")
+				{
+					line++;
+					continue;
+				}
+
+				col++;
+			}
+
+			return new LinePosition()
+			{
+				Line = line,
+				Col = col
+			};
+		}
+
 		public override string ToString()
 		{
 			var ch = Substr(20);
-			return $"Pos:{_position} Rest='{ch}'";
+			var linePos = GetLinePosition(_position);
+			return $"Pos:{_position} {linePos} Rest='{ch}'";
 		}
 	}
 }
