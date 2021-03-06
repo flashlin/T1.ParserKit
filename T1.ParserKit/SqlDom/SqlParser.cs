@@ -39,26 +39,6 @@ namespace T1.ParserKit.SqlDom
 			return p.CastParser<SqlExpression>();
 		}
 
-		public static readonly IParser<SqlExpression> SqlDataType0 =
-			SqlToken.Contains(
-				"bit", "smallint", "smallmoney", "int", "tinyint",
-				"money", "real", "date", "smalldatetime", "datetime",
-				"image", "text", "ntext"
-			);
-
-		public static readonly IParser<SqlExpression> SqlDataType1 =
-			SqlToken.Contains(
-				"bigint", "bit", "float", "datetime2", "time",
-				"char", "varchar", "binary", "varbinary", "nchar",
-				"nvarchar", "datetimeoffset"
-			);
-
-		public static readonly IParser<SqlExpression> SqlDataType2 =
-			SqlToken.Contains("decimal");
-
-		public static readonly IParser<SqlExpression> SqlDataType =
-			Parse.Any(SqlDataType0, SqlDataType1, SqlDataType2);
-
 		public static readonly IParser<SqlVariableExpression> Variable =
 			from at1 in SqlToken.At
 			from identifier in SqlToken.Identifier
@@ -295,7 +275,7 @@ namespace T1.ParserKit.SqlDom
 		public static readonly IParser<SqlDeclareExpression> DeclareVariableExpr =
 			(from declare1 in SqlToken.Word("DECLARE")
 			 from variable1 in Variable
-			 from sqlDataType1 in SqlDataType
+			 from sqlDataType1 in SqlToken.SqlDataType
 			 select new SqlDeclareExpression()
 			 {
 				 Name = variable1,
@@ -627,14 +607,14 @@ namespace T1.ParserKit.SqlDom
 			 }).Named(nameof(IfExprs));
 
 		public static readonly IParser<SqlDataTypeExpression> SqlDataType0Expr =
-			Parse.Any(SqlDataType0, SqlDataType1)
+			Parse.Any(SqlToken.SqlDataType0, SqlToken.SqlDataType1)
 				.MapResult(x => new SqlDataTypeExpression()
 				{
 					DataType = x.GetText(),
 				});
 
 		public static readonly IParser<SqlDataTypeExpression> SqlDataType1Expr =
-			from dataType1 in Parse.Any(SqlDataType2, SqlDataType1)
+			from dataType1 in Parse.Any(SqlToken.SqlDataType2, SqlToken.SqlDataType1)
 			from lparen1 in SqlToken.LParen
 			from size1 in IntegerExpr
 			from rparen1 in SqlToken.RParen
@@ -645,7 +625,7 @@ namespace T1.ParserKit.SqlDom
 			};
 
 		public static readonly IParser<SqlDataTypeExpression> SqlDataType2Expr =
-			from dataType1 in SqlDataType2
+			from dataType1 in SqlToken.SqlDataType2
 			from lparen1 in SqlToken.LParen
 			from size1 in IntegerExpr
 			from comma1 in SqlToken.Comma

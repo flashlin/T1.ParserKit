@@ -256,5 +256,25 @@ namespace T1.ParserKit.SqlDom
 
 			return sqlIdentifier.Or(cstyleIdentifier);
 		}
+
+		public static readonly IParser<SqlExpression> SqlDataType0 =
+			SqlToken.Contains(
+				"bit", "smallint", "smallmoney", "int", "tinyint",
+				"money", "real", "date", "smalldatetime", "datetime",
+				"image", "text", "ntext"
+			);
+
+		public static readonly IParser<SqlExpression> SqlDataType1 =
+			SqlToken.Contains(
+				"bigint", "bit", "float", "datetime2", "time",
+				"char", "varchar", "binary", "varbinary", "nchar",
+				"nvarchar", "datetimeoffset"
+			);
+
+		public static readonly IParser<SqlExpression> SqlDataType2 =
+			SqlToken.Contains("decimal");
+
+		public static readonly IParser<SqlExpression> SqlDataType =
+			Parse.Any(SqlDataType0, SqlDataType1, SqlDataType2);
 	}
 }
