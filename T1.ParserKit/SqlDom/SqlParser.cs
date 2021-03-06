@@ -41,6 +41,21 @@ namespace T1.ParserKit.SqlDom
 
 		public static readonly IParser<SqlIdentifierExpression> SqlIdentifier =
 			_SqlIdentifier().Named(nameof(SqlIdentifier));
+		
+		public static readonly IParser<SqlIdentifierExpression> SqlIdentifierExcludeKeyword =
+			SqlIdentifier.TransferToNext(rc =>
+			{
+				var ch = rc.TextSpan.Text;
+				if (Keywords.Contains($"{ch}"))
+				{
+					return $"Expect not keyword, but got '{ch}'";
+				}
+
+				return "";
+			});
+
+		public static readonly IParser<SqlIdentifierExpression> Identifier =
+			ParseToken.Lexeme(SqlIdentifierExcludeKeyword);
 
 		private static IParser<SqlIdentifierExpression> _SqlIdentifier()
 		{
@@ -87,21 +102,6 @@ namespace T1.ParserKit.SqlDom
 
 		private static readonly HashSet<string> Keywords = new HashSet<string>(
 			SqlToken.Keywords.Concat(SqlToken.Keywords.Select(x => x.ToLower())));
-
-		public static readonly IParser<SqlIdentifierExpression> SqlIdentifierExcludeKeyword =
-			SqlIdentifier.TransferToNext(rc =>
-			{
-				var ch = rc.TextSpan.Text;
-				if (Keywords.Contains($"{ch}"))
-				{
-					return $"Expect not keyword, but got '{ch}'";
-				}
-
-				return "";
-			});
-
-		public static readonly IParser<SqlIdentifierExpression> Identifier =
-			ParseToken.Lexeme(SqlIdentifierExcludeKeyword);
 
 		public static readonly IParser<SqlVariableExpression> Variable =
 			from at1 in SqlToken.At
