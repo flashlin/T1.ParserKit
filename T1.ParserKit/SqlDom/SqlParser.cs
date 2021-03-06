@@ -42,6 +42,9 @@ namespace T1.ParserKit.SqlDom
 		public static readonly IParser<SqlIdentifierExpression> SqlIdentifier =
 			_SqlIdentifier().Named(nameof(SqlIdentifier));
 		
+		private static readonly HashSet<string> Keywords = new HashSet<string>(
+			SqlToken.Keywords.Concat(SqlToken.Keywords.Select(x => x.ToLower())));
+		
 		public static readonly IParser<SqlIdentifierExpression> SqlIdentifierExcludeKeyword =
 			SqlIdentifier.TransferToNext(rc =>
 			{
@@ -99,9 +102,6 @@ namespace T1.ParserKit.SqlDom
 
 		public static readonly IParser<SqlExpression> SqlDataType =
 			Parse.Any(SqlDataType0, SqlDataType1, SqlDataType2);
-
-		private static readonly HashSet<string> Keywords = new HashSet<string>(
-			SqlToken.Keywords.Concat(SqlToken.Keywords.Select(x => x.ToLower())));
 
 		public static readonly IParser<SqlVariableExpression> Variable =
 			from at1 in SqlToken.At
