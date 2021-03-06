@@ -26,7 +26,6 @@ namespace T1.ParserKit.Core.Parsers
 		public IParseResult<TResult> TryParse(IInputReader inp)
 		{
 			TAccum acc = _seed();
-			var startPosition = inp.GetPosition();
 			do
 			{
 				var parsed = _parser.TryParse(inp);
@@ -36,11 +35,6 @@ namespace T1.ParserKit.Core.Parsers
 				}
 				acc = _accFunc(acc, parsed.Result);
 			} while (true);
-
-			//if (startPosition == inp.GetPosition())
-			//{
-			//	return Parse.Success<TResult>();
-			//}
 
 			return Parse.Success(_resultSelector(acc));
 		}
