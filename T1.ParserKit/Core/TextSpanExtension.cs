@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using T1.ParserKit.SqlDom.Expressions;
 using T1.Standard.Extensions;
 
 namespace T1.ParserKit.Core
@@ -52,6 +53,11 @@ namespace T1.ParserKit.Core
 				Text = str.ToString(),
 				Length = tl.Position + tl.Length - hd.Position
 			};
+		}
+
+		public static TextSpan GetTextSpan(this IEnumerable<SqlExpression> exprs)
+		{
+			return exprs.Where(x => x != null).Select(x => x.TextSpan).GetTextSpan();
 		}
 	}
 }

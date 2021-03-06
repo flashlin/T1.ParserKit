@@ -68,11 +68,6 @@ namespace T1.ParserKit.SqlDom
 				Name = at1.GetText() + identifier.GetText()
 			};
 
-		public static TextSpan GetTextSpan(this IEnumerable<SqlExpression> exprs)
-		{
-			return exprs.Where(x => x != null).Select(x => x.TextSpan).GetTextSpan();
-		}
-
 		public static IParser<SqlExpression> Merge(this IParser<IEnumerable<SqlExpression>> parsers)
 		{
 			return parsers.Select(x => new SqlExpression()
