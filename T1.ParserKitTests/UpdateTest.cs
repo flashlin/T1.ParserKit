@@ -39,7 +39,7 @@ namespace T1.ParserKitTests
 							Name = "custId",
 						},
 						Oper = "=",
-						Right = new VariableExpression
+						Right = new SqlVariableExpression
 						{
 							Name = "@customerId",
 						},

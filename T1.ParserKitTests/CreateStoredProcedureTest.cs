@@ -31,7 +31,7 @@ END
 				{
 					new SqlParameterExpression()
 					{
-						Name = new VariableExpression()
+						Name = new SqlVariableExpression()
 						{
 							Name = "@customerId"
 						},
@@ -42,7 +42,7 @@ END
 					},
 					new SqlParameterExpression()
 					{
-						Name = new VariableExpression()
+						Name = new SqlVariableExpression()
 						{
 							Name = "@name",
 						},
@@ -54,7 +54,7 @@ END
 					},
 					new SqlParameterExpression()
 					{
-						Name = new VariableExpression()
+						Name = new SqlVariableExpression()
 						{
 							Name = "@amount"
 						},

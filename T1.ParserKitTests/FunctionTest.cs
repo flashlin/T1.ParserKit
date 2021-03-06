@@ -100,7 +100,7 @@ namespace T1.ParserKitTests
 				Name = "ISNULL",
 				Parameters = new SqlExpression[]
 				{
-					new VariableExpression
+					new SqlVariableExpression
 					{
 						Name = "@name",
 						TextSpan = new TextSpan

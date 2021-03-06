@@ -18,9 +18,9 @@ namespace T1.ParserKitTests
 		{
 			GivenText("declare @name datetime");
 			WhenParse(SqlParser.DeclareVariableExpr);
-			ThenResultShouldBe(new DeclareExpression()
+			ThenResultShouldBe(new SqlDeclareExpression()
 			{
-				Name = new VariableExpression()
+				Name = new SqlVariableExpression()
 				{
 					Name = "@name"
 				},
@@ -97,7 +97,7 @@ namespace T1.ParserKitTests
 			{
 				Condition = new SqlFilterExpression
 				{
-					Left = new VariableExpression
+					Left = new SqlVariableExpression
 					{
 						Name = "@name",
 					},

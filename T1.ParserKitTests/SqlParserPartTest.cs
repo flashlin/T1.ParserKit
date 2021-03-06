@@ -143,7 +143,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("@name");
 			WhenParse(SqlParser.Atom);
-			ThenResultShouldBe(new VariableExpression()
+			ThenResultShouldBe(new SqlVariableExpression()
 			{
 				Name = "@name"
 			});

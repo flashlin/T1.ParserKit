@@ -103,10 +103,10 @@ namespace T1.ParserKit.SqlDom
 		public static readonly IParser<SqlIdentifierExpression> Identifier =
 			ParseToken.Lexeme(SqlIdentifierExcludeKeyword);
 
-		public static readonly IParser<VariableExpression> Variable =
+		public static readonly IParser<SqlVariableExpression> Variable =
 			from at1 in SqlToken.At
 			from identifier in Identifier
-			select new VariableExpression()
+			select new SqlVariableExpression()
 			{
 				TextSpan = new[] { at1, identifier }.GetTextSpan(),
 				Name = at1.GetText() + identifier.GetText()
@@ -341,11 +341,11 @@ namespace T1.ParserKit.SqlDom
 			 }
 			).Named(nameof(UseDatabaseExpr));
 
-		public static readonly IParser<DeclareExpression> DeclareVariableExpr =
+		public static readonly IParser<SqlDeclareExpression> DeclareVariableExpr =
 			(from declare1 in SqlToken.Word("DECLARE")
 			 from variable1 in Variable
 			 from sqlDataType1 in SqlDataType
-			 select new DeclareExpression()
+			 select new SqlDeclareExpression()
 			 {
 				 Name = variable1,
 				 DataType = sqlDataType1.GetText()

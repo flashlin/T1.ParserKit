@@ -16,9 +16,9 @@ namespace T1.ParserKitTests
 		{
 			GivenText("declare @name int");
 			WhenParse(SqlParser.StartExpr);
-			ThenResultShouldBe(new DeclareExpression()
+			ThenResultShouldBe(new SqlDeclareExpression()
 			{
-				Name = new VariableExpression()
+				Name = new SqlVariableExpression()
 				{
 					Name = "@name"
 				},

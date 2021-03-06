@@ -46,7 +46,7 @@ namespace T1.ParserKitTests
 			WhenParse(SqlParser.FilterExpr);
 			ThenResultShouldBe(new SqlFilterExpression()
 			{
-				Left = new VariableExpression
+				Left = new SqlVariableExpression
 				{
 					Name = "@name",
 				},
@@ -290,7 +290,7 @@ namespace T1.ParserKitTests
 							Name = "name"
 						},
 						Oper = "=",
-						Right = new VariableExpression()
+						Right = new SqlVariableExpression()
 						{
 							Name = "@name"
 						}
@@ -310,7 +310,7 @@ namespace T1.ParserKitTests
 				{
 					new SqlVariableAssignFieldExpression
 					{
-						VariableName = new VariableExpression
+						VariableName = new SqlVariableExpression
 						{
 							Name = "@name",
 						},

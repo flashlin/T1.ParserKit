@@ -1,8 +1,8 @@
 ﻿namespace T1.ParserKit.SqlDom.Expressions
 {
-	public class SqlParameterExpression : SqlExpression
+	public class SqlDeclareExpression : SqlExpression
 	{
 		public SqlVariableExpression Name { get; set; }
-		public SqlDataTypeExpression DataType { get; set; }
+		public string DataType { get; set; }
 	}
 }
