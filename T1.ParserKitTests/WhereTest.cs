@@ -133,6 +133,164 @@ namespace T1.ParserKitTests
 			});
 		}
 
+		[Fact]
+		public void FilterAndExpr_1_eq_2_AND_3_eq_4()
+		{
+			GivenText("1 = 2 and 3 = 4");
+			WhenParse(SqlParser.FilterAndExpr);
+			ThenResultShouldBe(new SqlAndOperExpression()
+			{
+				Left = new SqlFilterExpression()
+				{
+					Left = new SqlNumberExpression()
+					{
+						Value = 1,
+						ValueTypeFullname = typeof(int).FullName
+					},
+					Oper = "=",
+					Right = new SqlNumberExpression()
+					{
+						Value = 2,
+						ValueTypeFullname = typeof(int).FullName
+					}
+				},
+				Oper = "AND",
+				Right = new SqlFilterExpression()
+				{
+					Left = new SqlNumberExpression()
+					{
+						Value = 3,
+						ValueTypeFullname = typeof(int).FullName,
+					},
+					Oper = "=",
+					Right = new SqlNumberExpression()
+					{
+						Value = 4,
+						ValueTypeFullname = typeof(int).FullName
+					}
+				}
+			});
+		}
+
+		[Fact]
+		public void FilterOrExpr_1_eq_2_AND_3_eq_4()
+		{
+			GivenText("1 = 2 and 3 = 4");
+			WhenParse(SqlParser.FilterOrExpr);
+			ThenResultShouldBe(new SqlAndOperExpression()
+			{
+				Left = new SqlFilterExpression()
+				{
+					Left = new SqlNumberExpression()
+					{
+						Value = 1,
+						ValueTypeFullname = typeof(int).FullName
+					},
+					Oper = "=",
+					Right = new SqlNumberExpression()
+					{
+						Value = 2,
+						ValueTypeFullname = typeof(int).FullName
+					}
+				},
+				Oper = "AND",
+				Right = new SqlFilterExpression()
+				{
+					Left = new SqlNumberExpression()
+					{
+						Value = 3,
+						ValueTypeFullname = typeof(int).FullName,
+					},
+					Oper = "=",
+					Right = new SqlNumberExpression()
+					{
+						Value = 4,
+						ValueTypeFullname = typeof(int).FullName
+					}
+				}
+			});
+		}
+
+		[Fact]
+		public void FilterChainExpr_1_eq_2_AND_3_eq_4()
+		{
+			GivenText("1 = 2 and 3 = 4");
+			WhenParse(SqlParser.FilterChainExpr);
+			ThenResultShouldBe(new SqlAndOperExpression()
+			{
+				Left = new SqlFilterExpression()
+				{
+					Left = new SqlNumberExpression()
+					{
+						Value = 1,
+						ValueTypeFullname = typeof(int).FullName
+					},
+					Oper = "=",
+					Right = new SqlNumberExpression()
+					{
+						Value = 2,
+						ValueTypeFullname = typeof(int).FullName
+					}
+				},
+				Oper = "AND",
+				Right = new SqlFilterExpression()
+				{
+					Left = new SqlNumberExpression()
+					{
+						Value = 3,
+						ValueTypeFullname = typeof(int).FullName,
+					},
+					Oper = "=",
+					Right = new SqlNumberExpression()
+					{
+						Value = 4,
+						ValueTypeFullname = typeof(int).FullName
+					}
+				}
+			});
+		}
+
+		[Fact]
+		public void FilterChainExpr_field_eq_func_AND_func_eq_str1()
+		{
+			GivenText("name = DB_NAME() and SUSER_SNAME(owner_sid) = 'sa'");	
+			WhenParse(SqlParser.FilterChainExpr);
+			ThenResultShouldBe(new SqlAndOperExpression()
+			{
+				Left = new SqlFilterExpression()
+				{
+					Left = new SqlTableFieldExpression()
+					{
+						Name = "name"
+					},
+					Oper = "=",
+					Right = new SqlFuncDbNameExpression()
+					{
+						Name = "DB_NAME"
+					}
+				},
+				Oper = "AND",
+				Right = new SqlFilterExpression()
+				{
+					Left = new SqlFuncSuserSnameExpression()
+					{
+						Name = "SUSER_SNAME",
+						Parameters = new SqlExpression[]
+						{
+							new SqlIdentifierExpression()
+							{
+								Name = "owner_sid"
+							}
+						}
+					},
+					Oper = "=",
+					Right = new SqlStringExpression()
+					{
+						Text = "sa"
+					}
+				}
+			});
+		}
 
 		[Fact]
 		public void NString_not_like_NString()

@@ -16,12 +16,14 @@
 
 		public IParseResult<T> TryParse(IInputReader inp)
 		{
+			var pos1 = inp.GetPosition();
 			var parsed1 = _parserA.TryParse(inp);
 			if (parsed1.IsSuccess())
 			{
 				return parsed1;
 			}
 
+			inp.Seek(pos1);
 			var parsed2 = _parserB.TryParse(inp);
 			if (parsed2.IsSuccess())
 			{

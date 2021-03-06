@@ -228,13 +228,13 @@ namespace T1.ParserKit.SqlDom
 
 		public static readonly IParser<SqlFuncDbNameExpression> FuncDbNameExpr =
 			(from db_name in SqlToken.Word("DB_NAME")
-				from lparen in SqlToken.LParen
-				from rparen in SqlToken.RParen
-				select new SqlFuncDbNameExpression()
-				{
-					TextSpan = new[] { db_name, lparen, rparen }.GetTextSpan(),
-					Name = "DB_NAME"
-				}).Named(nameof(FuncDbNameExpr));
+			 from lparen in SqlToken.LParen
+			 from rparen in SqlToken.RParen
+			 select new SqlFuncDbNameExpression()
+			 {
+				 TextSpan = new[] { db_name, lparen, rparen }.GetTextSpan(),
+				 Name = "DB_NAME"
+			 }).Named(nameof(FuncDbNameExpr));
 
 		public static readonly IParser<SqlFunctionExpression> SqlFunctionsExpr =
 			Parse.AnyCast<SqlFunctionExpression>(
@@ -480,9 +480,51 @@ namespace T1.ParserKit.SqlDom
 			(from filterExpr in FilterExpr1.Or(FilterExpr2)
 			 select filterExpr).Named(nameof(FilterExpr));
 
+
+		public static readonly IParser<SqlExpression> FilterAndExpr =
+			AndExpr(FilterExpr);
+
+		public static readonly IParser<SqlExpression> FilterOrExpr =
+			OrExpr(FilterAndExpr);
+
+		public static readonly IParser<SqlExpression> FilterChainExpr =
+			FilterOrExpr;
+
+		public static IParser<SqlExpression> AndExpr<T>(IParser<T> factor)
+			where T : SqlExpression
+		{
+			var andExpr =
+				from left in factor
+				from oper1 in SqlToken.Word("AND")
+				from right in factor
+				select new SqlAndOperExpression()
+				{
+					Left = left,
+					Oper = "AND",
+					Right = right
+				};
+			return andExpr.CastParser<SqlExpression>().Or(factor.CastParser<SqlExpression>());
+		}
+
+		public static IParser<SqlExpression> OrExpr<T>(IParser<T> factor)
+			where T : SqlExpression
+		{
+			var orExpr =
+				from left in factor
+				from oper1 in SqlToken.Word("OR")
+				from right in factor
+				select new SqlAndOperExpression()
+				{
+					Left = left,
+					Oper = "OR",
+					Right = right
+				};
+			return orExpr.CastParser<SqlExpression>().Or(factor.CastParser<SqlExpression>());
+		}
+
 		public static readonly IParser<WhereExpression> WhereExpr =
 			from _ in SqlToken.Word("WHERE")
-			from filter1 in FilterExpr
+			from filter1 in FilterExpr//FilterChainExpr.Or(FilterExpr.CastParser<SqlExpression>())
 			select new WhereExpression()
 			{
 				Filter = filter1
