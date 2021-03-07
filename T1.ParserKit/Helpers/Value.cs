@@ -11,7 +11,7 @@ namespace T1.ParserKit.Helpers
 			where T2: class, new()
 		{
 			var to = new T2();
-			ValueHelper.CopyData(from, to);
+			ValueHelper.CopyData(@from, to);
 			init(to);
 			return to;
 		}
@@ -30,6 +30,11 @@ namespace T1.ParserKit.Helpers
 
 			//}
 			return cstyleString.Substring(1, cstyleString.Length - 2);
+		}
+
+		public static bool IsToggle(this string onOffText)
+		{
+			return string.Equals(onOffText.ToUpper(), "ON", StringComparison.Ordinal);
 		}
 	}
 }
