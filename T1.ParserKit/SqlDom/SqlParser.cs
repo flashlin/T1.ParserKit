@@ -697,7 +697,7 @@ namespace T1.ParserKit.SqlDom
 			).Named(nameof(PrintExpr));
 
 		public static readonly IParser<SqlExecExpression> ExecExpr =
-			from exec1 in SqlToken.Word("EXEC")
+			from exec1 in SqlToken.Contains("EXEC", "EXECUTE")
 			from name1 in DatabaseSchemaObjectName
 			from parameters1 in Parse.AnyCast<SqlExpression>(
 				 VariableAssignExpr(Atom), 
