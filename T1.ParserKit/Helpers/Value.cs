@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using T1.Standard.Common;
 
@@ -35,6 +36,12 @@ namespace T1.ParserKit.Helpers
 		public static bool IsToggle(this string onOffText)
 		{
 			return string.Equals(onOffText.ToUpper(), "ON", StringComparison.Ordinal);
+		}
+
+		public static IEnumerable<TSource> ConcatItems<TSource>(this IEnumerable<TSource> first, 
+			params TSource[] seconds)
+		{
+			return first.Concat(seconds);
 		}
 	}
 }

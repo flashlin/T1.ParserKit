@@ -128,15 +128,22 @@ namespace T1.ParserKit.SqlDom
 					 from end1 in mark
 					 select new SqlExpression()
 					 {
-						 TextSpan = new[] { start1, body1, end1 }.GetTextSpan()
+						 TextSpan = body1.Length == 0 ?
+							 new[] { start1, end1 }.GetTextSpan() :
+							 new[] { start1, body1, end1 }.GetTextSpan()
 					 };
 		}
 
 		public static readonly IParser<SqlExpression> String2 =
 			Surrounded(Parse.Equal("\""));
 
-		public static readonly IParser<SqlExpression> String1 =
-			Surrounded(Parse.Equal("'"));
+		public static readonly IParser<SqlStringExpression> String1 =
+			Surrounded(Parse.Equal("'"))
+				.MapResult(x => new SqlStringExpression()
+				{
+					TextSpan = x.TextSpan,
+					Text = x.GetText().GetCStyleStringText()
+				});
 
 		public static readonly IParser<SqlStringExpression> NString =
 			from n1 in Parse.Equal("N")
@@ -150,6 +157,13 @@ namespace T1.ParserKit.SqlDom
 
 		public static readonly IParser<SqlExpression> LexemeString =
 			Lexeme(Parse.AnyCast<SqlExpression>(NString, String1));
+
+		public static readonly IParser<SqlNullExpression> Null =
+			from null1 in Word("NULL")
+			select new SqlNullExpression()
+			{
+				TextSpan = null1.TextSpan,
+			};
 
 		public static IParser<T> Lexeme<T>(IParser<T> parser)
 		{

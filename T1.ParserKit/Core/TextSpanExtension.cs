@@ -46,12 +46,15 @@ namespace T1.ParserKit.Core
 				str.Append(span.Text);
 				prev = span;
 			}
+
+			var spanLen = tl.Position + tl.Length - hd.Position;
+
 			return new TextSpan()
 			{
 				File = hd.File,
 				Position = hd.Position,
 				Text = str.ToString(),
-				Length = tl.Position + tl.Length - hd.Position
+				Length = spanLen
 			};
 		}
 

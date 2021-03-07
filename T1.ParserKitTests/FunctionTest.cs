@@ -143,6 +143,28 @@ namespace T1.ParserKitTests
 		}
 
 		[Fact]
+		public void Cast()
+		{
+			GivenText("Cast(0x0000A5E5006236FB as DateTime)");	
+			WhenParse(SqlParser.FuncCastExpr);
+			ThenResultShouldBe(new SqlFunctionExpression()
+			{
+				Name = "CAST",
+				Parameters = new SqlExpression[]
+				{
+					new SqlHexExpression()
+					{
+						HexStr = "0000A5E5006236FB"
+					},
+					new SqlDataTypeExpression()
+					{
+						DataType = "DateTime"
+					}
+				}
+			});
+		}
+
+		[Fact]
 		public void SUSER_SNAME()
 		{
 			GivenText("SUSER_SNAME(server_user_sid)");

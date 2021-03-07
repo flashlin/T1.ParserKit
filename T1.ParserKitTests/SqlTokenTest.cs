@@ -21,6 +21,17 @@ namespace T1.ParserKitTests
 		}
 
 		[Fact]
+		public void Hex()
+		{
+			GivenText("0x0000A5E500670D9F");
+			WhenParse(SqlParser.HexExpr);
+			ThenResultShouldBe(new SqlHexExpression()
+			{
+				HexStr = "0000A5E500670D9F" 
+			});
+		}
+
+		[Fact]
 		public void NonIdentifier()
 		{
 			GivenText("from");
@@ -115,5 +126,41 @@ namespace T1.ParserKitTests
 				Text = "123"
 			});
 		}
+
+		[Fact]
+		public void NString_empty()
+		{
+			GivenText("N''");
+			WhenParse(SqlToken.NString);
+			ThenResultShouldBe(new SqlStringExpression()
+			{
+				IsUnicode = true,
+				Text = ""
+			});
+		}
+
+		[Fact]
+		public void String_empty()
+		{
+			GivenText("''");
+			WhenParse(SqlToken.String1);
+			ThenResultShouldBe(new SqlStringExpression()
+			{
+				Text = ""
+			});
+		}
+
+		[Fact]
+		public void String()
+		{
+			GivenText("'1'");
+			WhenParse(SqlToken.String1);
+			ThenResultShouldBe(new SqlStringExpression()
+			{
+				Text = "1"
+			});
+		}
+
+		
 	}
 }

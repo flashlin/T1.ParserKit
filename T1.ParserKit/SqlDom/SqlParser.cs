@@ -169,6 +169,25 @@ namespace T1.ParserKit.SqlDom
 					Name = "DB_NAME"
 				}).Named(nameof(FuncDbNameExpr));
 
+		//CAST(0x0000A5E5006236FB AS DateTime)
+		public static readonly IParser<SqlFunctionExpression> FuncCastExpr =
+			from cast1 in SqlToken.Word("CAST")
+			from lparen1 in SqlToken.LParen
+			from expr1 in Atom
+			from as1 in SqlToken.Word("AS")
+			from dataType1 in SqlDataTypeExpr
+			from rparen1 in SqlToken.RParen
+			select new SqlFunctionExpression()
+			{
+				TextSpan = new [] { cast1, lparen1, expr1, as1, dataType1, rparen1 }.GetTextSpan(),
+				Name = "CAST",
+				Parameters = new []
+				{
+					expr1, 
+					dataType1
+				}
+			};
+
 		public static readonly IParser<SqlFunctionExpression> SqlFunctionsExpr =
 			Parse.AnyCast<SqlFunctionExpression>(
 				FuncGetdateExpr,
@@ -177,6 +196,7 @@ namespace T1.ParserKit.SqlDom
 				FuncDatediffExpr,
 				FuncSuserSnameExpr,
 				FuncDbNameExpr,
+				FuncCastExpr,
 				FuncExistsExpr);
 
 		public static readonly IParser<SqlExpression> OptionName =
@@ -369,14 +389,27 @@ namespace T1.ParserKit.SqlDom
 		public static readonly IParser<SqlNumberExpression> NumberExpr =
 			Parse.Any(NegativeIntegerExpr, IntegerExpr);
 
+		public static readonly IParser<SqlHexExpression> HexExpr =
+			from zero1 in ParseToken.Symbol("0")
+			from x1 in Parse.Match("x")
+			from body1 in Parse.RepeatAny(Parse.Digits, Parse.Letters).Merge()
+			select new SqlHexExpression()
+			{
+				TextSpan = new[] { zero1, x1, body1 }.GetTextSpan(),
+				HexStr = body1.Text
+			};
+
 		public static readonly IParser<SqlExpression> Atom =
 			Parse.AnyCast<SqlExpression>(
+				HexExpr,
+				SqlToken.Null,
 				SqlToken.NString,
 				SqlToken.LexemeString,
 				FuncGetdateExpr,
 				TableFieldAliasExpr,
 				NumberExpr,
-				Variable);
+				Variable
+				);
 
 		public static readonly IParser<SqlExpression> ArithmeticOperatorAtomExpr =
 			ArithmeticOperatorExpr(Atom);
@@ -504,6 +537,32 @@ namespace T1.ParserKit.SqlDom
 
 		public static readonly IParser<SqlExpression> SelectExpr =
 			Parse.AnyCast<SqlExpression>(ComplexSelectExpr, SimpleSelectExpr);
+
+		public static readonly IParser<SqlInsertRowExpression> insertRowValue =
+			from lparen2 in SqlToken.LParen
+			from value2 in StartExpr.Or(Atom).SeparatedBy(SqlToken.Comma)
+			from rparen2 in SqlToken.RParen
+			select new SqlInsertRowExpression()
+			{
+				Values = value2.ToArray()
+			};
+
+		public static readonly IParser<SqlInsertExpression> InsertExpr =
+			from delete1 in SqlToken.Word("INSERT")
+			from table1 in DatabaseSchemaObjectName
+			from lparen1 in SqlToken.LParen
+			from fields1 in TableFieldExpr.SeparatedBy(SqlToken.Comma)
+			from rparen1 in SqlToken.RParen
+			from values1 in SqlToken.Word("VALUES")
+			from rows1 in insertRowValue.SeparatedBy(SqlToken.Comma)
+			select new SqlInsertExpression()
+			{
+				TextSpan = new[] { delete1, table1, lparen1 }.Concat(fields1)
+					.ConcatItems(rparen1, values1).Concat(rows1).GetTextSpan(),
+				Table = table1,
+				Fields = fields1.ToArray(),
+				InsertRows = rows1.ToArray()
+			};
 
 		private static readonly IParser<ObjectNameExpression> DatabaseDboSchemaName3 =
 			Parse.SeqCast<SqlExpression>(SqlToken.Identifier, SqlToken.Dot, SqlToken.Identifier, SqlToken.Dot,
@@ -763,6 +822,7 @@ namespace T1.ParserKit.SqlDom
 				SetManyOptionOnOffExpr,
 				GoExpr,
 				SelectExpr,
+				InsertExpr,
 				IfExprs,
 				SqlFunctionsExpr
 			).Named(nameof(StartExpr));
