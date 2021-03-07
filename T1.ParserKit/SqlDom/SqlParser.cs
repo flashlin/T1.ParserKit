@@ -711,12 +711,29 @@ namespace T1.ParserKit.SqlDom
 				Parameters = parameters1.ToArray()
 			};
 
+		private static readonly IParser<SqlExpression> DbPermissions = SqlToken.Contains(
+			"CONNECT", "DELETE", "SELECT", "INSERT", "UPDATE"
+		);
+
+		public static readonly IParser<SqlGrantPermissionToExpression> GrantPermissionToExpr =
+			from grant1 in SqlToken.Word("GRANT")
+			from permission1 in DbPermissions
+			from to1 in SqlToken.Word("TO")
+			from principal1 in SqlToken.SqlIdentifier
+			from semicolon1 in SqlToken.SemiColon.Optional()
+			select new SqlGrantPermissionToExpression()
+			{
+				ToPrincipal = principal1
+			};
+
+
 		public static readonly IParser<SqlExpression> BatchExpr =
 			Parse.AnyCast<SqlExpression>(
 				SetVarExpr,
 				OnErrorExitExpr,
 				DeclareVariableExpr,
 				UseDatabaseExpr,
+				GrantPermissionToExpr,
 				ExecExpr
 			);
 
