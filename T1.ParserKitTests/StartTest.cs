@@ -94,7 +94,6 @@ namespace T1.ParserKitTests
 			{
 				GivenTextFile(sample);
 				WhenParseAll(SqlParser.StartExpr);
-				return;
 				ThenResultShouldSuccess();
 			}
 		}
