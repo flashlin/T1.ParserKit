@@ -36,7 +36,7 @@ namespace T1.ParserKit.Core.Parsers
 					break;
 				}
 				acc = _accFunc(acc, parsed.Result);
-			} while (true);
+			} while (!inp.Eof());
 
 			return Parse.Success(_resultSelector(acc));
 		}

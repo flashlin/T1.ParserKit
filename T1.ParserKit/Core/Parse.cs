@@ -429,7 +429,7 @@ namespace T1.ParserKit.Core
 						break;
 					}
 					acc.Add(parsed2.Result);
-				} while (true);
+				} while (!inp.Eof());
 
 				if (acc.Count == 0)
 				{

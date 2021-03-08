@@ -13,5 +13,6 @@
 
 		string Substr(int len);
 		void Seek(int offset);
+		LinePosition GetLinePosition(int offset);
 	}
 }
