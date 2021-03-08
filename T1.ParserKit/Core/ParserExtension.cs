@@ -126,7 +126,7 @@ namespace T1.ParserKit.Core
 
 		public static IEnumerable<IParseResult<T>> TryParseAllText<T>(this IParser<T> p, string code)
 		{
-			IInputReader inp = new CacheStringReader(new StringInputReader(code));
+			IInputReader inp = new StringInputReader(code);
 			do
 			{
 				var parsed = p.TryParse(inp);
@@ -140,7 +140,7 @@ namespace T1.ParserKit.Core
 
 		public static IParseResult<T> TryParseText<T>(this IParser<T> p, string code)
 		{
-			IInputReader inp = new CacheStringReader(new StringInputReader(code));
+			IInputReader inp = new StringInputReader(code);
 			return p.TryParse(inp);
 		}
 	}
