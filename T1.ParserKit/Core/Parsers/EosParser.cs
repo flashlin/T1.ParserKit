@@ -12,7 +12,8 @@
 			}
 
 			var ch = inp.Substr(20);
-			return Parse.Error<T>($"Expected EOS, but got '{ch}' at {inp}.", inp.GetPosition());
+			string message = $"Expected EOS, but got '{ch}' at {inp}.";
+			return Parse.Error<T>(() => message, inp.GetPosition());
 		}
 	}
 }

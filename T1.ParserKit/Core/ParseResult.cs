@@ -18,7 +18,7 @@ namespace T1.ParserKit.Core
 			{
 				return $"{Result}";
 			}
-			return Error.Message;
+			return Error.Message();
 		}
 	}
 }

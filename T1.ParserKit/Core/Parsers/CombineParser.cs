@@ -158,8 +158,7 @@ namespace T1.ParserKit.Core.Parsers
 					acc.Add(parsed.Error);
 				}
 				var ch = inp.Substr(20);
-				return Parse.Error<T>($"Expect ({name}), but got '{ch}' at {inp}",
-					acc, inp.GetPosition());
+				return Parse.Error<T>(() => $"Expect ({name}), but got '{ch}' at {inp}", acc, inp.GetPosition());
 			});
 		}
 

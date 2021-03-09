@@ -10,14 +10,14 @@ namespace T1.ParserKit.Core
 	{
 		public static ParseError Empty = new ParseError()
 		{
-			Message = string.Empty,
+			Message = () => string.Empty,
 			Position = -1,
 			InnerErrors = new ParseError[0]
 		};
 
 		public ParseError[] InnerErrors { get; set; }
 
-		public string Message { get; set; }
+		public Func<string> Message { get; set; }
 
 		public int Position { get; set; }
 
@@ -51,7 +51,7 @@ namespace T1.ParserKit.Core
 
 			return new ParseError
 			{
-				Message = nameof(GetLastError),
+				Message = () => nameof(GetLastError),
 				InnerErrors = innerErrors.ToArray()
 			};
 		}
@@ -63,7 +63,7 @@ namespace T1.ParserKit.Core
 				Indent = tabs
 			};
 
-			errorMessage.WriteLine(ToDebugText(Message));
+			errorMessage.WriteLine(ToDebugText(Message()));
 			if (InnerErrors.Length > 0)
 			{
 				errorMessage.Indent++;
@@ -88,12 +88,12 @@ namespace T1.ParserKit.Core
 
 		public override string ToString()
 		{
-			if (Message == string.Empty)
+			if (Message() == string.Empty)
 			{
 				return string.Empty;
 			}
 
-			return $"{Message} at {Position}\r\n" + GetErrorMessage();
+			return $"{Message()} at {Position}\r\n" + GetErrorMessage();
 		}
 	}
 }
