@@ -37,10 +37,11 @@ namespace T1.ParserKit.Core
 				.Aggregate((a, b) => a.Position > b.Position ? a : b);
 
 			var innerErrors = new List<ParseError>();
+			innerErrors.Add(lastError);
 
 			foreach (var error in allErrors)
 			{
-				if (error != lastError)
+				if (error == lastError)
 				{
 					continue;
 				}
@@ -54,6 +55,7 @@ namespace T1.ParserKit.Core
 			return new ParseError
 			{
 				Message = nameof(GetLastError),
+				FileContent = FileContent.Empty,
 				InnerErrors = innerErrors.ToArray()
 			};
 		}

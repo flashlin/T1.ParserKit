@@ -99,8 +99,8 @@ namespace T1.ParserKitTests.Helpers
 		{
 			if (!_parsed.IsSuccess())
 			{
-				//var parseEx = new ParseException(_parsed.Error.GetLastError());
-				var parseEx = new ParseException(_parsed.Error);
+				var parseEx = new ParseException(_parsed.Error.GetLastError());
+				//var parseEx = new ParseException(_parsed.Error);
 				throw new Exception(_file, parseEx);
 			}
 		}

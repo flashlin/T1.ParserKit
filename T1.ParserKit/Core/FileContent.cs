@@ -13,6 +13,10 @@
 
 		public string Substr(int len)
 		{
+			if (Offset == -1)
+			{
+				return string.Empty;
+			}
 			var maxLen = Text.GetLength() - Offset;
 			if (len > maxLen)
 			{
@@ -23,6 +27,15 @@
 
 		public LinePosition GetPosition()
 		{
+			if (Offset == -1)
+			{
+				return new LinePosition()
+				{
+					Line = -1,
+					Col = -1,
+				};
+			}
+
 			var length = Text.GetLength();
 			var pos = 0;
 			var line = 1;
