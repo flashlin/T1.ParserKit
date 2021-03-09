@@ -65,10 +65,9 @@ namespace T1.ParserKit.Core
 				Indent = tabs
 			};
 
-			var errorPos = FileContent.GetPosition();
-			var rest = FileContent.Substr(40);
-			var message = $"{Message} at {errorPos} rest='{rest}'.";
-			errorMessage.WriteLine(ToDebugText(message));
+			var debugText = GetDebugErrorMessage();
+			errorMessage.WriteLine(debugText);
+
 			if (InnerErrors.Length > 0)
 			{
 				errorMessage.Indent++;
@@ -81,6 +80,21 @@ namespace T1.ParserKit.Core
 			}
 
 			return errorMessage.ToString();
+		}
+
+		private string GetDebugErrorMessage()
+		{
+			var message = GetErrorPositionMessage();
+			var debugText = ToDebugText(message);
+			return debugText;
+		}
+
+		private string GetErrorPositionMessage()
+		{
+			var errorPos = FileContent.GetPosition();
+			var rest = FileContent.Substr(40);
+			var message = $"{Message} at {errorPos} rest='{rest}'.";
+			return message;
 		}
 
 		private string ToDebugText(string message)
