@@ -19,7 +19,7 @@ namespace T1.ParserKit.Core.Parsers
 			if (result.IsSuccess())
 			{
 				inp.Seek(pos);
-				return Parse.Error<Unit>(() => $"Expect {_parser.Name}, but got '{result.Result}' at {inp}.", inp.GetPosition());
+				return Parse.Error<Unit>($"Expect {_parser.Name}, but got '{result.Result}'", inp);
 			}
 			return Parse.Success(Unit.Instance);
 		}

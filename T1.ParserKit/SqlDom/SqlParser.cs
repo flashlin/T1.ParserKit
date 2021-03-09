@@ -823,8 +823,8 @@ namespace T1.ParserKit.SqlDom
 				GoExpr,
 				SelectExpr,
 				InsertExpr,
-				IfExprs,
-				SqlFunctionsExpr
+				SqlFunctionsExpr,
+				IfExprs
 			).Named(nameof(StartExpr));
 
 		private static readonly IParser<SqlExpression> Oper1 =

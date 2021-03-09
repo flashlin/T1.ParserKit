@@ -10,16 +10,18 @@ namespace T1.ParserKit.Core
 	{
 		public static ParseError Empty = new ParseError()
 		{
-			Message = () => string.Empty,
-			Position = -1,
+			Message = string.Empty,
+			FileContent = FileContent.Empty,
 			InnerErrors = new ParseError[0]
 		};
 
 		public ParseError[] InnerErrors { get; set; }
 
-		public Func<string> Message { get; set; }
+		public string Message { get; set; }
 
-		public int Position { get; set; }
+		public int Position => FileContent.Offset;
+
+		public FileContent FileContent { get; set; }
 
 		private IEnumerable<ParseError> GetAllErrors()
 		{
@@ -30,7 +32,7 @@ namespace T1.ParserKit.Core
 		public ParseError GetLastError()
 		{
 			var allErrors = GetAllErrors().ToArray();
-			
+
 			var lastError = allErrors
 				.Aggregate((a, b) => a.Position > b.Position ? a : b);
 
@@ -51,7 +53,7 @@ namespace T1.ParserKit.Core
 
 			return new ParseError
 			{
-				Message = () => nameof(GetLastError),
+				Message = nameof(GetLastError),
 				InnerErrors = innerErrors.ToArray()
 			};
 		}
@@ -63,7 +65,10 @@ namespace T1.ParserKit.Core
 				Indent = tabs
 			};
 
-			errorMessage.WriteLine(ToDebugText(Message()));
+			var errorPos = FileContent.GetPosition();
+			var rest = FileContent.Substr(40);
+			var message = $"{Message} at {errorPos} rest='{rest}'.";
+			errorMessage.WriteLine(ToDebugText(message));
 			if (InnerErrors.Length > 0)
 			{
 				errorMessage.Indent++;
@@ -88,12 +93,12 @@ namespace T1.ParserKit.Core
 
 		public override string ToString()
 		{
-			if (Message() == string.Empty)
+			if (Message == string.Empty)
 			{
 				return string.Empty;
 			}
 
-			return $"{Message()} at {Position}\r\n" + GetErrorMessage();
+			return $"{Message} at {Position}\r\n" + GetErrorMessage();
 		}
 	}
 }

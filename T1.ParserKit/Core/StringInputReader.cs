@@ -13,6 +13,23 @@
 			_position = 0;
 		}
 
+		public FileContent GetFileContent()
+		{
+			return new FileContent()
+			{
+				Text = new StringPtr()
+				{
+					Content = _text
+				},
+				Offset = _position
+			};
+		}
+
+		public string GetContent()
+		{
+			return _text;
+		}
+
 		public string GetFile()
 		{
 			return "";

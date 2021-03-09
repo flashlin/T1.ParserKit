@@ -40,7 +40,7 @@ namespace T1.ParserKit.Core
 				}
 
 				var ch = inp.Substr(1);
-				var error = Parse.Error<string>(() => $"Expect assertion, but got '{ch}' at {inp}.", inp.GetPosition());
+				var error = Parse.Error<string>($"Expect assertion, but got '{ch}'", inp);
 
 				var letter = Parse.Letter.TryParse(inp);
 				if (letter.IsSuccess())

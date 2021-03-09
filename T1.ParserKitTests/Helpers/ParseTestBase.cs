@@ -46,7 +46,8 @@ namespace T1.ParserKitTests.Helpers
 		{
 			if (!_parsed.IsSuccess())
 			{
-				throw new ParseException(_parsed.Error.GetLastError());
+				//throw new ParseException(_parsed.Error.GetLastError());
+				throw new ParseException(_parsed.Error);
 			}
 
 			var actualResult = _parsed.Result;
@@ -98,7 +99,8 @@ namespace T1.ParserKitTests.Helpers
 		{
 			if (!_parsed.IsSuccess())
 			{
-				var parseEx = new ParseException(_parsed.Error.GetLastError());
+				//var parseEx = new ParseException(_parsed.Error.GetLastError());
+				var parseEx = new ParseException(_parsed.Error);
 				throw new Exception(_file, parseEx);
 			}
 		}

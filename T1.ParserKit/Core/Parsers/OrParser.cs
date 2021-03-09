@@ -31,7 +31,7 @@
 			}
 
 			var ch = inp.Substr(20);
-			return Parse.Error<T>(() => $"Expect {Name}, but got '{ch}' at {inp}.", new []{ parsed1.Error, parsed2.Error }, inp.GetPosition());
+			return Parse.Error<T>($"Expect {Name}, but got '{ch}'", inp);
 		}
 	}
 }
