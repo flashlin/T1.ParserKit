@@ -2,7 +2,7 @@
 {
 	public class SqlInsertExpression : SqlExpression
 	{
-		public ObjectNameExpression Table { get; set; }
+		public SqlObjectNameExpression Table { get; set; }
 		public SqlBaseFieldExpression[] Fields { get; set; }
 		public SqlInsertRowExpression[] InsertRows { get; set; }
 		public bool HasInto { get; set; }

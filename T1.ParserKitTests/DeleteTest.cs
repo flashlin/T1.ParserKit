@@ -14,7 +14,7 @@ namespace T1.ParserKitTests
 			WhenParse(SqlParser.DeleteExpr);
 			ThenResultShouldBe(new SqlDeleteExpression()
 			{
-				From = new ObjectNameExpression()
+				From = new SqlObjectNameExpression()
 				{
 					Name = "customer"
 				},
@@ -22,7 +22,7 @@ namespace T1.ParserKitTests
 				{
 					Filter = new SqlFilterExpression()
 					{
-						Left = new ObjectNameExpression()
+						Left = new SqlObjectNameExpression()
 						{
 							Name = "id"
 						},

@@ -104,7 +104,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("db1.dbo.customer");
 			WhenParse(SqlParser.DatabaseSchemaObjectName);
-			ThenResultShouldBe(new ObjectNameExpression()
+			ThenResultShouldBe(new SqlObjectNameExpression()
 			{
 				Name = "db1.dbo.customer"
 			});
@@ -115,7 +115,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("dbo.customer");
 			WhenParse(SqlParser.DatabaseSchemaObjectName);
-			ThenResultShouldBe(new ObjectNameExpression()
+			ThenResultShouldBe(new SqlObjectNameExpression()
 			{
 				Name = "dbo.customer"
 			});
@@ -126,7 +126,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("customer");
 			WhenParse(SqlParser.DatabaseSchemaObjectName);
-			ThenResultShouldBe(new ObjectNameExpression()
+			ThenResultShouldBe(new SqlObjectNameExpression()
 			{
 				Name = "customer"
 			});

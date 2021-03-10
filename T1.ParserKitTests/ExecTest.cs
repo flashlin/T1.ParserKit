@@ -15,7 +15,7 @@ namespace T1.ParserKitTests
 			WhenParse(SqlParser.ExecExpr);
 			ThenResultShouldBe(new SqlExecExpression()
 			{
-				Name = new ObjectNameExpression()
+				Name = new SqlObjectNameExpression()
 				{
 					Name = "sys.sp_changedbowner"
 				},
@@ -36,7 +36,7 @@ namespace T1.ParserKitTests
 			WhenParse(SqlParser.ExecExpr);
 			ThenResultShouldBe(new SqlExecExpression()
 			{
-				Name = new ObjectNameExpression()
+				Name = new SqlObjectNameExpression()
 				{
 					Name = "sys.sp_addextendedproperty"
 				},

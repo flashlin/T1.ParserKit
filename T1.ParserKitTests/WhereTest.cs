@@ -499,7 +499,7 @@ select 1 END");
 			WhenParse(SqlParser.FilterExpr);
 			ThenResultShouldBe(new SqlFilterExpression()
 			{
-				Left = new ObjectNameExpression()
+				Left = new SqlObjectNameExpression()
 				{
 					Name = "id"
 				},

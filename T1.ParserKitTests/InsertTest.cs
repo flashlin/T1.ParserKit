@@ -16,7 +16,7 @@ namespace T1.ParserKitTests
 			WhenParse(SqlParser.InsertExpr);
 			ThenResultShouldBe(new SqlInsertExpression()
 			{
-				Table = new ObjectNameExpression()
+				Table = new SqlObjectNameExpression()
 				{
 					Name = "[dbo].[customer]",
 				},
@@ -53,7 +53,7 @@ namespace T1.ParserKitTests
 			WhenParse(SqlParser.InsertExpr);
 			ThenResultShouldBe(new SqlInsertExpression()
 			{
-				Table = new ObjectNameExpression()
+				Table = new SqlObjectNameExpression()
 				{
 					Name = "[dbo].[customer]",
 				},
@@ -86,7 +86,7 @@ namespace T1.ParserKitTests
 			WhenParse(SqlParser.InsertExpr);
 			ThenResultShouldBe(new SqlInsertExpression()
 			{
-				Table = new ObjectNameExpression()
+				Table = new SqlObjectNameExpression()
 				{
 					Name = "[dbo].[customer]",
 				},
@@ -134,7 +134,7 @@ namespace T1.ParserKitTests
 			WhenParse(SqlParser.InsertExpr);
 			ThenResultShouldBe(new SqlInsertExpression()
 			{
-				Table = new ObjectNameExpression()
+				Table = new SqlObjectNameExpression()
 				{
 					Name = "[dbo].[customer]",
 				},
@@ -205,7 +205,7 @@ namespace T1.ParserKitTests
 			ThenResultShouldBe(new SqlInsertExpression()
 			{
 				HasInto = true,
-				Table = new ObjectNameExpression()
+				Table = new SqlObjectNameExpression()
 				{
 					Name = "[dbo].[customer]",
 				},

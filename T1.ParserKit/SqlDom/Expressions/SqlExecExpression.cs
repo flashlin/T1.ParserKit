@@ -2,7 +2,7 @@
 {
 	public class SqlExecExpression : SqlExpression
 	{
-		public ObjectNameExpression Name { get; set; }
+		public SqlObjectNameExpression Name { get; set; }
 		public SqlExpression[] Parameters { get; set; }
 	}
 }

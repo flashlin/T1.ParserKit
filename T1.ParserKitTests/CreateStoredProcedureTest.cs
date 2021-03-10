@@ -23,7 +23,7 @@ END
 			WhenParse(SqlParser.CreateStoredProcedureExpr);
 			ThenResultShouldBe(new SqlCreateStoredProcedureExpression()
 			{
-				Name = new ObjectNameExpression()
+				Name = new SqlObjectNameExpression()
 				{
 					Name = "[dbo].[AddCustomer]"
 				},

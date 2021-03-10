@@ -562,30 +562,30 @@ namespace T1.ParserKit.SqlDom
 				InsertRows = rows1.ToArray()
 			};
 
-		private static readonly IParser<ObjectNameExpression> DatabaseDboSchemaName3 =
+		private static readonly IParser<SqlObjectNameExpression> DatabaseDboSchemaName3 =
 			Parse.SeqCast<SqlExpression>(SqlToken.Identifier, SqlToken.Dot, SqlToken.Identifier, SqlToken.Dot,
 					SqlToken.Identifier
 				).Merge()
-				.MapResult(x => new ObjectNameExpression()
+				.MapResult(x => new SqlObjectNameExpression()
 				{
 					Name = x.GetText()
 				});
 
-		private static readonly IParser<ObjectNameExpression> DatabaseDboSchemaName2 =
+		private static readonly IParser<SqlObjectNameExpression> DatabaseDboSchemaName2 =
 			Parse.SeqCast<SqlExpression>(SqlToken.Identifier, SqlToken.Dot, SqlToken.Identifier
 				).Merge()
-				.MapResult(x => new ObjectNameExpression()
+				.MapResult(x => new SqlObjectNameExpression()
 				{
 					Name = x.GetText()
 				});
 
-		private static readonly IParser<ObjectNameExpression> DatabaseDboSchemaName1 = SqlToken.Identifier
-			.MapResult(x => new ObjectNameExpression()
+		private static readonly IParser<SqlObjectNameExpression> DatabaseDboSchemaName1 = SqlToken.Identifier
+			.MapResult(x => new SqlObjectNameExpression()
 			{
 				Name = x.GetText()
 			});
 
-		public static readonly IParser<ObjectNameExpression> DatabaseSchemaObjectName =
+		public static readonly IParser<SqlObjectNameExpression> DatabaseSchemaObjectName =
 			Parse.Any(DatabaseDboSchemaName3,
 				DatabaseDboSchemaName2,
 				DatabaseDboSchemaName1);
