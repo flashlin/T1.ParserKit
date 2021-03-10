@@ -165,6 +165,31 @@ namespace T1.ParserKitTests
 		}
 
 		[Fact]
+		public void Cast_float_as_decimal()
+		{
+			GivenText("CAST(0.0075 AS Decimal(5, 4))");	
+			WhenParse(SqlParser.FuncCastExpr);
+			ThenResultShouldBe(new SqlFunctionExpression()
+			{
+				Name = "CAST",
+				Parameters = new SqlExpression[]
+				{
+					new SqlNumberExpression()
+					{
+						Value = 0.0075m,
+						ValueTypeFullname = typeof(decimal).FullName
+					},
+					new SqlDataTypeExpression()
+					{
+						DataType = "Decimal",
+						Size = 5,
+						Scale = 4
+					}
+				}
+			});
+		}
+
+		[Fact]
 		public void SUSER_SNAME()
 		{
 			GivenText("SUSER_SNAME(server_user_sid)");

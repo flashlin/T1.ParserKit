@@ -30,6 +30,18 @@ namespace T1.ParserKitTests
 				HexStr = "0000A5E500670D9F" 
 			});
 		}
+		
+		[Fact]
+		public void Float()
+		{
+			GivenText("0.0075");
+			WhenParse(SqlParser.NumberExpr);
+			ThenResultShouldBe(new SqlNumberExpression()
+			{
+				Value = 0.0075m,
+				ValueTypeFullname = typeof(decimal).FullName
+			});
+		}
 
 		[Fact]
 		public void NonIdentifier()
