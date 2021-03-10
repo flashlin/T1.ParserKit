@@ -93,7 +93,7 @@ namespace T1.ParserKit.Core
 
 		private string GetErrorPositionMessage()
 		{
-			var errorPos = TextOffset.GetPosition();
+			var errorPos = TextOffset.GetLinePosition();
 			var rest = TextOffset.Substr(40);
 			var message = $"{Message} at {errorPos} rest='{rest}'.";
 			return message;

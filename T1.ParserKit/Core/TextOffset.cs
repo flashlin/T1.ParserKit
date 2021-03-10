@@ -25,7 +25,7 @@
 			return Text.Substring(Offset, len);
 		}
 
-		public LinePosition GetPosition()
+		public LinePosition GetLinePosition()
 		{
 			if (Offset == -1)
 			{
