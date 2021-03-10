@@ -435,7 +435,7 @@ namespace T1.ParserKit.SqlDom
 		//		Items = x.TakeEvery(1).ToList()
 		//	});
 
-		public static readonly IParser<SqlFilterExpression> FilterExpr1 =
+		public static readonly IParser<SqlFilterExpression> FilterNotExpr =
 			from not1 in SqlToken.Word("NOT")
 			from subquery in StartExpr.GroupOptional()
 			select new SqlFilterExpression()
@@ -458,20 +458,6 @@ namespace T1.ParserKit.SqlDom
 				Oper = oper.GetText(),
 				Right = right
 			};
-
-		public static readonly IParser<SqlFilterExpression> FilterExpr =
-			(from filterExpr in FilterExpr1.Or(FilterExpr2)
-			 select filterExpr).Named(nameof(FilterExpr));
-
-
-		public static readonly IParser<SqlExpression> FilterAndExpr =
-			AndExpr(FilterExpr);
-
-		public static readonly IParser<SqlExpression> FilterOrExpr =
-			OrExpr(FilterAndExpr);
-
-		public static readonly IParser<SqlExpression> FilterChainExpr =
-			FilterOrExpr;
 
 		public static IParser<SqlExpression> AndExpr<T>(IParser<T> factor)
 			where T : SqlExpression
@@ -604,6 +590,35 @@ namespace T1.ParserKit.SqlDom
 				DatabaseDboSchemaName2,
 				DatabaseDboSchemaName1);
 
+		public static readonly IParser<SqlFilterExpression> FilterInExpr =
+			from objectSchema1 in DatabaseSchemaObjectName
+			from in1 in SqlToken.Word("IN")
+			from lparen1 in SqlToken.LParen
+			from subQuery1 in SelectExpr
+			from rparen1 in SqlToken.RParen
+			select new SqlFilterExpression()
+			{
+				Left = objectSchema1,
+				Oper = "IN",
+				Right = subQuery1
+			};
+
+		public static readonly IParser<SqlFilterExpression> FilterExpr =
+			(
+				from filterExpr in Parse.Any(FilterInExpr, FilterNotExpr, FilterExpr2)
+				select filterExpr
+			 ).Named(nameof(FilterExpr));
+
+
+		public static readonly IParser<SqlExpression> FilterAndExpr =
+			AndExpr(FilterExpr);
+
+		public static readonly IParser<SqlExpression> FilterOrExpr =
+			OrExpr(FilterAndExpr);
+
+		public static readonly IParser<SqlExpression> FilterChainExpr =
+			FilterOrExpr;
+
 		private static IParser<UpdateSetFieldExpression> SetFieldEqualExpr(IParser<SqlExpression> factor)
 		{
 			return from field1 in DatabaseDboSchemaName1
@@ -639,6 +654,17 @@ namespace T1.ParserKit.SqlDom
 				};
 			return Parse.Any(updateExpr.MapSqlExpr(), factor);
 		}
+
+		public static readonly IParser<SqlDeleteExpression> DeleteExpr =
+			from delete1 in SqlToken.Word("DELETE")
+			from from1 in SqlToken.Word("FROM")
+			from table1 in DatabaseSchemaObjectName
+			from where1 in WhereExpr.Optional()
+			select new SqlDeleteExpression()
+			{
+				From = table1,
+				Where = where1
+			};
 
 		public static IParser<T> Group<T>(this IParser<T> p)
 		{
@@ -835,6 +861,7 @@ namespace T1.ParserKit.SqlDom
 				GoExpr,
 				SelectExpr,
 				InsertExpr,
+				DeleteExpr,
 				SqlFunctionsExpr,
 				IfExprs
 			).Named(nameof(StartExpr));

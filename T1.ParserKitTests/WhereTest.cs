@@ -491,5 +491,34 @@ select 1 END");
 				}
 			});
 		}
+
+		[Fact]
+		public void Field_in_select_field_from_table()
+		{
+			GivenText("id in (select custid from oldCustomer)");	
+			WhenParse(SqlParser.FilterExpr);
+			ThenResultShouldBe(new SqlFilterExpression()
+			{
+				Left = new ObjectNameExpression()
+				{
+					Name = "id"
+				},
+				Oper = "IN",
+				Right = new SqlSelectExpression()
+				{
+					Fields = new SqlExpression[]
+					{
+						new SqlTableFieldExpression()
+						{
+							Name = "custid"
+						}
+					},
+					From = new SqlTableExpression()
+					{
+						Name = "oldCustomer"
+					}
+				}
+			});
+		}
 	}
 }
