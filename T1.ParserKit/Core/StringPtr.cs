@@ -4,21 +4,23 @@ namespace T1.ParserKit.Core
 {
 	public class StringPtr
 	{
-		public static StringPtr Empty = new StringPtr()
-		{
-			Content = String.Empty
-		};
+		public static StringPtr Empty = new StringPtr(String.Empty);
 
-		public string Content { get; set; }
+		private readonly string _content;
+
+		public StringPtr(string str)
+		{
+			_content = str;
+		}
 
 		public int GetLength()
 		{
-			return Content.Length;
+			return _content.Length;
 		}
 
 		public string Substring(int pos, int len)
 		{
-			return Content.Substring(pos, len);
+			return _content.Substring(pos, len);
 		}
 	}
 }

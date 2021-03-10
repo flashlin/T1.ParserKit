@@ -17,10 +17,7 @@
 		{
 			return new TextOffset()
 			{
-				Text = new StringPtr()
-				{
-					Content = _text
-				},
+				Text = new StringPtr(_text),
 				Offset = _position
 			};
 		}
