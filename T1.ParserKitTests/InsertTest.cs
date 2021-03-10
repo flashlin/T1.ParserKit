@@ -214,5 +214,78 @@ namespace T1.ParserKitTests
 				}
 			});
 		}
+
+		[Fact]
+		public void Insert_into_table_values_1()
+		{
+			GivenText(@"INSERT INTO [dbo].[customer] ([custid], [firstname], [lastname], [birth]) VALUES 
+(267467, N'', NULL, CAST(0x0000A5E5006236FB AS DateTime))
+");
+			WhenParse(SqlParser.InsertExpr);
+			ThenResultShouldBe(new SqlInsertExpression()
+			{
+				HasInto = true,
+				Table = new ObjectNameExpression()
+				{
+					Name = "[dbo].[customer]",
+				},
+				Fields = new SqlBaseFieldExpression[]
+				{
+					new SqlTableFieldExpression()
+					{
+						Name = "[custid]"
+					},
+					new SqlTableFieldExpression()
+					{
+						Name = "[firstname]"
+					},
+					new SqlTableFieldExpression()
+					{
+						Name = "[lastname]"
+					},
+					new SqlTableFieldExpression()
+					{
+						Name = "[birth]"
+					}
+				},
+				InsertRows = new[]
+				{
+					new SqlInsertRowExpression()
+					{
+						Values = new SqlExpression[]
+						{
+							new SqlNumberExpression()
+							{
+								Value = 267467,
+								ValueTypeFullname = typeof(int).FullName
+							},
+							new SqlStringExpression()
+							{
+								IsUnicode = true,
+								Text = "",
+							},
+							new SqlNullExpression(),
+							new SqlFunctionExpression()
+							{
+								Name = "CAST",
+								Parameters = new SqlExpression[]
+								{
+									new SqlHexExpression()
+									{
+										HexStr = "0000A5E5006236FB"
+									},
+									new SqlDataTypeExpression()
+									{
+										DataType = "DateTime"
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+		}
+
+
 	}
 }
