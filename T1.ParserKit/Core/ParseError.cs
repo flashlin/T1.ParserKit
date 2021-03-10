@@ -11,7 +11,7 @@ namespace T1.ParserKit.Core
 		public static ParseError Empty = new ParseError()
 		{
 			Message = string.Empty,
-			FileContent = FileContent.Empty,
+			TextOffset = TextOffset.Empty,
 			InnerErrors = new ParseError[0]
 		};
 
@@ -19,9 +19,9 @@ namespace T1.ParserKit.Core
 
 		public string Message { get; set; }
 
-		public int Position => FileContent.Offset;
+		public int Position => TextOffset.Offset;
 
-		public FileContent FileContent { get; set; }
+		public TextOffset TextOffset { get; set; }
 
 		private IEnumerable<ParseError> GetAllErrors()
 		{
@@ -55,7 +55,7 @@ namespace T1.ParserKit.Core
 			return new ParseError
 			{
 				Message = nameof(GetLastError),
-				FileContent = FileContent.Empty,
+				TextOffset = TextOffset.Empty,
 				InnerErrors = innerErrors.ToArray()
 			};
 		}
@@ -93,8 +93,8 @@ namespace T1.ParserKit.Core
 
 		private string GetErrorPositionMessage()
 		{
-			var errorPos = FileContent.GetPosition();
-			var rest = FileContent.Substr(40);
+			var errorPos = TextOffset.GetPosition();
+			var rest = TextOffset.Substr(40);
 			var message = $"{Message} at {errorPos} rest='{rest}'.";
 			return message;
 		}

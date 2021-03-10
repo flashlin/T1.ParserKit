@@ -15,6 +15,6 @@
 		void Seek(int offset);
 		LinePosition GetLinePosition(int offset);
 		string GetContent();
-		FileContent GetFileContent();
+		TextOffset GetTextOffset();
 	}
 }

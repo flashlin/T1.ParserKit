@@ -1,8 +1,8 @@
 ﻿namespace T1.ParserKit.Core
 {
-	public struct FileContent
+	public struct TextOffset
 	{
-		public static FileContent Empty = new FileContent()
+		public static TextOffset Empty = new TextOffset()
 		{
 			Text = StringPtr.Empty,
 			Offset = -1

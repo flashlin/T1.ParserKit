@@ -48,7 +48,7 @@ namespace T1.ParserKit.Core
 				Error = new ParseError()
 				{
 					Message = message,
-					FileContent = inp.GetFileContent(),
+					TextOffset = inp.GetTextOffset(),
 					InnerErrors = new ParseError[0]
 				}
 			};
@@ -72,7 +72,7 @@ namespace T1.ParserKit.Core
 				Error = new ParseError()
 				{
 					Message = message,
-					FileContent = inp.GetFileContent(),
+					TextOffset = inp.GetTextOffset(),
 					InnerErrors = innerErrors.CastArray()
 				}
 			};

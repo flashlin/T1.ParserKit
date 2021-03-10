@@ -13,9 +13,9 @@
 			_position = 0;
 		}
 
-		public FileContent GetFileContent()
+		public TextOffset GetTextOffset()
 		{
-			return new FileContent()
+			return new TextOffset()
 			{
 				Text = new StringPtr()
 				{
