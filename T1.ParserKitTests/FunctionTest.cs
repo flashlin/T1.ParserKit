@@ -143,7 +143,7 @@ namespace T1.ParserKitTests
 		}
 
 		[Fact]
-		public void Cast()
+		public void Cast_hex_as_datetime()
 		{
 			GivenText("Cast(0x0000A5E5006236FB as DateTime)");	
 			WhenParse(SqlParser.FuncCastExpr);
