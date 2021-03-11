@@ -286,7 +286,7 @@ namespace T1.ParserKit.SqlDom
 			);
 
 		public static readonly IParser<SqlExpression> SqlDataType2 =
-			SqlToken.Contains("decimal");
+			SqlToken.Contains("decimal", "numeric");
 
 		public static readonly IParser<SqlExpression> SqlDataType =
 			Parse.Any(SqlDataType0, SqlDataType1, SqlDataType2);

@@ -190,6 +190,33 @@ namespace T1.ParserKitTests
 		}
 
 		[Fact]
+		public void Cast_negative_float_as_decimal()
+		{
+			GivenText("CAST(-12.00 AS Numeric(4, 2))");	
+			WhenParse(SqlParser.FuncCastExpr);
+			ThenResultShouldBe(new SqlFunctionExpression()
+			{
+				Name = "CAST",
+				Parameters = new SqlExpression[]
+				{
+					new SqlNumberExpression()
+					{
+						Value = -12.0m,
+						ValueTypeFullname = typeof(decimal).FullName
+					},
+					new SqlDataTypeExpression()
+					{
+						DataType = "Numeric",
+						Size = 4,
+						Scale = 2
+					}
+				}
+			});
+		}
+
+
+
+		[Fact]
 		public void SUSER_SNAME()
 		{
 			GivenText("SUSER_SNAME(server_user_sid)");

@@ -421,12 +421,12 @@ namespace T1.ParserKit.SqlDom
 		public static readonly IParser<SqlExpression> Atom =
 			Parse.AnyCast<SqlExpression>(
 				HexExpr,
+				NumberExpr,
 				SqlToken.Null,
 				SqlToken.NString,
 				SqlToken.LexemeString,
-				FuncGetdateExpr,
 				TableFieldAliasExpr,
-				NumberExpr,
+				FuncGetdateExpr,
 				Variable
 				);
 

@@ -265,5 +265,54 @@ namespace T1.ParserKitTests
 				}
 			});
 		}
+
+		[Fact]
+		public void Insert_table_field_values_cast_negative_numeric()
+		{
+			GivenText(
+				"INSERT [dbo].[TimeZones] ([Name]) VALUES (CAST(-12.00 AS Numeric(4, 2)))");
+			WhenParse(SqlParser.InsertExpr);
+			ThenResultShouldBe(new SqlInsertExpression()
+			{
+				Table = new SqlObjectNameExpression()
+				{
+					Name = "[dbo].[TimeZones]"
+				},
+				Fields = new SqlBaseFieldExpression[]
+				{
+					new SqlTableFieldExpression()
+					{
+						Name = "[Name]"
+					}
+				},
+				InsertRows = new []
+				{
+					new SqlInsertRowExpression()
+					{
+						Values = new SqlExpression[]
+						{
+							new SqlFunctionExpression()
+							{
+								Name = "CAST",
+								Parameters = new SqlExpression[]
+								{
+									new SqlNumberExpression()
+									{
+										Value = -12.0d,
+										ValueTypeFullname = typeof(decimal).FullName
+									},
+									new SqlDataTypeExpression()
+									{
+										DataType = "Numeric",
+										Size = 4,
+										Scale = 2
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+		}
 	}
 }
