@@ -4,5 +4,6 @@
 	{
 		public UpdateSetFieldExpression[] SetFields { get; set; }
 		public SqlWhereExpression WhereExpr { get; set; }
+		public SqlObjectNameExpression Table { get; set; }
 	}
 }

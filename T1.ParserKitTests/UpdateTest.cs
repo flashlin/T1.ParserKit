@@ -15,9 +15,14 @@ namespace T1.ParserKitTests
 		public void Update_table_set_field1_eq_1()
 		{
 			GivenText("UPDATE customer set id=1 where custId=@customerId");
-			WhenParse(SqlParser.UpdateExpr(SqlParser.Atom));
+			//WhenParse(SqlParser.UpdateExprFactor(SqlParser.Atom));
+			WhenParse(SqlParser.UpdateExpr);
 			ThenResultShouldBe(new UpdateExpression()
 			{
+				Table = new SqlObjectNameExpression()
+				{
+					Name = "customer"
+				},
 				SetFields = new[]
 				{
 					new UpdateSetFieldExpression()
@@ -45,6 +50,40 @@ namespace T1.ParserKitTests
 						},
 					},
 				}
+			});
+		}
+
+		[Fact]
+		public void Update_table_set_field1_eq_field2_add_1()
+		{
+			GivenText("Update exchange set ForecastRate = actualrate + 1");
+			WhenParse(SqlParser.UpdateExpr);
+			ThenResultShouldBe(new UpdateExpression()
+			{
+				Table = new SqlObjectNameExpression()
+				{
+					Name = "exchange"
+				},
+				SetFields = new[]
+				{
+					new UpdateSetFieldExpression()
+					{
+						FieldName = "ForecastRate",
+						AssignExpr = new ArithmeticOperatorExpression()
+						{
+							Left = new SqlTableFieldExpression()
+							{
+								Name = "actualrate"
+							},
+							Oper = "+",
+							Right = new SqlNumberExpression()
+							{
+								Value = 1,
+								ValueTypeFullname = typeof(int).FullName
+							}
+						}
+					}
+				},
 			});
 		}
 	}
