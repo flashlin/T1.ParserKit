@@ -214,7 +214,7 @@ namespace T1.ParserKit.SqlDom
 			from onOff1 in SqlToken.Contains("ON", "OFF")
 			select new SetOptionPrincipalExpression()
 			{
-				OptionName = option1.GetText(),
+				Value = option1.GetText(),
 				Principal = principal1,
 				IsToggle = onOff1.GetText().IsToggle()
 			};
@@ -848,12 +848,12 @@ namespace T1.ParserKit.SqlDom
 				DeclareVariableExpr,
 				UseDatabaseExpr,
 				GrantPermissionToExpr,
-				ExecExpr,
-				SetOptionPrincipalExpr
+				ExecExpr
 			);
 
 		public static readonly IParser<SqlExpression> StartExpr =
 			Parse.AnyCast<SqlExpression>(
+				SetOptionPrincipalExpr,
 				BatchExpr,
 				PrintExpr,
 				SetOptionOnOffExpr,

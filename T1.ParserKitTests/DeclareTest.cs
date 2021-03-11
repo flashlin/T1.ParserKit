@@ -41,6 +41,22 @@ namespace T1.ParserKitTests
 		}
 
 		[Fact]
+		public void Set_identity_insert__on()
+		{
+			GivenText("SET IDENTITY_INSERT [dbo].[TimeZones] ON");
+			WhenParse(SqlParser.SetOptionPrincipalExpr);
+			ThenResultShouldBe(new SetOptionPrincipalExpression()
+			{
+				Value = "IDENTITY_INSERT",
+				Principal = new SqlObjectNameExpression()
+				{
+					Name = "[dbo].[TimeZones]"
+				},
+				IsToggle = true
+			});
+		}
+
+		[Fact]
 		public void Set_ansinulls_ansipadding_on()
 		{
 			GivenText("SET ANSI_NULLS, ANSI_PADDING ON;");
