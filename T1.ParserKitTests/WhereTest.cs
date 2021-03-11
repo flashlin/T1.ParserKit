@@ -41,7 +41,7 @@ namespace T1.ParserKitTests
 		}
 
 		[Fact]
-		public void Filter()
+		public void Filter_1_eq_1()
 		{
 			GivenText("1 = 1");
 			WhenParse(SqlParser.FilterExpr);
