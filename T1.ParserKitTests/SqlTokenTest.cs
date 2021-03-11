@@ -44,6 +44,20 @@ namespace T1.ParserKitTests
 		}
 
 		[Fact]
+		public void NegativeFloat()
+		{
+			GivenText("-0.0075");
+			WhenParse(SqlParser.NumberExpr);
+			ThenResultShouldBe(new SqlNumberExpression()
+			{
+				Value = -0.0075m,
+				ValueTypeFullname = typeof(decimal).FullName
+			});
+		}
+
+
+
+		[Fact]
 		public void NonIdentifier()
 		{
 			GivenText("from");

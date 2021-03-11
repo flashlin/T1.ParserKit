@@ -379,6 +379,15 @@ namespace T1.ParserKit.SqlDom
 				ValueTypeFullname = typeof(decimal).FullName
 			};
 
+		public static readonly IParser<SqlNumberExpression> NegativeFloatExpr =
+			from nagative1 in SqlToken.Symbol("-")
+			from number1 in FloatExpr
+			select new SqlNumberExpression()
+			{
+				Value = -(decimal) number1.Value,
+				ValueTypeFullname = number1.ValueTypeFullname
+			};
+
 		public static readonly IParser<SqlNumberExpression> IntegerExpr =
 			ParseToken.Lexeme(Parse.Digits)
 				.MapResult(x => new SqlNumberExpression()
@@ -397,7 +406,7 @@ namespace T1.ParserKit.SqlDom
 				});
 
 		public static readonly IParser<SqlNumberExpression> NumberExpr =
-			Parse.Any(FloatExpr, NegativeIntegerExpr, IntegerExpr);
+			Parse.Any(NegativeFloatExpr, FloatExpr, NegativeIntegerExpr, IntegerExpr);
 
 		public static readonly IParser<SqlHexExpression> HexExpr =
 			from zero1 in ParseToken.Symbol("0")
