@@ -520,5 +520,21 @@ select 1 END");
 				}
 			});
 		}
+
+		[Fact]
+		public void Filter_name_is_null()
+		{
+			GivenText("name is null");
+			WhenParse(SqlParser.FilterExpr);
+			ThenResultShouldBe(new SqlFilterExpression()
+			{
+				Left = new SqlObjectNameExpression()
+				{
+					Name = "name"
+				},
+				Oper = "IS",
+				Right = new SqlNullExpression()
+			});
+		}
 	}
 }

@@ -612,9 +612,20 @@ namespace T1.ParserKit.SqlDom
 				Right = subQuery1
 			};
 
+		public static readonly IParser<SqlFilterExpression> FilterIsNullExpr =
+			from objectSchema1 in DatabaseSchemaObjectName
+			from is1 in SqlToken.Word("IS")
+			from null1 in SqlToken.Null
+			select new SqlFilterExpression()
+			{
+				Left = objectSchema1,
+				Oper = "IS",
+				Right = null1
+			};
+
 		public static readonly IParser<SqlFilterExpression> FilterExpr =
 			(
-				from filterExpr in Parse.Any(FilterInExpr, FilterNotExpr, FilterExpr2)
+				from filterExpr in Parse.Any(FilterInExpr, FilterIsNullExpr, FilterNotExpr, FilterExpr2)
 				select filterExpr
 			 ).Named(nameof(FilterExpr));
 
