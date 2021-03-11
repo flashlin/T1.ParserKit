@@ -27,10 +27,10 @@ namespace T1.ParserKitTests
 			WhenParse(SqlParser.HexExpr);
 			ThenResultShouldBe(new SqlHexExpression()
 			{
-				HexStr = "0000A5E500670D9F" 
+				HexStr = "0000A5E500670D9F"
 			});
 		}
-		
+
 		[Fact]
 		public void Float()
 		{
@@ -54,7 +54,6 @@ namespace T1.ParserKitTests
 				ValueTypeFullname = typeof(decimal).FullName
 			});
 		}
-
 
 
 		[Fact]
@@ -187,6 +186,16 @@ namespace T1.ParserKitTests
 			});
 		}
 
-		
+		[Fact]
+		public void NString_with_double_quotation()
+		{
+			GivenText("N'Dumont D''Urville'");
+			WhenParse(SqlToken.NString);
+			ThenResultShouldBe(new SqlStringExpression()
+			{
+				IsUnicode = true,
+				Text = "Dumont D''Urville"
+			});
+		}
 	}
 }

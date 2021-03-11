@@ -123,8 +123,11 @@ namespace T1.ParserKit.SqlDom
 
 		private static IParser<SqlExpression> Surrounded(IParser<TextSpan> mark)
 		{
+			var doubleQuotation = Parse.Seq(mark, mark).Merge();
+			var notMark = mark.Not().ThenRight(Parse.AnyChars(1));
+
 			return from start1 in mark
-					 from body1 in mark.Not().ThenRight(Parse.AnyChars(1)).Many()
+					 from body1 in Parse.Any(doubleQuotation, notMark).Many()
 					 from end1 in mark
 					 select new SqlExpression()
 					 {
