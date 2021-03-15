@@ -210,6 +210,30 @@ namespace T1.ParserKitTests
 		}
 
 		[Fact]
+		public void Cast_hex_as_datetime2()
+		{
+			GivenText("CAST(0x0300000000903B0B00 AS DateTime2)");	
+			WhenParse(SqlParser.FuncCastExpr);
+			ThenResultShouldBe(new SqlFunctionExpression()
+			{
+				Name = "CAST",
+				Parameters = new SqlExpression[]
+				{
+					new SqlHexExpression()
+					{
+						HexStr = "0300000000903B0B00"
+					},
+					new SqlDataTypeExpression()
+					{
+						DataType = "DateTime2"
+					}
+				}
+			});
+		}
+
+
+
+		[Fact]
 		public void Cast_float_as_decimal()
 		{
 			GivenText("CAST(0.0075 AS Decimal(5, 4))");	

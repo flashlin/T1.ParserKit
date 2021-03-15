@@ -728,8 +728,9 @@ namespace T1.ParserKit.SqlDom
 					Body = body1
 				}).Named(nameof(IfExprs));
 
+
 		public static readonly IParser<SqlDataTypeExpression> SqlDataType0Expr =
-			Parse.Any(SqlToken.SqlDataType0, SqlToken.SqlDataType1)
+			SqlToken.SqlDataType01
 				.MapResult(x => new SqlDataTypeExpression()
 				{
 					DataType = x.GetText(),

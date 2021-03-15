@@ -6,6 +6,7 @@ using T1.ParserKit.Core;
 using T1.ParserKit.Core.Parsers;
 using T1.ParserKit.Helpers;
 using T1.ParserKit.SqlDom.Expressions;
+using T1.Standard.Extensions;
 
 namespace T1.ParserKit.SqlDom
 {
@@ -215,10 +216,10 @@ namespace T1.ParserKit.SqlDom
 		public static IParser<SqlExpression> ToExpr(this IParser<TextSpan> p)
 		{
 			return from p1 in p
-				select new SqlExpression()
-				{
-					TextSpan = p1
-				};
+					 select new SqlExpression()
+					 {
+						 TextSpan = p1
+					 };
 		}
 
 		public static readonly IParser<SqlExpression> LParen = SqlToken.Symbol("(");
@@ -274,19 +275,31 @@ namespace T1.ParserKit.SqlDom
 			return sqlIdentifier.Or(cstyleIdentifier);
 		}
 
-		public static readonly IParser<SqlExpression> SqlDataType0 =
-			SqlToken.Contains(
+		private static readonly string[] SqlDataType0Words =
+			new[]
+			{
 				"bit", "smallint", "smallmoney", "int", "tinyint",
 				"money", "real", "date", "smalldatetime", "datetime",
 				"image", "text", "ntext"
-			);
+			}.OrderByDescending(x => x.Length).ToArray();
 
-		public static readonly IParser<SqlExpression> SqlDataType1 =
-			SqlToken.Contains(
+		public static readonly IParser<SqlExpression> SqlDataType0 =
+			SqlToken.Contains(SqlDataType0Words);
+
+		private static readonly string[] SqlDataType1Words =
+			new[]
+			{
 				"bigint", "bit", "float", "datetime2", "time",
 				"char", "varchar", "binary", "varbinary", "nchar",
 				"nvarchar", "datetimeoffset"
-			);
+			}.OrderByDescending(x => x.Length).ToArray();
+
+		public static readonly IParser<SqlExpression> SqlDataType01 =
+			SqlToken.Contains(SqlDataType0Words.Concat(SqlDataType1Words)
+				.OrderByDescending(x => x.Length).ToArray());
+
+		public static readonly IParser<SqlExpression> SqlDataType1 =
+			SqlToken.Contains(SqlDataType1Words);
 
 		public static readonly IParser<SqlExpression> SqlDataType2 =
 			SqlToken.Contains("decimal", "numeric");
