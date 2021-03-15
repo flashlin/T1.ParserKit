@@ -16,7 +16,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("UPDATE customer set id=1 where custId=@customerId");
 			WhenParse(SqlParser.UpdateExpr);
-			ThenResultShouldBe(new UpdateExpression()
+			ThenResultShouldBe(new SqlUpdateExpression()
 			{
 				Table = new SqlObjectNameExpression()
 				{
@@ -57,7 +57,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("Update exchange set ForecastRate = actualrate + 1");
 			WhenParse(SqlParser.UpdateExpr);
-			ThenResultShouldBe(new UpdateExpression()
+			ThenResultShouldBe(new SqlUpdateExpression()
 			{
 				Table = new SqlObjectNameExpression()
 				{

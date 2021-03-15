@@ -656,13 +656,13 @@ namespace T1.ParserKit.SqlDom
 				AssignExpr = expr1
 			};
 
-		public static readonly IParser<UpdateExpression> UpdateExpr =
+		public static readonly IParser<SqlUpdateExpression> UpdateExpr =
 			from update1 in SqlToken.Word("UPDATE")
 			from table1 in DatabaseSchemaObjectName
 			from set1 in SqlToken.Word("SET")
 			from updateFields1 in FieldAssignExpr.SeparatedBy(SqlToken.Comma)
 			from where1 in WhereExpr.Optional()
-			select new UpdateExpression()
+			select new SqlUpdateExpression()
 			{
 				Table = table1,
 				SetFields = updateFields1.ToArray(),

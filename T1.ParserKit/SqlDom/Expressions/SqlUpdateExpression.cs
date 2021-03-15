@@ -1,6 +1,6 @@
 ﻿namespace T1.ParserKit.SqlDom.Expressions
 {
-	public class UpdateExpression : SqlExpression
+	public class SqlUpdateExpression : SqlExpression
 	{
 		public UpdateSetFieldExpression[] SetFields { get; set; }
 		public SqlWhereExpression WhereExpr { get; set; }
