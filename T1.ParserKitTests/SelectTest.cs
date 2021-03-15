@@ -205,7 +205,7 @@ namespace T1.ParserKitTests
 			{
 				Fields = new SqlExpression[]
 				{
-					new ArithmeticOperatorExpression
+					new SqlArithmeticOperatorExpression
 					{
 						Left = new SqlTableFieldExpression
 						{

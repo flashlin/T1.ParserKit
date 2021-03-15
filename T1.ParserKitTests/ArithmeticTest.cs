@@ -12,7 +12,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("1 + 2");	
 			WhenParse(SqlParser.ArithmeticOperatorAtomExpr);
-			ThenResultShouldBe(new ArithmeticOperatorExpression()
+			ThenResultShouldBe(new SqlArithmeticOperatorExpression()
 			{
 				Left = new SqlNumberExpression()
 				{
@@ -33,7 +33,7 @@ namespace T1.ParserKitTests
 		{
 			GivenText("1 + 2 * 3");	
 			WhenParse(SqlParser.ArithmeticOperatorAtomExpr);
-			ThenResultShouldBe(new ArithmeticOperatorExpression()
+			ThenResultShouldBe(new SqlArithmeticOperatorExpression()
 			{
 				Left = new SqlNumberExpression()
 				{
@@ -41,7 +41,7 @@ namespace T1.ParserKitTests
 					ValueTypeFullname = typeof(int).FullName
 				},
 				Oper = "+",
-				Right = new ArithmeticOperatorExpression()
+				Right = new SqlArithmeticOperatorExpression()
 				{
 					Left = new SqlNumberExpression()
 					{
@@ -63,10 +63,10 @@ namespace T1.ParserKitTests
 		{
 			GivenText("1 + 2 * 3 + 4");
 			WhenParse(SqlParser.ArithmeticOperatorAtomExpr);
-			ThenResultShouldBe(new ArithmeticOperatorExpression()
+			ThenResultShouldBe(new SqlArithmeticOperatorExpression()
 			{
 				Oper = "+",
-				Left = new ArithmeticOperatorExpression
+				Left = new SqlArithmeticOperatorExpression
 				{
 					Left = new SqlNumberExpression
 					{
@@ -74,7 +74,7 @@ namespace T1.ParserKitTests
 						ValueTypeFullname = typeof(int).FullName,
 					},
 					Oper = "+",
-					Right = new ArithmeticOperatorExpression
+					Right = new SqlArithmeticOperatorExpression
 					{
 						Left = new SqlNumberExpression
 						{
@@ -102,9 +102,9 @@ namespace T1.ParserKitTests
 		{
 			GivenText("(1 + 2) * 3");
 			WhenParse(SqlParser.ArithmeticOperatorAtomExpr);
-			ThenResultShouldBe(new ArithmeticOperatorExpression()
+			ThenResultShouldBe(new SqlArithmeticOperatorExpression()
 			{
-				Left = new ArithmeticOperatorExpression
+				Left = new SqlArithmeticOperatorExpression
 				{
 					Left = new SqlNumberExpression
 					{

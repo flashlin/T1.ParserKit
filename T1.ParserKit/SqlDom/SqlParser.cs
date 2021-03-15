@@ -361,7 +361,7 @@ namespace T1.ParserKit.SqlDom
 				SqlToken.Symbol("/"),
 				SqlToken.Symbol("+"),
 				SqlToken.Symbol("-")
-			}, x => new ArithmeticOperatorExpression
+			}, x => new SqlArithmeticOperatorExpression
 			{
 				Left = x[0],
 				Oper = x[1].GetText(),

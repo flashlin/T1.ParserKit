@@ -68,7 +68,7 @@ namespace T1.ParserKitTests
 					new UpdateSetFieldExpression()
 					{
 						FieldName = "ForecastRate",
-						AssignExpr = new ArithmeticOperatorExpression()
+						AssignExpr = new SqlArithmeticOperatorExpression()
 						{
 							Left = new SqlTableFieldExpression()
 							{
