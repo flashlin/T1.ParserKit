@@ -391,7 +391,7 @@ namespace T1.ParserKitTests
 						Length = 0
 					}
 				},
-				Body = new StatementsExpression
+				Body = new SqlStatementsExpression
 				{
 					Items = new SqlExpression[]
 					{
@@ -475,7 +475,7 @@ select 1 END");
 						}
 					}
 				},
-				Body = new StatementsExpression()
+				Body = new SqlStatementsExpression()
 				{
 					Items = new SqlExpression[]
 					{

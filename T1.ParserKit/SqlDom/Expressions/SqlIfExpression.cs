@@ -3,6 +3,6 @@
 	public class SqlIfExpression : SqlExpression
 	{
 		public SqlFilterExpression Condition { get; set; }
-		public StatementsExpression Body { get; set; }
+		public SqlStatementsExpression Body { get; set; }
 	}
 }

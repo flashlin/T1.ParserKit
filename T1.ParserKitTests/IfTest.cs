@@ -56,7 +56,7 @@ END");
 						}
 					}
 				},
-				Body = new StatementsExpression()
+				Body = new SqlStatementsExpression()
 				{
 					Items = new SqlExpression[]
 					{

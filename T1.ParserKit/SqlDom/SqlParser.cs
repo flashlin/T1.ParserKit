@@ -717,7 +717,7 @@ namespace T1.ParserKit.SqlDom
 				from conditionExpr1 in FilterExpr.GroupOptional()
 				from begin1 in SqlToken.Word("BEGIN")
 				from body1 in StartExpr.Many1()
-					.MapResult(x => new StatementsExpression()
+					.MapResult(x => new SqlStatementsExpression()
 					{
 						Items = x.ToArray()
 					})

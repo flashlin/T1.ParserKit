@@ -124,7 +124,7 @@ namespace T1.ParserKitTests
 						ValueTypeFullname = typeof(int).FullName,
 					},
 				},
-				Body = new StatementsExpression
+				Body = new SqlStatementsExpression
 				{
 					Items = new SqlExpression[]
 					{
