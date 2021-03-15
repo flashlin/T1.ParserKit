@@ -515,11 +515,11 @@ namespace T1.ParserKit.SqlDom
 				Filter = filter1
 			};
 
-		public static IParser<SourceExpression> ToTableExpr(this IParser<SqlSelectExpression> subSelect)
+		public static IParser<SqlSourceExpression> ToTableExpr(this IParser<SqlSelectExpression> subSelect)
 		{
 			return from subQuery1 in subSelect.Group()
 				from alias1 in AliasExpr.Optional()
-				select new SourceExpression()
+				select new SqlSourceExpression()
 				{
 					Item = subQuery1,
 					AliasName = alias1?.Name

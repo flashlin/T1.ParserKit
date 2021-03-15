@@ -519,7 +519,7 @@ namespace T1.ParserKitTests
 						AliasName = "n1"
 					}
 				},
-				From = new SourceExpression()
+				From = new SqlSourceExpression()
 				{
 					Item = new SqlSelectExpression()
 					{
