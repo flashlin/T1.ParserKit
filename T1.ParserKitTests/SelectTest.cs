@@ -227,6 +227,44 @@ namespace T1.ParserKitTests
 		}
 
 		[Fact]
+		public void Select_1_from_table_with_nolock_where_field_is_null()
+		{
+			GivenText("select 1 from Customer with (nolock) where id is null");
+			WhenParse(SqlParser.SelectExpr);
+			ThenResultShouldBe(new SqlSelectExpression()
+			{
+				Fields = new SqlExpression[]
+				{
+					new SqlNumberExpression()
+					{
+						Value = 1,
+						ValueTypeFullname = typeof(int).FullName
+					}
+				},
+				From = new SqlTableExpression()
+				{
+					Name = "Customer",
+					WithOption = new SqlWithOptionExpression()
+					{
+						Nolock = true
+					}
+				},
+				Where = new SqlWhereExpression()
+				{
+					Filter = new SqlFilterExpression()
+					{
+						Left = new SqlTableFieldExpression()
+						{
+							Name	= "id"
+						},
+						Oper = "IS",
+						Right = new SqlNullExpression()
+					}
+				}
+			});
+		}
+
+		[Fact]
 		public void Select_field_from_table_where_field_eq_1()
 		{
 			GivenText("select name from customer where name = 1");

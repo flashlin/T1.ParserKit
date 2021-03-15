@@ -454,6 +454,13 @@ namespace T1.ParserKit.SqlDom
 				Right = subquery
 			};
 
+		public static readonly IParser<SqlFilterExpression> FilterBoolFuncExpr =
+			from trueFunc1 in FuncExistsExpr
+			select new SqlFilterExpression()
+			{
+				Oper = "bool",
+				Right = trueFunc1
+			};
 
 		public static readonly IParser<SqlFilterExpression> FilterExpr2 =
 			from _ in SqlToken.Blanks.Optional()
@@ -625,7 +632,7 @@ namespace T1.ParserKit.SqlDom
 
 		public static readonly IParser<SqlFilterExpression> FilterExpr =
 		(
-			from filterExpr in Parse.Any(FilterInExpr, FilterIsNullExpr, FilterNotExpr, FilterExpr2)
+			from filterExpr in Parse.Any(FilterInExpr, FilterIsNullExpr, FilterNotExpr, FilterBoolFuncExpr, FilterExpr2)
 			select filterExpr
 		).Named(nameof(FilterExpr));
 

@@ -495,7 +495,7 @@ select 1 END");
 		[Fact]
 		public void Field_in_select_field_from_table()
 		{
-			GivenText("id in (select custid from oldCustomer)");	
+			GivenText("id in (select custid from oldCustomer)");
 			WhenParse(SqlParser.FilterExpr);
 			ThenResultShouldBe(new SqlFilterExpression()
 			{
@@ -534,6 +534,58 @@ select 1 END");
 				},
 				Oper = "IS",
 				Right = new SqlNullExpression()
+			});
+		}
+
+		[Fact]
+		public void Filter_exists_select_1_from_table()
+		{
+			GivenText("WHERE exists (select 1 from customer with (nolock) where id is null)");
+			WhenParse(SqlParser.WhereExpr);
+			ThenResultShouldBe(new SqlWhereExpression()
+			{
+				Filter = new SqlFilterExpression()
+				{
+					Oper = "bool",
+					Right = new SqlFuncExistsExpression()
+					{
+						Name = "EXISTS",
+						Parameters = new SqlExpression[]
+						{
+							new SqlSelectExpression()
+							{
+								Fields = new SqlExpression[]
+								{
+									new SqlNumberExpression()
+									{
+										Value = 1,
+										ValueTypeFullname = typeof(int).FullName
+									}
+								},
+								From = new SqlTableExpression()
+								{
+									Name = "customer",
+									WithOption = new SqlWithOptionExpression()
+									{
+										Nolock = true
+									}
+								},
+								Where = new SqlWhereExpression()
+								{
+									Filter = new SqlFilterExpression()
+									{
+										Left = new SqlTableFieldExpression()
+										{
+											Name = "id"
+										},
+										Oper = "IS",
+										Right = new SqlNullExpression()
+									}
+								}
+							}
+						}
+					}
+				}
 			});
 		}
 	}

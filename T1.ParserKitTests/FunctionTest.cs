@@ -143,6 +143,51 @@ namespace T1.ParserKitTests
 		}
 
 		[Fact]
+		public void Exists_select_1_from_table_with_nolock_where_field_is_null()
+		{
+			GivenText("exists (select 1 from customer with (nolock) where id is null)");	
+			WhenParse(SqlParser.SqlFunctionsExpr);
+			ThenResultShouldBe(new SqlFuncExistsExpression()
+			{
+				Name = "EXISTS",
+				Parameters = new SqlExpression[]
+				{
+					new SqlSelectExpression()
+					{
+						Fields = new SqlExpression[]
+						{
+							new SqlNumberExpression()
+							{
+								Value = 1,
+								ValueTypeFullname = typeof(int).FullName
+							}
+						},
+						From = new SqlTableExpression()
+						{
+							Name = "customer",
+							WithOption = new SqlWithOptionExpression()
+							{
+								Nolock = true
+							}
+						},
+						Where = new SqlWhereExpression()
+						{
+							Filter = new SqlFilterExpression()
+							{
+								Left = new SqlTableFieldExpression()
+								{
+									Name = "id"
+								},
+								Oper = "IS",
+								Right = new SqlNullExpression()
+							}
+						}
+					}
+				}
+			});
+		}
+
+		[Fact]
 		public void Cast_hex_as_datetime()
 		{
 			GivenText("Cast(0x0000A5E5006236FB as DateTime)");	
