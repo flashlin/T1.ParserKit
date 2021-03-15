@@ -693,10 +693,10 @@ namespace T1.ParserKit.SqlDom
 			return Parse.Any(p.Group(), p);
 		}
 
-		private static readonly IParser<AliasExpression> AliasExpr =
+		private static readonly IParser<SqlAliasExpression> AliasExpr =
 			from as1 in SqlToken.Word("AS").Optional()
 			from identifier in SqlToken.Identifier
-			select new AliasExpression()
+			select new SqlAliasExpression()
 			{
 				Name = identifier.GetText()
 			};
