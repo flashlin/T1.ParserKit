@@ -15,5 +15,6 @@
 		void Seek(int offset);
 		string GetContent();
 		TextOffset GetTextOffset();
+		void AdvanceByBlanks();
 	}
 }

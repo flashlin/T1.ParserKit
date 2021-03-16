@@ -135,6 +135,8 @@ namespace T1.ParserKit.Core
 					yield return parsed;
 					break;
 				}
+				yield return parsed;
+				inp.AdvanceByBlanks();
 			} while (!inp.Eof());
 		}
 

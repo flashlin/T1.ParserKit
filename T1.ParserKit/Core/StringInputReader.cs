@@ -1,4 +1,6 @@
-﻿namespace T1.ParserKit.Core
+﻿using System.Linq;
+
+namespace T1.ParserKit.Core
 {
 	public class StringInputReader : IInputReader
 	{
@@ -11,6 +13,21 @@
 			_text = text;
 			_length = text.Length;
 			_position = 0;
+		}
+
+		public void AdvanceByBlanks()
+		{
+			var chs = new[] {"\r", "\n", "\t", " "};
+			while (!Eof())
+			{
+				var ch = Substr(1);
+				if (!chs.Contains(ch))
+				{
+					break;
+				}
+
+				_position++;
+			}
 		}
 
 		public TextOffset GetTextOffset()
