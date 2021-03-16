@@ -253,6 +253,7 @@ namespace T1.ParserKit.SqlDom
 				select go1
 			).Named(nameof(GoExpr));
 
+
 		public static readonly IParser<SqlWithOptionExpression> WithOptionExpr =
 			Parse.Seq(
 				SqlToken.Word("with"), SqlToken.LParen,
@@ -879,7 +880,8 @@ namespace T1.ParserKit.SqlDom
 				DeleteExpr,
 				UpdateExpr,
 				SqlFunctionsExpr,
-				IfExprs
+				IfExprs,
+				CreateStoredProcedureExpr
 			).Named(nameof(StartExpr));
 
 		private static readonly IParser<SqlExpression> Oper1 =
